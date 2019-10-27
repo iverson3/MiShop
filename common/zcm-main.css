@@ -1,6 +1,6 @@
 /* 防止图片闪一下 */
 image{will-change: transform}
-/* scroll-view */
+/* scroll-view x轴 横向滚动 */
 .scroll-row{ width: 100%;white-space: nowrap; }
 .scroll-row-item{ display: inline-block; }
 

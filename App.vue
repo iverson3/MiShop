@@ -1,5 +1,19 @@
 <script>
 	export default {
+		// 定义全局变量 (任何页面都可以获取和修改)
+		globalData: {
+			text: ""
+		},
+		
+		// 监听nvue页面使用uni.postMessage()发送过来的数据
+		onUniNViewMessage: function(e) {
+			// 获取nvue页面发送过来的数据
+			let data = e.message;
+			if (data.from && data.from === 'index') {
+				// 触发自定义的全局事件 (通知class分类页修改数据)
+				uni.$emit('index', data)
+			}
+		},
 		onLaunch: function() {
 			console.log('App Launch')
 		},

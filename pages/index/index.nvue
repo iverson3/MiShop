@@ -1,0 +1,119 @@
+<template>
+	<div>
+		<list :show-scrollbar="false">
+			<cell>
+				
+				<!-- 轮播图组件 -->
+				<mi-slider :sliders="sliders"></mi-slider>
+				
+				<!-- 图标分类组件 -->
+				<mi-index-navs :resdata="indexNavs"></mi-index-navs>
+				
+				<!-- 封装全局分割线组件 -->
+				<divider></divider>
+				
+				<!-- 三图广告组件 -->
+				<mi-three-adv></mi-three-adv>
+				
+				<divider></divider>
+				
+				<!-- 大图广告 -->
+				<mi-one-adv></mi-one-adv>
+				
+			</cell>
+		</list>
+	</div>
+</template>
+
+<script>
+	import miSlider from '@/components/index/nvue/mi-slider.nvue'
+	import miIndexNavs from '@/components/index/nvue/mi-index-navs.nvue'
+	import divider from '@/components/common/divider.nvue'
+	import miThreeAdv from '@/components/index/nvue/mi-three-adv.nvue'
+	import miOneAdv from '@/components/index/nvue/mi-one-adv.nvue'
+	
+	// 获取当前页面
+	const currentWebview = plus.webview.currentWebview()
+	
+	export default {
+		components: {
+			miSlider,
+			miIndexNavs,
+			divider,
+			miThreeAdv,
+			miOneAdv
+		},
+		data() {
+			return {
+				sliders: [
+					{src: "/static/images/demo/demo4.jpg"},
+					{src: "/static/images/demo/demo4.jpg"},
+					{src: "/static/images/demo/demo4.jpg"}
+				],
+				
+				indexNavs: [
+					{
+						src: "/static/images/indexnav/1.png",
+						text: "新品发布"
+					},
+					{
+						src: "/static/images/indexnav/2.gif",
+						text: "小米众筹"
+					},
+					{
+						src: "/static/images/indexnav/3.gif",
+						text: "以旧换新"
+					},
+					{
+						src: "/static/images/indexnav/4.gif",
+						text: "一分换团"
+					},
+					{
+						src: "/static/images/indexnav/5.gif",
+						text: "超值特卖"
+					},
+					{
+						src: "/static/images/indexnav/6.gif",
+						text: "小米秒杀"
+					},
+					{
+						src: "/static/images/indexnav/7.gif",
+						text: "真心想要"
+					},
+					{
+						src: "/static/images/indexnav/8.gif",
+						text: "电视热卖"
+					},
+					{
+						src: "/static/images/indexnav/9.gif",
+						text: "家电热卖"
+					},
+					{
+						src: "/static/images/indexnav/10.gif",
+						text: "米粉卡"
+					}
+				]
+			}
+		},
+		created: function() {
+			// 添加对当前页面show事件的监听
+			// 替代nvue中没有的onShow()生命周期函数
+			currentWebview.addEventListener('show', e => {
+				console.log('index show')
+			})
+		},
+		beforeDestroy: function() {
+			// 移除监听的事件
+			currentWebview.removeEventListener('show', e=>{})
+		},
+		methods: {
+			
+		}
+	}
+</script>
+
+<!-- 引入nvue专用的公共UI基础库 -->
+<style src="@/common/zcm-main-nvue.css"></style>
+<style>
+
+</style>

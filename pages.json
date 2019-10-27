@@ -3,7 +3,42 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "首页"
+				// 配置编译到 App 平台时的特定样式
+				"app-plus": {
+				    // 不显示滚动条
+					"scrollIndicator":"none",
+					// app顶部导航栏自定义设置
+					"titleNView": {
+						// 搜索框
+						"searchInput": {
+							"align":"left",
+							"backgroundColor":"#F7F7F7",
+							"borderRadius":"4px",
+							"disabled":"true",
+							"placeholder":"kamaka ukulele",
+							"placeholderColor":"#CCCCCC"
+						},
+						// 左右各一个按钮
+						"buttons": [
+							{
+								"color":"#989898",
+								"colorPressed":"#FD6801",
+								"float":"left",
+								"fontSize":"22px",
+								"fontSrc":"/static/font/iconfont.ttf",
+								"text": "\ue67a"  // 图标的Unicode (消息图标)
+							},
+							{
+								"color":"#989898",
+								"colorPressed":"#FD6801",
+								"float":"right",
+								"fontSize":"22px",
+								"fontSrc":"/static/font/iconfont.ttf",
+								"text": "\ue661"  // 图标的Unicode (扫一扫图标)
+							}
+						]
+					}
+				}
 			}
 		}
 	    ,{
@@ -23,6 +58,10 @@
             "style" : {
 				"navigationBarTitleText": "我的"
 			}
+        }
+        ,{
+            "path" : "pages/ceshi/ceshi",
+            "style" : {}
         }
     ],
 	"globalStyle": {
@@ -63,4 +102,16 @@
 			}
 		]
 	}
+	
+	// 在nvue(weex)开发模式下 这部分配置不能存在，否则无法正常运行
+	// "condition": { // 模式配置，仅开发期间生效
+	// 	"current": 0, // 当前激活的模式(list的索引)
+	// 	"list": [
+	// 		{
+	// 			"name": "index", // 模式名称
+	// 			"path": "pages/index/index", // 启动页面
+	// 			"query": "" // 页面参数 在页面的onLoad函数里面得到
+	// 		}
+	// 	]
+	// }
 }

@@ -1,0 +1,148 @@
+<template>
+	<list>
+		<!-- 下拉刷新 -->
+		<refresh style="height: 80px;" @refresh="refresh" @pullingdown="pullingdown" :display="show">
+			<text>{{ refreshtext }}</text>
+		</refresh>
+		
+		<!-- nvue默认是flex布局 且 flex-direction: column;flex-wrap: nowrap; -->
+		<cell style="flex-direction: row;flex-wrap: wrap;">
+			<div @click="openCeshi" style="width: 375px;height: 300px;background-color: #007AFF;">
+				<text style="font-size: 50px;">{{ ceshiText }}</text>
+			</div>
+			<div style="width: 375px;height: 300px;background-color: #09BB07;">
+				<text>222222</text>
+			</div>
+			<div style="width: 375px;height: 300px;background-color: #17A2B8;">
+				<text>333333</text>
+			</div>
+			<div style="width: 375px;height: 300px;background-color: #2C405A">
+				<text>444444</text>
+			</div>
+		</cell>
+		
+		<!-- 自动吸顶header -->
+		<header>
+			<div style="height: 150px;background-color: #888888;"></div>
+		</header>
+		
+		<!-- 数据列表 -->
+		<cell v-for="(num,index) in lists" :key="index">
+			<div @click="postMessage(num)" style="height: 300px;border-width: 2px;border-style: bolid;border-color: #007BFF;margin: 50px;background-color: #333333;">
+				<text style="color: white;">{{ num }}</text>
+			</div>
+		</cell>
+		
+		<!-- 上拉加载更多 -->
+		<loading @loading="onLoading" :display="loadingShow">
+			<text style="display: flex;justify-content: center;width: 720px;">
+				{{ loadmoretext }}
+			</text>
+		</loading>
+	</list>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				ceshiText: "index",
+				
+				show: 'hide',
+				refreshtext: "下拉刷新",
+				
+				loadingShow: 'hide',
+				loadmoretext: "上拉可加载更多",
+				
+				lists: ['A', 'B', 'C', 'D', 'E', 'F']
+			}
+		},
+		created: function() {
+			// 注册监听导航栏按钮点击事件
+			uni.onNavigationBarButtonTap(e => {
+				console.log(e)
+				if (e.index === 1) {
+					console.log('点击了右边按钮')
+				} else {
+					console.log('点击了左边按钮')
+				}
+			})
+			// 监听导航栏searchinput搜索框点击事件
+			uni.onNavigationBarSearchInputClicked(e => {
+				console.log('点击了搜索框')
+			})
+		
+			
+			console.log('created')
+			// 引入weex的全局事件模块
+			const globalEvent = weex.requireModule('globalEvent')
+			// 添加事件监听器，监听plus.webview.postMessageToUniNView()发送的数据
+			globalEvent.addEventListener('plusMessage', e => {
+				this.ceshiText = e.data.res
+			})
+			
+			// 修改全局变量
+			getApp().globalData.text = "index-modify"
+			
+			// 存储
+			uni.setStorage({
+				key: 'index',
+				data: 'indexdata'
+			})
+		},
+		methods: {
+			openCeshi: function() {
+				uni.navigateTo({
+					url: '/pages/ceshi/ceshi'
+				});
+			},
+			
+			// nvue与vue之间的通讯
+			postMessage: function(num) {
+				uni.postMessage({
+					data: num,
+					from: 'index',
+					other: 'other info'
+				})
+				
+				// 修改全局变量
+				getApp().globalData.text = "index-modify: " + num
+			},
+			
+			// 上拉加载事件
+			onLoading: function() {
+				this.loadingShow = 'show'
+				this.loadmoretext = "加载中..."
+				setTimeout(() => {
+					let resdata = ['G', 'H', 'I']
+					this.lists = [...this.lists, ...resdata]
+					this.loadingShow = 'hide'
+					this.loadmoretext = "上拉可加载更多"
+				}, 2000)
+			},
+			
+			refresh: function(e) {
+				console.log(e)
+				this.show = 'show'
+				this.refreshtext = "正在刷新中..."
+				setTimeout(() => {
+					this.show = 'hide'
+					this.refreshtext = "下拉刷新"
+				}, 2000);
+			},
+			pullingdown: function(e) {
+				console.log(e)
+				// 当下拉高度超过某个值 则提示可进行刷新
+				if (e.pullingDistance > e.viewHeight) {
+					this.refreshtext = "释放就能刷新"
+				} else {
+					this.refreshtext = "下拉刷新"
+				}
+			} 
+		}
+	}
+</script>
+
+<style>
+
+</style>
