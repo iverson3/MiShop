@@ -2,10 +2,10 @@
 	<div>
 		<div class="w-100">
 			<div class="p-2 border-bottom">
-				<text class="text-dark font-md font-weight">每日精选</text>
+				<text class="text-dark font-md font-weight">{{ resdata.title }}</text>
 			</div>
 			<div>
-				<image src="/static/images/demo/demo4.jpg" class="w-100" style="height: 300px;"></image>
+				<image :src="resdata.cover" class="w-100" style="height: 300px;"></image>
 			</div>
 		</div>
 	</div>
@@ -13,7 +13,9 @@
 
 <script>
 	export default {
-		
+		props: {
+			resdata: Object
+		}
 	}
 </script>
 

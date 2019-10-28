@@ -1,0 +1,77 @@
+<template>
+	<!-- 横向滚动 顶部选项卡组件 -->
+	<div class="w-100" style="height: 75px;">
+		<scroller class="w-100 flex-row" style="height: 75px;" :show-scrollbar="false" scroll-direction="horizontal">
+			
+			<div v-for="(item,index) in tabBars" :key="index" 
+			class="a-center j-center" 
+			@click="change(index)"
+			:ref="`tab${index}`"
+			style="height: 75px; width: 120px;">
+				<text style="height: 75px;line-height: 75px;border-bottom-width: 5px;border-style: solid;"
+				:style="{'color':tabIndex === index? '#FD6801':'#555', 'border-color':tabIndex === index? '#FD6801':'#FFFFFF'}"
+				class="font-md">{{ item.name }}</text>
+			</div>
+			
+		</scroller>
+	</div>
+</template>
+
+<script>
+	// 获取nvue/weex的dom模块
+	const dom = weex.requireModule('dom')
+	
+	export default {
+		props: {
+			tabBars:{
+				type: Array,
+				default: []
+			},
+			tabIndex:{
+				type: Number,
+				default: 0
+			}
+		},
+		watch: {
+			// 监听tabIndex的改变
+			tabIndex(newValue, oldValue) {
+				this.scrollView(newValue)
+			}
+		},
+		methods: {
+			// 监听顶部选项卡点击事件
+			change: function(index) {
+				// 不要在子组件中直接修改props传递过来的变量
+				// this.tabIndex = index
+				// 而是emit触发事件 由父组件进行监听并对变量进行修改
+				this.$emit('tabchange', index)
+			},
+			
+			// 监听滚动区域变化，并进行对应的视图滚动处理
+			async scrollView(index) {
+				// 通过ref得到当前tab元素
+				let el = this.$refs[`tab${index}`][0]
+				// 获取当前tab元素的节点信息
+				dom.getComponentRect(el, (res) => {
+					// 当前tab元素处于屏幕可视区域的右边
+					if (res.size.right > 750) {
+						// 拿到处于屏幕可视区域中间的tab元素
+						let newEl = this.$refs[`tab${index-4}`][0]
+						// 将该tab元素滚动到屏幕可视区域的最左边
+						return dom.scrollToElement(newEl, {})
+					}
+					// 当前tab元素处于屏幕可视区域的左边
+					if (res.size.left < 0) {
+						dom.scrollToElement(el, {})
+					}
+				})
+			}
+		}
+	}
+</script>
+
+<!-- 引入nvue专用的公共UI基础库 -->
+<style src="@/common/zcm-main-nvue.css"></style>
+<style>
+
+</style>

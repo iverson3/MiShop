@@ -9,11 +9,11 @@
 		-->
 		<div class="w-100 row">
 			<div class="col-6">
-				<image src="/static/images/demo/demo1.jpg" style="width: 373px;height: 530px;"></image>
+				<image :src="resdata.big.src" style="width: 373px;height: 530px;"></image>
 			</div>
 			<div class="col-6 j-sb">
-				<image src="/static/images/demo/demo2.jpg" style="width: 375px;height: 263.5px;"></image>
-				<image src="/static/images/demo/demo3.jpg" style="width: 375px;height: 263.5px;"></image>
+				<image :src="resdata.smalltop.src" style="width: 375px;height: 263.5px;"></image>
+				<image :src="resdata.smallbottom.src" style="width: 375px;height: 263.5px;"></image>
 			</div>
 		</div>
 	</div>
@@ -21,7 +21,9 @@
 
 <script>
 	export default {
-		
+		props: {
+			resdata: Object
+		}
 	}
 </script>
 
