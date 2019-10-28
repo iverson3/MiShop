@@ -63,6 +63,70 @@
             "path" : "pages/ceshi/ceshi",
             "style" : {}
         }
+        ,{
+            "path" : "pages/search/search",
+            "style": {
+            	// 配置编译到 App 平台时的特定样式
+            	"app-plus": {
+            	    // 不显示滚动条
+            		"scrollIndicator":"none",
+            		// app顶部导航栏自定义设置
+            		"titleNView": {
+            			// 搜索框
+            			"searchInput": {
+            				"align":"left",
+            				"backgroundColor":"#F7F7F7",
+            				"borderRadius":"4px",
+            				"disabled":"false",
+            				"placeholder":"kamaka ukulele",
+            				"placeholderColor":"#CCCCCC"
+            			},
+            			// 左右各一个按钮
+            			"buttons": [
+            				{
+            					"color":"#989898",
+            					"colorPressed":"#FD6801",
+            					"float":"right",
+            					"fontSize":"16px",
+            					"text": "搜索"
+            				}
+            			]
+            		}
+            	}
+            }
+        }
+        ,{
+            "path" : "pages/search-list/search-list",
+            "style": {
+            	// 配置编译到 App 平台时的特定样式
+            	"app-plus": {
+            	    // 不显示滚动条
+            		"scrollIndicator":"none",
+            		// app顶部导航栏自定义设置
+            		"titleNView": {
+            			// 搜索框
+            			"searchInput": {
+            				"align":"left",
+            				"backgroundColor":"#F7F7F7",
+            				"borderRadius":"4px",
+            				"disabled":"false",
+            				"placeholder":"kamaka ukulele",
+            				"placeholderColor":"#CCCCCC"
+            			},
+            			// 左右各一个按钮
+            			"buttons": [
+            				{
+            					"color":"#989898",
+            					"colorPressed":"#FD6801",
+            					"float":"right",
+            					"fontSize":"16px",
+            					"text": "搜索"
+            				}
+            			]
+            		}
+            	}
+            }
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
