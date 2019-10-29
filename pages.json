@@ -43,9 +43,38 @@
 		}
 	    ,{
             "path" : "pages/class/class",
-            "style" : {
-				"navigationBarTitleText": "分类"
-			}
+            "style": {
+            	// 配置编译到 App 平台时的特定样式
+            	"app-plus": {
+            	    // 不显示滚动条
+            		"scrollIndicator":"none",
+					// 关闭回弹效果
+					"bounce":"none",
+            		// app顶部导航栏自定义设置
+            		"titleNView": {
+            			// 搜索框
+            			"searchInput": {
+            				"align":"left",
+            				"backgroundColor":"#F7F7F7",
+            				"borderRadius":"4px",
+            				"disabled":"true",
+            				"placeholder":"kamaka ukulele",
+            				"placeholderColor":"#CCCCCC"
+            			},
+            			// 左右各一个按钮
+            			"buttons": [
+            				{
+            					"color":"#989898",
+            					"colorPressed":"#FD6801",
+            					"float":"right",
+            					"fontSize":"22px",
+            					"fontSrc":"/static/font/iconfont.ttf",
+            					"text": "\ue67a"  // 图标的Unicode (消息图标)
+            				}
+            			]
+            		}
+            	}
+            }
         }
         ,{
             "path" : "pages/cart/cart",
@@ -126,6 +155,25 @@
             		}
             	}
             }
+        }
+        ,{
+            "path" : "pages/detail/detail",
+            "style" : {
+				"app-plus": {
+					"scrollIndicator":"none",
+					"bounce":"none",
+					// 导航栏属性设置
+					"titleNView":{
+						// 透明样式，顶部沉浸式显示
+						"type":"transparent",
+						"buttons":[
+							{
+								"type":"menu"  // "三个点"样式的菜单按钮
+							}
+						]
+					}
+				}
+			}
         }
     ],
 	"globalStyle": {

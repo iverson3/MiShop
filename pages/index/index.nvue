@@ -297,7 +297,12 @@
 				this.newsitems[index].refreshtext = "正在刷新中..."
 				setTimeout(() => {
 					// 重新向服务器端请求数据
-					this.newsitems = this.randomfn()
+					// this.newsitems = this.randomfn()
+					
+					// 模拟重新从服务器端请求数据
+					// 先清空对应tab下的数据，再在对应的tab下添加新数据
+					this.newsitems[index].data = []
+					this.addData(index)
 					
 					this.newsitems[index].refreshShow = 'hide'
 					this.newsitems[index].refreshtext = "下拉刷新"
@@ -509,6 +514,8 @@
 					
 				}
 				console.log(ary)
+				// json字符串化输出
+				console.log(JSON.stringify(ary))
 				return ary;
 			}
 			

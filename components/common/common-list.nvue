@@ -4,7 +4,7 @@
 		间隙 w:5px
 		每列占 w:375px
 		-->
-		<div class="col-6 common-list mb-1">
+		<div class="col-6 common-list mb-1" @click="openDetail">
 			<image :src="item.cover" class="common-list-cover"></image>
 			<text class="font-md text-dark px-2 py-1 common-list-lines">{{ item.title }}</text>
 			<text class="px-2 font text-light-muted common-list-lines">{{ item.desc }}</text>
@@ -26,6 +26,13 @@
 		props: {
 			index: Number,
 			item: Object
+		},
+		methods: {
+			openDetail: function() {
+				uni.navigateTo({
+					url: "/pages/detail/detail"
+				})
+			}
 		}
 	}
 </script>
