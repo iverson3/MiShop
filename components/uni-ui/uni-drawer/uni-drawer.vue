@@ -1,5 +1,5 @@
 <template>
-	<view v-if="visibleSync" :class="{ 'uni-drawer--visible': showDrawer, 'uni-drawer--right': rightMode }" class="uni-drawer" @touchmove.stop.prevent="moveHandle" style="width: 75%;">
+	<view v-if="visibleSync" :class="{ 'uni-drawer--visible': showDrawer, 'uni-drawer--right': rightMode }" class="uni-drawer" @touchmove.stop.prevent="moveHandle">
 		<view class="uni-drawer__mask" @tap="close" />
 		<view class="uni-drawer__content">
 			<slot />
@@ -132,7 +132,8 @@
 		position: absolute;
 		top: 0;
 		left: 0;
-		width: 61.8%;
+		/* width: 61.8%; */
+		width: 75%;
 		height: 100%;
 		background: #fff;
 		transition: all .3s ease-out;

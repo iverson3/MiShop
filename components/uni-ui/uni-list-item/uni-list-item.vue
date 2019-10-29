@@ -10,8 +10,9 @@
 			<view class="uni-list-item__content">
 				<view class="uni-list-item__content-title">{{ title }}</view>
 				<view v-if="note" class="uni-list-item__content-note">{{ note }}</view>
+				<slot></slot>
 			</view>
-			<view v-if="showBadge || showArrow || showSwitch" class="uni-list-item__extra">
+			<view v-if="showBadge || showArrow || showSwitch" class="uni-list-item__extra" :style="'width:'+extraWidth+';'">
 				<uni-badge v-if="showBadge" :type="badgeType" :text="badgeText" />
 				<switch v-if="showSwitch" :disabled="disabled" :checked="switchChecked" @change="onSwitchChange" />
 				<uni-icons v-if="showArrow" :size="20" class="uni-icon-wrapper" color="#bbb" type="arrowright" />
@@ -30,6 +31,10 @@
 			uniBadge
 		},
 		props: {
+			extraWidth: {
+				type: String,
+				default: ""
+			},
 			title: {
 				type: String,
 				default: ''
@@ -125,7 +130,7 @@
 	}
 
 	.uni-list-item--hover {
-		background-color: #f1f1f1
+		background-color: #f4f4f4;
 	}
 
 	.uni-list-item__container {

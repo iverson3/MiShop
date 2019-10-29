@@ -33,6 +33,7 @@
 			</view>
 		</uni-drawer>
 		
+		
 		<!-- 搜索结果列表 -->
 		<block v-for="(item,index) in list" :key="index">
 			<search-list :item="item" :index="index"></search-list>

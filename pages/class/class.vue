@@ -106,19 +106,19 @@
 						scrollOffset: obj.scrollOffset? true : false
 					}
 					const query = uni.createSelectorQuery().in(this)
-					let q = obj.all ? query.selectAll('.${obj.all}-scroll-item') : query.select('#leftScroll')
+					let q = obj.all ? query.selectAll("."+ obj.all +"-scroll-item") : query.select('#leftScroll')
 					q.fields(option, data => {
 						res(data)
 					}).exec();
 				})
 			},
 			getData: function() {
-				for (var i = 0; i < 15; i++) {
+				for (var i = 0; i < 20; i++) {
 					this.cate.push({name: "分类 " + i})
 					this.list.push({list: []})
 				}
 				for (var i = 0; i < this.list.length; i++) {
-					for (var j = 0; j < 20; j++) {
+					for (var j = 0; j < 25; j++) {
 						this.list[i].list.push({
 							src: "/static/images/demo/cate_03.png", 
 							name: `分类${i}-商品${j}`
@@ -139,12 +139,11 @@
 			},
 			// 右边商品列表滚动事件
 			async onRightScroll(e) {
-				console.log(e)
+				// console.log(e)
 				// 匹配当前scrollTop所处的索引
 				this.rightDomsTop.forEach((v, k) => {
-					if (v < e.detail.scrollTop) {
+					if (v < (e.detail.scrollTop + 1)) {
 						this.activeIndex = k
-						return false
 					}
 				})
 			}

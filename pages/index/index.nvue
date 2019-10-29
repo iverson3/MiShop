@@ -231,6 +231,11 @@
 			
 			// 生成随机数据
 			this.newsitems = this.randomfn()
+			
+			// 开发阶段使用 直接跳转到detail页面
+			// uni.navigateTo({
+			// 	url: "/pages/detail/detail"
+			// })
 		},
 		beforeDestroy: function() {
 			// 移除监听的事件
