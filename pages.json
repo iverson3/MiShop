@@ -61,7 +61,7 @@
             				"placeholder":"kamaka ukulele",
             				"placeholderColor":"#CCCCCC"
             			},
-            			// 左右各一个按钮
+            			// 按钮
             			"buttons": [
             				{
             					"color":"#989898",
@@ -110,7 +110,7 @@
             				"placeholder":"kamaka ukulele",
             				"placeholderColor":"#CCCCCC"
             			},
-            			// 左右各一个按钮
+            			// 按钮
             			"buttons": [
             				{
             					"color":"#989898",
@@ -142,7 +142,7 @@
             				"placeholder":"kamaka ukulele",
             				"placeholderColor":"#CCCCCC"
             			},
-            			// 左右各一个按钮
+            			// 按钮
             			"buttons": [
             				{
             					"color":"#989898",
@@ -169,6 +169,23 @@
 						"buttons":[
 							{
 								"type":"menu"  // "三个点"样式的菜单按钮
+							}
+						]
+					}
+				}
+			}
+        }
+        ,{
+            "path" : "pages/detail-comment/detail-comment",
+            "style" : {
+				"navigationBarTitleText":"商品评论",
+				"app-plus": {
+					"scrollIndicator":"none",
+					"bounce":"none",
+					"titleNView": {
+						"buttons": [
+							{
+								"type":"share"
 							}
 						]
 					}
