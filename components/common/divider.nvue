@@ -10,6 +10,8 @@
 	}
 </script>
 
+<!-- 引入nvue专用的公共UI基础库 -->
+<style src="@/common/zcm-main-nvue.css"></style>
 <style>
 
 </style>

@@ -20,7 +20,10 @@
 					</view>
 					<view class="iconfont icon-dianzan font text-light-muted pl-1 ml-auto">{{ item.goods_num }}</view>
 				</view>
-				<view class="d-block font-md mb-2 pt line-h-sm" style="min-height: 90upx;max-height: 104upx;white-space: initial;overflow: hidden;">{{ item.context }}</view>
+				<view class="d-block font-md mb-2 pt line-h-sm" 
+				style="min-height: 90upx;max-height: 104upx;white-space: initial;overflow: hidden;">
+					{{ item.context }}
+				</view>
 				<view class="row">
 					<view v-for="(img,i) in item.imglist" :key="i" class="span24-8 px-2">
 						<image :src="img" mode="widthFix" class="rounded" style="height: 115upx;"></image>

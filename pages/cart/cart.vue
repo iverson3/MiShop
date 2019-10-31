@@ -1,60 +1,175 @@
 <template>
-	<view>
+	<view style="background: #F5F5F5;">
+		<!-- 自定义的顶部导航栏 -->
+		<uni-nav-bar :right-text="isedit?'完成':'编辑'" 
+		@click-right="isedit = !isedit"
+		title="购物车" 
+		:statusBar="true" 
+		:fixed="true"
+		:shadow="false"></uni-nav-bar>
 		
-		<view class="row p-2">
-			<view class="span-4 text-center py-2">
-				<view class="iconfont icon-VIP"></view>
-				1
-			</view>
-			<view class="span-4 text-center py-2">
-				<view class="iconfont icon-VIP"></view>
-				2
-			</view>
-			<view class="span-4 text-center py-2">
-				<view class="iconfont icon-VIP"></view>
-				3
-			</view>
-			<view class="span-4 text-center py-2">
-				<view class="iconfont icon-VIP"></view>
-				4
-			</view>
-			<view class="span-4 text-center py-2">
-				<view class="iconfont icon-VIP"></view>
-				5
-			</view>
-			<view class="span-4 text-center py-2">
-				<view class="iconfont icon-VIP"></view>
-				1
-			</view>
-			<view class="span-4 text-center py-2">
-				<view class="iconfont icon-VIP"></view>
-				2
-			</view>
-			<view class="span-4 text-center py-2">
-				<view class="iconfont icon-VIP"></view>
-				3
-			</view>
-			<view class="span-4 text-center py-2">
-				<view class="iconfont icon-VIP"></view>
-				4
-			</view>
-			<view class="span-4 text-center py-2">
-				<view class="iconfont icon-VIP"></view>
-				5
+		<!-- 购物车为空 -->
+		<view v-if="disableSelectAll" class="py-5 d-flex j-center a-center bg-white border">
+			<view class="iconfont icon-gouwuche text-light-muted" style="font-size: 50upx;"></view>
+			<view class="text-light-muted mx-2">购物车空空如也</view>
+			<view class="px-2 py-1 border border-light-secondary rounded" hover-class="bg-light-secondary">去逛逛</view>
+		</view>
+		
+		<!-- 购物车商品列表组件 -->
+		<view v-else class="bg-white px-2">
+			<!-- 列表 -->
+			<view v-for="(item,index) in list" :key="index" class="d-flex a-center py-3 border-bottom border-light-secondary">
+				
+				<label @click="selectItem(index)" class="radio d-flex a-center j-center flex-shrink" style="width: 80upx;height: 80upx;">
+					<radio :value="item.id" :checked="item.checked" color="#FD6801"/>
+				</label>
+				
+				<image :src="item.cover" mode="widthFix" 
+				class="border border-light-secondary rounded p-2 flex-shrink"
+				style="width: 150upx;height: 150upx;"></image>
+				
+				<view class="flex-1 d-flex flex-column pl-2">
+					<view class="text-dark" style="font-size: 35upx;">{{ item.title }}</view>
+					<!-- 商品的属性和规格 -->
+					<view @tap.stop="doShowPopup(index)" class="d-flex text-light-muted mb-1" :class="isedit? 'p-1 bg-light-secondary mb-2':''">
+						<text class="mr-1" v-for="(attr,i) in item.attrs" :key="i">{{ attr.list[attr.selected].name }}</text>
+						<view v-if="isedit" class="iconfont icon-bottom font ml-auto"></view>
+					</view>
+				</view>
+				
+				<view class="mt-auto d-flex j-sb">
+					<price>{{ item.pprice }}</price>
+					<view class="a-self-end">
+						<uni-number-box @change="changeNum($event, item, index)" :value="item.num" :min="item.minnum" :max="item.maxnum"></uni-number-box>
+					</view>
+				</view>
 			</view>
 		</view>
+		
+		
+		<!-- 价格合计组件 -->
+		<view class="d-flex a-center a-stretch position-fixed left-0 right-0 bottom-0 border-top border-light-secondary" style="height: 100upx;z-index: 100;">
+			<label @click="doSelectAll" class="radio d-flex a-center j-center flex-shrink" style="width: 120upx;">
+				<radio color="#FD6801" :checked="checkedAll" :disabled="disableSelectAll"/>
+			</label>
+			<!-- 非编辑状态下显示 -->
+			<template v-if="!isedit">
+				<view class="flex-1 d-flex a-center j-center font-md">
+					合计 <price>{{ totalPrice }}</price>
+				</view>
+				<view class="flex-1 d-flex a-center j-center main-bg-color text-white font-md" hover-class="main-bg-hover-color">
+					结算
+				</view>
+			</template>
+			<!-- 编辑状态下显示 -->
+			<template v-else>
+				<view class="flex-1 d-flex a-center j-center font-md main-bg-color text-white">
+					移入收藏
+				</view>
+				<view @tap="doDelGoods"
+				class="flex-1 d-flex a-center j-center bg-danger text-white font-md" 
+				hover-class="main-bg-hover-color">
+					删除
+				</view>
+			</template>
+		</view>
+		
+		
+		<!-- 属性筛选弹出框 -->
+		<common-popup :popupClass="popupShow" @hide="doHidePopup">
+			<!-- 
+			商品信息 h275
+			图片 180*180
+			 -->
+			<view class="d-flex a-center" style="height: 275upx;">
+				<image src="../../static/images/demo/list/1.jpg" 
+				style="width: 180upx;height: 180upx;"
+				class="border rounded"
+				mode="widthFix"></image>
+				<view class="pl-2">
+				 	<price priceSize="font-lg" unitSize="font">2365</price>
+					<view class="d-block">
+						<text class="mr-1" v-for="(attr,i) in popupData.attrs" :key="i">{{ attr.list[attr.selected].name }}</text>
+					</view>
+				</view>
+			</view>
+			 
+			<!-- 表单部分 h660 -->
+			<scroll-view scroll-y class="w-100" style="height: 660upx;">
+			 	<card :headTitle="item.title" 
+				v-for="(item,index) in popupData.attrs"
+				:key="index"
+				:headTitleWeight="false" 
+				:headBorderBottom="false">
+					<mi-radio-group :label="item" :selected.sync="item.selected"></mi-radio-group>
+				</card>
+				<view class="d-flex j-sb a-center p-2 border-top border-light-secondary">
+					<text>购买数量</text>
+					<uni-number-box :value="popupData.num" :min="1" :max="popupData.max" @change="popupData.num = $event"></uni-number-box>
+				</view>
+			</scroll-view>
+			 
+			<!-- 按钮 h100 -->
+			<view class="main-bg-color text-white font-md d-flex j-center a-center"
+			hover-class="main-bg-hover-color"
+			@tap.stop="doHidePopup"
+			style="height: 100upx;margin-left: -30upx;margin-right: -30upx;">
+				确定
+			</view>
+		</common-popup>
+		
 	</view>
 </template>
 
 <script>
+	import uniNavBar from '@/components/uni-ui/uni-nav-bar/uni-nav-bar.vue'
+	import price from '@/components/common/price.vue'
+	import uniNumberBox from '@/components/uni-ui/uni-number-box/uni-number-box.vue'
+	import card from '@/components/common/card.vue'
+	import commonPopup from '@/components/common/common-popup.vue'
+	import miRadioGroup from '@/components/common/mi-radio-group.vue'
+	
+	import {mapState, mapGetters, mapMutations, mapActions} from 'vuex'
 	export default {
+		components: {
+			uniNavBar,
+			price,
+			uniNumberBox,
+			card,
+			commonPopup,
+			miRadioGroup
+		},
 		data() {
 			return {
-				
+				isedit: false,
 			}
 		},
+		computed: {
+			...mapState({
+				list: state => state.cart.list,
+				popupShow: state => state.cart.popupShow,
+			}),
+			...mapGetters([
+				'checkedAll',
+				'totalPrice',
+				'disableSelectAll',
+				'popupData'
+			])
+		},
 		methods: {
+			...mapMutations([
+				'selectItem'
+			]),
+			...mapActions([
+				'doSelectAll',
+				'doDelGoods',
+				'doShowPopup',
+				'doHidePopup'
+			]),
 			
+			changeNum: function(e, item, index) {
+				item.num = e
+			}
 		}
 	}
 </script>

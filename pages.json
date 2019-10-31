@@ -79,7 +79,12 @@
         ,{
             "path" : "pages/cart/cart",
             "style" : {
-				"navigationBarTitleText": "购物车"
+				"app-plus": {
+					// 取消app中默认的顶部导航栏，在页面中使用自定义的导航栏
+					"titleNView": false,
+					"scrollIndicator":"none",
+					"bounce":"none"
+				}
 			}
         }
         ,{

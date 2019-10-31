@@ -1,5 +1,5 @@
 <template>
-	<view class="divider">
+	<view class="w-100 divider">
 	</view>
 </template>
 

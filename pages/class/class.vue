@@ -142,7 +142,7 @@
 				// console.log(e)
 				// 匹配当前scrollTop所处的索引
 				this.rightDomsTop.forEach((v, k) => {
-					if (v < (e.detail.scrollTop + 1)) {
+					if (v < (e.detail.scrollTop + 3)) {
 						this.activeIndex = k
 					}
 				})
