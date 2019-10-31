@@ -2,7 +2,7 @@
 	<view style="background: #F5F5F5;">
 		<!-- 自定义的顶部导航栏 -->
 		<uni-nav-bar :right-text="isedit?'完成':'编辑'" 
-		@click-right="isedit = !isedit"
+		@click-right="changeEditStatus"
 		title="购物车" 
 		:statusBar="true" 
 		:fixed="true"
@@ -12,43 +12,50 @@
 		<view v-if="disableSelectAll" class="py-5 d-flex j-center a-center bg-white border">
 			<view class="iconfont icon-gouwuche text-light-muted" style="font-size: 50upx;"></view>
 			<view class="text-light-muted mx-2">购物车空空如也</view>
-			<view class="px-2 py-1 border border-light-secondary rounded" hover-class="bg-light-secondary">去逛逛</view>
+			<view class="px-2 py-1 border border-light-secondary rounded" hover-class="bg-light-secondary" @click="gotoIndex()">去逛逛</view>
 		</view>
 		
 		<!-- 购物车商品列表组件 -->
 		<view v-else class="bg-white px-2">
 			<!-- 列表 -->
-			<view v-for="(item,index) in list" :key="index" class="d-flex a-center py-3 border-bottom border-light-secondary">
-				
-				<label @click="selectItem(index)" class="radio d-flex a-center j-center flex-shrink" style="width: 80upx;height: 80upx;">
-					<radio :value="item.id" :checked="item.checked" color="#FD6801"/>
-				</label>
-				
-				<image :src="item.cover" mode="widthFix" 
-				class="border border-light-secondary rounded p-2 flex-shrink"
-				style="width: 150upx;height: 150upx;"></image>
-				
-				<view class="flex-1 d-flex flex-column pl-2">
-					<view class="text-dark" style="font-size: 35upx;">{{ item.title }}</view>
-					<!-- 商品的属性和规格 -->
-					<view @tap.stop="doShowPopup(index)" class="d-flex text-light-muted mb-1" :class="isedit? 'p-1 bg-light-secondary mb-2':''">
-						<text class="mr-1" v-for="(attr,i) in item.attrs" :key="i">{{ attr.list[attr.selected].name }}</text>
-						<view v-if="isedit" class="iconfont icon-bottom font ml-auto"></view>
+			<template v-for="(item,index) in list">
+				<view :key="index" class="d-flex a-center py-3 border-bottom border-light-secondary" style="height: 260upx;">
+					
+					<label @click="selectItem(index)" class="radio d-flex a-center j-center flex-shrink" style="width: 80upx;height: 80upx;">
+						<radio :value="item.id" :checked="item.checked" color="#FD6801"/>
+					</label>
+					
+					<image :src="item.cover" mode="widthFix" 
+					class="border border-light-secondary rounded p-2 flex-shrink"
+					style="width: 150upx;height: 150upx;"></image>
+					
+					<view class="d-flex flex-column flex-1">
+						<view class="flex-1 d-flex flex-column pl-2">
+							<view class="text-dark" style="font-size: 35upx;">{{ item.title }}</view>
+							<!-- 商品的属性和规格 -->
+							<view @tap.stop="doShowPopup(index)" class="d-flex text-light-muted mb-1 p-1 pl-0" :class="isedit? 'bg-light-secondary':''">
+								<text class="mr-1" v-for="(attr,i) in item.attrs" :key="i">{{ attr.list[attr.selected].name }}</text>
+								<view v-if="isedit" class="iconfont icon-bottom font ml-auto"></view>
+							</view>
+						</view>
+						
+						<view class="mt-auto d-flex j-sb pl-2">
+							<price>{{ item.pprice }}</price>
+							<view class="a-self-end">
+								<uni-number-box @change="changeNum($event, item)" :value="item.num" :min="item.minnum" :max="item.maxnum"></uni-number-box>
+							</view>
+						</view>
 					</view>
 				</view>
 				
-				<view class="mt-auto d-flex j-sb">
-					<price>{{ item.pprice }}</price>
-					<view class="a-self-end">
-						<uni-number-box @change="changeNum($event, item, index)" :value="item.num" :min="item.minnum" :max="item.maxnum"></uni-number-box>
-					</view>
-				</view>
-			</view>
+				<divider :key="index" v-if="index+1 !== list.length"></divider>
+			</template>
 		</view>
 		
-		
+		<!-- 占位 -->
+		<view style="height: 100upx;background: white;"></view>
 		<!-- 价格合计组件 -->
-		<view class="d-flex a-center a-stretch position-fixed left-0 right-0 bottom-0 border-top border-light-secondary" style="height: 100upx;z-index: 100;">
+		<view class="d-flex a-center a-stretch position-fixed left-0 right-0 bottom-0 border-top border-light-secondary bg-light-secondary" style="height: 100upx;z-index: 1000;">
 			<label @click="doSelectAll" class="radio d-flex a-center j-center flex-shrink" style="width: 120upx;">
 				<radio color="#FD6801" :checked="checkedAll" :disabled="disableSelectAll"/>
 			</label>
@@ -105,7 +112,7 @@
 				</card>
 				<view class="d-flex j-sb a-center p-2 border-top border-light-secondary">
 					<text>购买数量</text>
-					<uni-number-box :value="popupData.num" :min="1" :max="popupData.max" @change="popupData.num = $event"></uni-number-box>
+					<uni-number-box :value="popupData.num" :min="popupData.minnum" :max="popupData.maxnum" @change="changeNum($event, popupData)"></uni-number-box>
 				</view>
 			</scroll-view>
 			 
@@ -128,6 +135,7 @@
 	import card from '@/components/common/card.vue'
 	import commonPopup from '@/components/common/common-popup.vue'
 	import miRadioGroup from '@/components/common/mi-radio-group.vue'
+	import divider from '@/components/common/divider.vue'
 	
 	import {mapState, mapGetters, mapMutations, mapActions} from 'vuex'
 	export default {
@@ -137,15 +145,17 @@
 			uniNumberBox,
 			card,
 			commonPopup,
-			miRadioGroup
+			miRadioGroup,
+			divider
 		},
 		data() {
 			return {
-				isedit: false,
+				
 			}
 		},
 		computed: {
 			...mapState({
+				isedit: state => state.cart.isedit,
 				list: state => state.cart.list,
 				popupShow: state => state.cart.popupShow,
 			}),
@@ -158,7 +168,8 @@
 		},
 		methods: {
 			...mapMutations([
-				'selectItem'
+				'selectItem',
+				'changeEditStatus'
 			]),
 			...mapActions([
 				'doSelectAll',
@@ -167,8 +178,13 @@
 				'doHidePopup'
 			]),
 			
-			changeNum: function(e, item, index) {
+			changeNum: function(e, item) {
 				item.num = e
+			},
+			gotoIndex: function() {
+				uni.navigateTo({
+					url: "/pages/index/index"
+				})
 			}
 		}
 	}

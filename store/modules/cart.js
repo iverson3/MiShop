@@ -1,10 +1,90 @@
 export default {
 	state: {
+		isedit: false,
+		
 		list: [
 			{
 				checked: false,
 				id: 1,
 				title: "商品标题111",
+				cover: "/static/images/demo/list/1.jpg",
+				// 当前商品的可选属性
+				attrs: [
+					{
+						title: "颜色",
+						selected: 0,
+						list: [
+							{ name: "火焰色" },
+							{ name: "炭黑" },
+							{ name: "冰川蓝" }
+						]
+					},
+					{
+						title: "容量",
+						selected: 0,
+						list: [
+							{ name: "64GB" },
+							{ name: "128GB" }
+						]
+					},
+					{
+						title: "套餐",
+						selected: 0,
+						list: [
+							{ name: "标配" },
+							{ name: "套餐一" },
+							{ name: "套餐二" }
+						]
+					}
+				],
+				pprice: 998,
+				num: 1,
+				minnum: 1,
+				maxnum: 10   // 商品库存
+			},
+			{
+				checked: false,
+				id: 2,
+				title: "商品标题222",
+				cover: "/static/images/demo/list/1.jpg",
+				// 当前商品的可选属性
+				attrs: [
+					{
+						title: "颜色",
+						selected: 0,
+						list: [
+							{ name: "火焰色" },
+							{ name: "炭黑" },
+							{ name: "冰川蓝" }
+						]
+					},
+					{
+						title: "容量",
+						selected: 0,
+						list: [
+							{ name: "64GB" },
+							{ name: "128GB" }
+						]
+					},
+					{
+						title: "套餐",
+						selected: 0,
+						list: [
+							{ name: "标配" },
+							{ name: "套餐一" },
+							{ name: "套餐二" }
+						]
+					}
+				],
+				pprice: 998,
+				num: 1,
+				minnum: 1,
+				maxnum: 10   // 商品库存
+			},
+			{
+				checked: false,
+				id: 3,
+				title: "商品标题333",
 				cover: "/static/images/demo/list/1.jpg",
 				// 当前商品的可选属性
 				attrs: [
@@ -73,6 +153,9 @@ export default {
 		}
 	},
 	mutations: {
+		changeEditStatus(state) {
+			state.isedit = !state.isedit
+		},
 		// 选中/取消选中某个商品
 		selectItem(state, index) {
 			// 根据索引获取当前商品的id
@@ -114,13 +197,21 @@ export default {
 		// 初始化popupIndex
 		initPopupIndex(state, index) {
 			state.popupIndex = index
+		},
+		// 加入购物车
+		addGoodsToCart(state, goods) {
+			// 使用unshift()加入到数组头部
+			state.list.unshift(goods)
 		}
 	},
 	actions: {
 		// 显示弹出框
 		doShowPopup({state, commit}, index) {
-			commit('initPopupIndex', index)
-			state.popupShow = 'show'
+			// 只有在编辑状态下才能显示弹出框
+			if (state.isedit) {
+				commit('initPopupIndex', index)
+				state.popupShow = 'show'
+			}
 		},
 		// 隐藏弹出框
 		doHidePopup({state, commit}) {
@@ -137,7 +228,12 @@ export default {
 				commit('selectAll')
 			}
 		},
-		doDelGoods({commit}) {
+		doDelGoods({state, commit}) {
+			// 判断是否有商品被选中
+			if (state.selectedList.length === 0) {
+				uni.showToast({title: "请先选择商品"})
+				return
+			}
 			uni.showModal({
 				content: "是否删除选中的商品",
 				success: (res) => {

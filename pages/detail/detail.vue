@@ -61,7 +61,7 @@
 		</card>
 		
 		<!-- 底部操作条 -->
-		<bottom-btn></bottom-btn>
+		<bottom-btn @showAttrPopup="showPopup('attr')"></bottom-btn>
 		
 		
 		<!-- 属性筛选弹出框 -->
@@ -99,7 +99,7 @@
 			<!-- 按钮 h100 -->
 			<view class="main-bg-color text-white font-md d-flex j-center a-center"
 			hover-class="main-bg-hover-color"
-			@tap.stop="hidePopup('attr')"
+			@tap.stop="addCart"
 			style="height: 100upx;margin-left: -30upx;margin-right: -30upx;">
 				加入购物车
 			</view>
@@ -180,33 +180,21 @@
 	import price from '@/components/common/price.vue'
 	import miRadioGroup from '@/components/common/mi-radio-group.vue'
 	import uniNumberBox from '@/components/uni-ui/uni-number-box/uni-number-box.vue'
-	
-let htmlString = `
-<p>很多资讯页面，服务端返回的数据都是 markdown 字符串或 html 字符串，使用本模板可直接解析 html 为符合 uni-app 规范的富文本界面。下文为示例：</p>
-<p>HBuilderX堪称markdown书写编辑的最佳工具，本文简单介绍HBuilderX里markdown的使用技巧。更多详情请在HBuilderX里点菜单帮助-markdown语法帮助。</p>
-<p>markdown的标题是行首以#号开头，空格分割的，不同级别的标题，在HX里着色也不同。如下：</p>
-<h1>标题1</h1>
-<h2>标题2</h2>
-<h3>标题3</h3>
-<h4>标题4</h4>
-<h5>标题5</h5>
-<p>HBuilderX标题编辑技巧：</p>
-<ol>
-<li>Emmet快速输入：敲h2+Tab即可生成二级标题【同HTML里的emmet写法，不止标题，HX里所有可对应tag的markdown语法均支持emmet写法】。仅行首生效</li>
-<li>智能双击：双击#号可选中整个标题段落</li>
-<li>智能回车：行尾回车或行中Ctrl+Enter强制换行后会自动在下一行补#</li>
-<li>回车后再次按Tab可递进一层标题，再按Tab切换列表符</li>
-<li>在# 后回车，可上插一个空标题行【同word】，任意位置按Ctrl+Shift+Enter也可以</li>
-</ol>
-<ul>
-<li>折叠：点标题前的-号可折叠该标题段落，快捷键是Alt+-（展开折叠是Alt+=）</li>
-<li>折叠：多层折叠时折叠或展开子节点，快捷键是Alt+Shift+-或=</li>
-</ul>
-<p><strong>加粗</strong> 【快捷键：Ctrl+B，支持多光标；Emmet：b后敲Tab】</p>
-<p><em>倾斜</em>【Emmet：i后敲Tab；前后包围：选中文字按Ctrl+\是在选区两侧添加光标，可以继续输入_】</p>
-<p><del>删除线</del>【前后包围：选中文字按Ctrl+\是在选区两侧添加光标，可以继续输入~~，会在2侧同时输入】</p>
-`
-	
+
+var htmlString = `
+	<p>
+		<img src="https://i8.mifile.cn/v1/a1/9c3e29dc-151f-75cb-b0a5-c423a5d13926.webp">
+		<img src="https://i8.mifile.cn/v1/a1/f442b971-379f-5030-68aa-3b0accb8c2b9.webp">
+		<img src="https://i8.mifile.cn/v1/a1/63b700b6-643e-ec18-fdf3-da66b4b4173f.webp">
+		<img src="https://i8.mifile.cn/v1/a1/e9dbf276-193e-11c4-99a6-3097fde82350.webp">
+		<img src="https://i8.mifile.cn/v1/a1/1249d3ee-2990-a2b4-28d9-f719c2417b1f.webp">
+		<img src="https://i8.mifile.cn/v1/a1/97c79915-64b2-808c-53b4-4345652a179f.webp">
+		<img src="https://i8.mifile.cn/v1/a1/cd0fbe1e-a1b3-a87a-f4a6-6fb08ec54931.webp">
+	</p>
+	    `
+
+
+	import {mapMutations} from 'vuex'
 	export default {
 		components: {
 			swiperImage,
@@ -237,7 +225,9 @@ let htmlString = `
 				],
 				
 				detail: {
+					id: 5,
 					title: "小米MIX3 6GB+128GB",
+					cover: "/static/images/demo/list/1.jpg",
 					desc: "磁动力滑盖全面屏 / 前后旗舰AI双摄 / 四曲面彩色陶瓷机身 / 高效10W无限充电",
 					pprice: 3299,
 					num: 1,
@@ -382,6 +372,21 @@ let htmlString = `
 			return false  // 让页面正常返回
 		},
 		methods: {
+			...mapMutations([
+				'addGoodsToCart'
+			]),
+			addCart: function() {
+				let goods = this.detail
+				
+				goods['checked'] = false
+				goods['attrs'] = this.selects
+				// 加入购物车
+				this.addGoodsToCart(goods)
+				// 隐藏属性选择弹出框
+				this.hidePopup('attr')
+				// 加入成功提示
+				uni.showToast({title: "加入成功"})
+			},
 			hidePopup: function(key) {
 				this.popup[key] = "hide"
 				setTimeout(() => {
