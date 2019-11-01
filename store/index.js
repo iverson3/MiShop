@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 
 import cart from '@/store/modules/cart.js'
 import user from '@/store/modules/user.js'
+import path from '@/store/modules/path.js'
 
 Vue.use(Vuex)
 
@@ -15,6 +16,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
 	modules: {
 		cart,
-		user
+		user,
+		path
 	}
 })

@@ -113,10 +113,10 @@
 			 
 			<!-- 地址列表 h660 -->
 			<scroll-view scroll-y class="w-100" style="height: 835upx;">
-			 	<uni-list-item v-for="i in 5" :key="i">
-					<view class="iconfont icon-dingwei font-weight font-md">张三</view>
+			 	<uni-list-item v-for="(item,index) in pathList" :key="index">
+					<view class="iconfont icon-dingwei font-weight font-md">{{ item.name }}</view>
 					<view class="font text-light-muted">
-						广东省深圳市南山区88路明亮科技园 2栋122
+						{{ item.path }} {{ item.detailPath }}
 					</view>
 				</uni-list-item>
 			</scroll-view>
@@ -124,7 +124,7 @@
 			<!-- 按钮 h100 -->
 			<view class="main-bg-color text-white font-md d-flex j-center a-center"
 			hover-class="main-bg-hover-color"
-			@tap.stop="hidePopup('express')"
+			@tap.stop="openCreatePath"
 			style="height: 100upx;margin-left: -30upx;margin-right: -30upx;">
 				选择新地址
 			</view>
@@ -194,7 +194,7 @@ var htmlString = `
 	    `
 
 
-	import {mapMutations} from 'vuex'
+	import {mapState, mapMutations} from 'vuex'
 	export default {
 		components: {
 			swiperImage,
@@ -359,6 +359,11 @@ var htmlString = `
 				]
 			}
 		},
+		computed: {
+			...mapState({
+				pathList: state => state.path.list
+			})
+		},
 		
 		// 监听页面返回事件
 		onBackPress: function() {
@@ -386,6 +391,12 @@ var htmlString = `
 				this.hidePopup('attr')
 				// 加入成功提示
 				uni.showToast({title: "加入成功"})
+			},
+			openCreatePath: function() {
+				uni.navigateTo({
+					url: "/pages/user-path-edit/user-path-edit"
+				})
+				this.hidePopup('express')
 			},
 			hidePopup: function(key) {
 				this.popup[key] = "hide"

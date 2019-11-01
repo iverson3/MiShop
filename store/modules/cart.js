@@ -193,6 +193,8 @@ export default {
 			state.list = state.list.filter(v => {
 				return state.selectedList.indexOf(v.id) === -1
 			})
+			// 清空选中列表
+			state.selectedList = []
 		},
 		// 初始化popupIndex
 		initPopupIndex(state, index) {

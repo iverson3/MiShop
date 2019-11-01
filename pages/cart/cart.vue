@@ -19,7 +19,7 @@
 		<view v-else class="bg-white px-2">
 			<!-- 列表 -->
 			<template v-for="(item,index) in list">
-				<view :key="index" class="d-flex a-center py-3 border-bottom border-light-secondary" style="height: 260upx;">
+				<view :key="index" class="d-flex a-center py-1 border-bottom border-light-secondary" style="height: 260upx;">
 					
 					<label @click="selectItem(index)" class="radio d-flex a-center j-center flex-shrink" style="width: 80upx;height: 80upx;">
 						<radio :value="item.id" :checked="item.checked" color="#FD6801"/>
@@ -52,10 +52,22 @@
 			</template>
 		</view>
 		
+		
+		<!-- 热门商品推荐列表 -->
+		<view class="text-center main-text-color font-md font-weight mt-5">为你推荐</view>
+		<view class="position-relative d-flex j-center a-center text-secondary mb-3 pt-3">
+			<view class="px-2 position-absolute" style="background: #F5F5F5;z-index: 2;">买的人还买了</view>
+			<view class="position-absolute" style="background: #DDDDDD;height: 1upx;left: 0;right: 0;"></view>
+		</view>
+		<!-- 列表 -->
+		<view class="row j-sb bg-white">
+			<common-list v-for="(item,index) in hotList" :key="index" :item="item" :index="index"></common-list>
+		</view>
+		
 		<!-- 占位 -->
 		<view style="height: 100upx;background: white;"></view>
 		<!-- 价格合计组件 -->
-		<view class="d-flex a-center a-stretch position-fixed left-0 right-0 bottom-0 border-top border-light-secondary bg-light-secondary" style="height: 100upx;z-index: 1000;">
+		<view class="d-flex a-center a-stretch position-fixed left-0 right-0 bottom-0 border-top border-light-secondary bg-white" style="height: 100upx;z-index: 1000;">
 			<label @click="doSelectAll" class="radio d-flex a-center j-center flex-shrink" style="width: 120upx;">
 				<radio color="#FD6801" :checked="checkedAll" :disabled="disableSelectAll"/>
 			</label>
@@ -135,7 +147,7 @@
 	import card from '@/components/common/card.vue'
 	import commonPopup from '@/components/common/common-popup.vue'
 	import miRadioGroup from '@/components/common/mi-radio-group.vue'
-	import divider from '@/components/common/divider.vue'
+	import commonList from '@/components/common/common-list.vue'
 	
 	import {mapState, mapGetters, mapMutations, mapActions} from 'vuex'
 	export default {
@@ -146,11 +158,54 @@
 			card,
 			commonPopup,
 			miRadioGroup,
-			divider
+			commonList
 		},
 		data() {
 			return {
-				
+				hotList: [
+					{
+						cover:"/static/images/demo/list/1.jpg",
+						title:"米家空调",
+						desc:"1.5匹变频",
+						oprice:2699,
+						pprice:1399
+					},
+					{
+						cover:"/static/images/demo/list/1.jpg",
+						title:"米家空调",
+						desc:"1.5匹变频",
+						oprice:2699,
+						pprice:1399
+					},
+					{
+						cover:"/static/images/demo/list/1.jpg",
+						title:"米家空调",
+						desc:"1.5匹变频",
+						oprice:2699,
+						pprice:1399
+					},
+					{
+						cover:"/static/images/demo/list/1.jpg",
+						title:"米家空调",
+						desc:"1.5匹变频",
+						oprice:2699,
+						pprice:1399
+					},
+					{
+						cover:"/static/images/demo/list/1.jpg",
+						title:"米家空调",
+						desc:"1.5匹变频",
+						oprice:2699,
+						pprice:1399
+					},
+					{
+						cover:"/static/images/demo/list/1.jpg",
+						title:"米家空调",
+						desc:"1.5匹变频",
+						oprice:2699,
+						pprice:1399
+					}
+				]
 			}
 		},
 		computed: {

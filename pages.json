@@ -90,7 +90,12 @@
         ,{
             "path" : "pages/my/my",
             "style" : {
-				"navigationBarTitleText": "我的"
+				"app-plus": {
+					// 取消app中默认的顶部导航栏，在页面中使用自定义的导航栏
+					"titleNView": false,
+					"scrollIndicator":"none",
+					"bounce":"none"
+				}
 			}
         }
         ,{
@@ -196,6 +201,61 @@
 					}
 				}
 			}
+        }
+        ,{
+            "path" : "pages/user-set/user-set",
+            "style" : {
+				"navigationBarTitleText":"用户设置"
+			}
+        }
+        ,{
+            "path" : "pages/user-userinfo/user-userinfo",
+            "style" : {
+				"navigationBarTitleText":"修改资料"
+			}
+        }
+        ,{
+            "path" : "pages/user-path-list/user-path-list",
+            "style" : {
+            	"navigationBarTitleText":"收货地址",
+            	"app-plus": {
+            		"scrollIndicator":"none",
+            		"bounce":"none",
+            		"titleNView": {
+            			"buttons": [
+            				{
+            					"float":"right",
+								"fontSize":"15px",
+								"color":"#999999",
+								"colorPressed":"#BBBBBB",
+								"fontSrc":"/static/font/iconfont.ttf",
+								"text": "\ue626"  // 图标的Unicode (加号图标)
+            				}
+            			]
+            		}
+            	}
+            }
+        }
+        ,{
+            "path" : "pages/user-path-edit/user-path-edit",
+            "style" : {
+            	"navigationBarTitleText":"新增收货地址",
+            	"app-plus": {
+            		"scrollIndicator":"none",
+            		"bounce":"none",
+            		"titleNView": {
+            			"buttons": [
+            				{
+            					"float":"right",
+            					"fontSize":"16px",
+            					"color":"#999999",
+            					"colorPressed":"#BBBBBB",
+            					"text": "删除"
+            				}
+            			]
+            		}
+            	}
+            }
         }
     ],
 	"globalStyle": {
