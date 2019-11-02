@@ -15,10 +15,11 @@
 				<slot></slot>
 			</view>
 			<view v-if="showBadge || showArrow || showSwitch" class="uni-list-item__extra" :style="'width:'+extraWidth+';'">
+				<slot name="rightContent"></slot>
 				<slot name="right">
 					<uni-badge v-if="showBadge" :type="badgeType" :text="badgeText" />
 					<switch v-if="showSwitch" :disabled="disabled" :checked="switchChecked" @change="onSwitchChange" />
-					<uni-icons v-if="showArrow" :size="20" class="uni-icon-wrapper" color="#bbb" type="arrowright" />
+					<uni-icons v-if="showArrow && showArrowIcon" :size="20" class="uni-icon-wrapper" color="#bbb" type="arrowright" />
 				</slot>
 			</view>
 		</view>
@@ -35,6 +36,10 @@
 			uniBadge
 		},
 		props: {
+			showArrowIcon: {
+				type: Boolean,
+				default: true
+			},
 			leftIcon: {
 				type: String,
 				default: ""

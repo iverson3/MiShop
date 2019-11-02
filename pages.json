@@ -257,6 +257,60 @@
             	}
             }
         }
+        ,{
+            "path" : "pages/order/order",
+            "style" : {
+            	"navigationBarTitleText":"我的订单",
+            	"app-plus": {
+            		"scrollIndicator":"none",
+            		"bounce":"none",
+            		"titleNView": {
+            			"buttons": [
+							{
+								"float":"right",
+								"fontSize":"18px",
+								"color":"#999999",
+								"colorPressed":"#BBBBBB",
+								"fontSrc":"/static/font/iconfont.ttf",
+								"text": "\ue60c"  // 图标的Unicode (购物车图标)
+							},
+							{
+								"float":"right",
+								"fontSize":"18px",
+								"color":"#999999",
+								"colorPressed":"#BBBBBB",
+								"fontSrc":"/static/font/iconfont.ttf",
+								"text": "\ue6e3"  // 图标的Unicode (搜索图标)
+							}
+            			]
+            		}
+            	}
+            }
+        }
+        ,{
+            "path" : "pages/order-confirm/order-confirm",
+            "style" : {
+				"navigationBarTitleText":"订单配送至",
+				"navigationBarBackgroundColor":"#FD6801",
+				"navigationBarTextStyle":"white"
+			}
+        }
+        ,{
+            "path" : "pages/order-invoice/order-invoice",
+            "style" : {
+				"navigationBarTitleText":"发票"
+			}
+        }
+        ,{
+            "path" : "pages/login/login",
+            "style" : {
+				"app-plus":{
+					"bounce":"none",
+					"scrollIndicator":"none",
+					"titleNView":false
+				}
+			}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

@@ -31,3 +31,7 @@ image {
 .main-border-color {
 	border-color: #F1F1F1;
 }
+/* input输入框边框颜色 */
+.input-border-color {
+	border-color: #FD6801;
+}

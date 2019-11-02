@@ -3,9 +3,16 @@ export default {
 		list: [
 			{
 				name: "张三",
+				phone: "13458698574",
+				path: "广东省 惠州市 ABC区",
+				detailPath: "xxxx街道",
+				isdefault: false
+			},
+			{
+				name: "Stefan",
 				phone: "13396095889",
 				path: "广东省 深圳市 南山区",
-				detailPath: "xxxx街道",
+				detailPath: "xxxx公司 2栋 122",
 				isdefault: false
 			}
 		],
@@ -16,6 +23,14 @@ export default {
 			return state.list.filter(v => {
 				return v.isdefault
 			})
+		},
+		// 获取默认地址中的城市部分
+		defaultPathCity: (state, getters) => {
+			let city = "北京 东城区"
+			if (getters.defaultPath.length > 0) {
+				city = getters.defaultPath[0].path
+			}
+			return city
 		}
 	},
 	mutations: {

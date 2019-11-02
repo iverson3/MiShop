@@ -72,6 +72,7 @@
 			}
 		},
 		onLoad: function(e) {
+			console.log(e)
 			if (e.data) {
 				let res = JSON.parse(e.data)
 				this.index = res.index

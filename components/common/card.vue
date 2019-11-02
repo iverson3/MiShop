@@ -1,6 +1,6 @@
 <template>
 	<!-- 基础卡片组件 -->
-	<view class="card">
+	<view class="card" :style="cardStyle">
 		<!-- head -->
 		<view v-if="showhead" class="p-2 border-bottom main-border-color" :class="getHeadClass">
 			<slot name="title">
@@ -54,6 +54,11 @@
 			bodyPadding:{
 				type: Boolean,
 				default: false
+			},
+			
+			cardStyle: {
+				type: String,
+				default: ""
 			}
 		},
 		computed: {

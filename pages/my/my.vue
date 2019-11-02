@@ -9,7 +9,9 @@
 			<view class="d-flex a-center position-absolute left-0 right-0" style="bottom: 50upx;">
 				<image src="/static/images/demo/demo6.jpg" class="rounded-circle border-light ml-4" 
 				style="width: 145upx;height: 145upx;border: 5upx solid;"></image>
-				<view class="ml-2 text-white font-md">测试昵称</view>
+				<navigator url="/pages/login/login">
+					<view class="ml-2 text-white font-md">测试昵称</view>
+				</navigator>
 				<view class="d-flex a-center j-center ml-auto a-self-end px-2" 
 				style="height: 70upx;background: #FFD43F;color: #CC4A00;border-top-left-radius: 35upx;border-bottom-left-radius: 35upx;">
 					<view class="iconfont icon-huangguan line-h mr-2"></view>
@@ -22,7 +24,7 @@
 		<card>
 			<view slot="title" class="d-flex a-center j-sb">
 				<text class="font-md font-weight">我的订单</text>
-				<view class="text-secondary font">
+				<view class="text-secondary font" @click="navigate('order')">
 					全部订单 <text class="iconfont icon-you font"></text>
 				</view>
 			</view>

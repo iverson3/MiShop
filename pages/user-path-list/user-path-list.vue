@@ -2,12 +2,12 @@
 	<view>
 		<block v-for="(item,index) in list" :key="index">
 			<uni-swipe-action :options="options" @click="bindClick($event, index)">
-				<uni-list-item>
+				<uni-list-item @click="choose(item)">
 					<view class="text-secondary">
 						<view class="d-flex a-center">
-							<text class="main-text-color">{{ item.name }}</text>
+							<text class="main-text-color mr-2">{{ item.name }}</text>
 							{{ item.phone }}
-							<text class="main-text-color" v-if="item.isdefault">[默认]</text>
+							<text class="main-text-color ml-2" v-if="item.isdefault">[默认]</text>
 						</view>
 						<view class="">{{ item.path }}</view>
 						<view class="">{{ item.detailPath }}</view>
@@ -30,6 +30,8 @@
 		},
 		data() {
 			return {
+				isChoose: false,
+				
 				options: [{
 					text: '修改',
 					style: {
@@ -47,6 +49,11 @@
 			...mapState({
 				list: state => state.path.list
 			})
+		},
+		onLoad: function(e) {
+			if (e.type === 'choose') {
+				this.isChoose = true
+			}
 		},
 		onNavigationBarButtonTap: function(e) {
 			if (e.index === 0) {
@@ -86,6 +93,16 @@
 						break;
 				}
 			},
+			
+			// 选择收货地址
+			choose: function(item) {
+				if (this.isChoose) {
+					// 通知订单提交页面修改收货地址
+					uni.$emit('choosePath', item)
+					// 关闭当前页面
+					uni.navigateBack({delta: 1})
+				}
+			}
 		}
 	}
 </script>

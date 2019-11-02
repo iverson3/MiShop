@@ -12,7 +12,7 @@
 		<view v-if="disableSelectAll" class="py-5 d-flex j-center a-center bg-white border">
 			<view class="iconfont icon-gouwuche text-light-muted" style="font-size: 50upx;"></view>
 			<view class="text-light-muted mx-2">购物车空空如也</view>
-			<view class="px-2 py-1 border border-light-secondary rounded" hover-class="bg-light-secondary" @click="gotoIndex()">去逛逛</view>
+			<view class="px-2 py-1 border border-light-secondary rounded" hover-class="bg-light-secondary" @tap="gotoIndex">去逛逛</view>
 		</view>
 		
 		<!-- 购物车商品列表组件 -->
@@ -54,9 +54,9 @@
 		
 		
 		<!-- 热门商品推荐列表 -->
-		<view class="text-center main-text-color font-md font-weight mt-5">为你推荐</view>
-		<view class="position-relative d-flex j-center a-center text-secondary mb-3 pt-3">
-			<view class="px-2 position-absolute" style="background: #F5F5F5;z-index: 2;">买的人还买了</view>
+		<view class="text-center main-text-color font-md font-weight pt-5 bg-white">为你推荐</view>
+		<view class="position-relative d-flex j-center a-center text-secondary pb-5 pt-3 bg-white">
+			<view class="px-2 position-absolute" style="background: white;z-index: 2;">买的人还买了</view>
 			<view class="position-absolute" style="background: #DDDDDD;height: 1upx;left: 0;right: 0;"></view>
 		</view>
 		<!-- 列表 -->
@@ -76,7 +76,7 @@
 				<view class="flex-1 d-flex a-center j-center font-md">
 					合计 <price>{{ totalPrice }}</price>
 				</view>
-				<view class="flex-1 d-flex a-center j-center main-bg-color text-white font-md" hover-class="main-bg-hover-color">
+				<view @tap="orderConfirm" class="flex-1 d-flex a-center j-center main-bg-color text-white font-md" hover-class="main-bg-hover-color">
 					结算
 				</view>
 			</template>
@@ -237,8 +237,15 @@
 				item.num = e
 			},
 			gotoIndex: function() {
+				console.log('go index')
 				uni.navigateTo({
 					url: "/pages/index/index"
+				})
+			},
+			
+			orderConfirm: function() {
+				uni.navigateTo({
+					url: "/pages/order-confirm/order-confirm"
 				})
 			}
 		}

@@ -22,7 +22,7 @@
 				<uni-list-item @tap="showPopup('express')">
 					<view class="d-flex">
 						<text class="mr-2 text-muted">配送</text>
-						<text class="mr-2">北京 东城区</text>
+						<text class="mr-2">{{ defaultPathCity }}</text>
 						<text class="main-text-color">现配</text>
 					</view>
 				</uni-list-item>
@@ -114,7 +114,11 @@
 			<!-- 地址列表 h660 -->
 			<scroll-view scroll-y class="w-100" style="height: 835upx;">
 			 	<uni-list-item v-for="(item,index) in pathList" :key="index">
-					<view class="iconfont icon-dingwei font-weight font-md">{{ item.name }}</view>
+					<view class="iconfont icon-dingwei font-weight font-md">
+						{{ item.name }}
+						<text class="ml-2">{{ item.phone }}</text> 
+						<text v-if="item.isdefault" class="ml-3" style="color: red;">[默认]</text>
+					</view>
 					<view class="font text-light-muted">
 						{{ item.path }} {{ item.detailPath }}
 					</view>
@@ -194,7 +198,7 @@ var htmlString = `
 	    `
 
 
-	import {mapState, mapMutations} from 'vuex'
+	import {mapState, mapMutations, mapGetters} from 'vuex'
 	export default {
 		components: {
 			swiperImage,
@@ -362,7 +366,10 @@ var htmlString = `
 		computed: {
 			...mapState({
 				pathList: state => state.path.list
-			})
+			}),
+			...mapGetters([
+				'defaultPathCity'
+			])
 		},
 		
 		// 监听页面返回事件
