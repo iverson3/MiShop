@@ -1,7 +1,7 @@
 <template>
-	<view>
+	<view class="d-flex flex-column" style="height: 100%;">
 		<!-- 选项卡 -->
-		<view class="d-flex a-center bg-white font-md text-muted border-top border-bottom border-light-secondary">
+		<view class="d-flex a-center bg-white font-md text-muted border-top border-bottom border-light-secondary position-fixed top-0 left-0 right-0" style="height: 90upx;z-index: 100;">
 			<view v-for="(item,index) in tabBars" :key="index" 
 			@tap="changeTab(index)"
 			:class="index === tabIndex? 'tabactive':''"
@@ -9,37 +9,41 @@
 				{{ item.name }}
 			</view>
 		</view>
+		<!-- 占位 -->
+		<view class="w-100" style="height: 90upx;"></view>
 		
-		<!-- 订单列表 -->
-		<block v-for="(tab,tabI) in tabBars" :key="tabI">
-			<view class="position-relative" v-show="tabI === tabIndex" style="min-height: 400upx;">
-				<template v-if="tab.list.length > 0">
-					<!-- 列表 -->
-					<block v-for="(item,index) in tab.list" :key="index">
-						<order-list :item="item" :index="index"></order-list>
-					</block>
-					<divider></divider>
-				</template>
-				
-				<template v-else>
-					<!-- 没有订单 -->
-					<no-thing :icon="tab.no_thing" :msg="tab.msg"></no-thing>
-				</template>
+		<scroll-view scroll-y class="flex-1" style="background-color: #F5F5F5;" :scroll-top="scrollTop">
+			<!-- 订单列表 -->
+			<block v-for="(tab,tabI) in tabBars" :key="tabI">
+				<view class="position-relative" v-show="tabI === tabIndex" style="min-height: 400upx;">
+					<template v-if="tab.list.length > 0">
+						<!-- 列表 -->
+						<block v-for="(item,index) in tab.list" :key="index">
+							<order-list :item="item" :index="index"></order-list>
+						</block>
+						<divider></divider>
+					</template>
+					
+					<template v-else>
+						<!-- 没有订单 -->
+						<no-thing :icon="tab.no_thing" :msg="tab.msg"></no-thing>
+					</template>
+				</view>
+			</block>
+			
+			
+			<!-- 热门商品推荐列表 -->
+			<view class="text-center main-text-color font-md font-weight pt-5 bg-white">为你推荐</view>
+			<view class="position-relative d-flex j-center a-center text-secondary pb-5 pt-3 bg-white">
+				<view class="px-2 position-absolute" style="background: white;z-index: 2;">买的人还买了</view>
+				<view class="position-absolute" style="background: #DDDDDD;height: 1upx;left: 0;right: 0;"></view>
 			</view>
-		</block>
+			<!-- 列表 -->
+			<view class="row j-sb bg-white">
+				<common-list v-for="(item,index) in hotList" :key="index" :item="item" :index="index"></common-list>
+			</view>
+		</scroll-view>
 		
-		
-		
-		<!-- 热门商品推荐列表 -->
-		<view class="text-center main-text-color font-md font-weight pt-5 bg-white">为你推荐</view>
-		<view class="position-relative d-flex j-center a-center text-secondary pb-5 pt-3 bg-white">
-			<view class="px-2 position-absolute" style="background: white;z-index: 2;">买的人还买了</view>
-			<view class="position-absolute" style="background: #DDDDDD;height: 1upx;left: 0;right: 0;"></view>
-		</view>
-		<!-- 列表 -->
-		<view class="row j-sb bg-white">
-			<common-list v-for="(item,index) in hotList" :key="index" :item="item" :index="index"></common-list>
-		</view>
 	</view>
 </template>
 
@@ -57,6 +61,7 @@
 		data() {
 			return {
 				tabIndex: 0,
+				scrollTop: 0,
 				tabBars: [
 					{
 						name:"全部",
@@ -166,6 +171,13 @@
 						pprice:1399
 					}
 				]
+			}
+		},
+		watch: {
+			async tabIndex(newValue, oldValue) {
+				console.log(this.scrollTop)
+				this.scrollTop = 0
+				console.log(this.scrollTop)
 			}
 		},
 		methods: {

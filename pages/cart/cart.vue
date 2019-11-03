@@ -1,5 +1,8 @@
 <template>
-	<view style="background: #F5F5F5;">
+	<view class="animated fadeIn faster" style="background: #F5F5F5;">
+		
+		<loading-plus v-if="beforeReady"></loading-plus>
+		
 		<!-- 自定义的顶部导航栏 -->
 		<uni-nav-bar :right-text="isedit?'完成':'编辑'" 
 		@click-right="changeEditStatus"
@@ -141,6 +144,8 @@
 </template>
 
 <script>
+	import loading from '@/common/mixin/loading.js';
+	
 	import uniNavBar from '@/components/uni-ui/uni-nav-bar/uni-nav-bar.vue'
 	import price from '@/components/common/price.vue'
 	import uniNumberBox from '@/components/uni-ui/uni-number-box/uni-number-box.vue'
@@ -151,6 +156,7 @@
 	
 	import {mapState, mapGetters, mapMutations, mapActions} from 'vuex'
 	export default {
+		mixins: [loading],
 		components: {
 			uniNavBar,
 			price,

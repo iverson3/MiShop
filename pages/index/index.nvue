@@ -206,10 +206,10 @@
 		},
 		watch: {
 			newsitems(a, b) {
-				console.log('a.length')
-				console.log(a.length)
+				// console.log('a.length')
+				// console.log(a.length)
 				for (var i = 0; i < a.length; i++) {
-					console.log(a[i].data.length)
+					// console.log(a[i].data.length)
 				}
 			}
 		},
@@ -227,6 +227,18 @@
 				uni.navigateTo({
 					url: '../search/search'
 				})
+			})
+	
+			// 监听导航栏图标按钮点击事件
+			uni.onNavigationBarButtonTap(e => {
+				console.log(e)
+				if (e.index === 0) {
+					uni.navigateTo({
+						url: "/pages/msg-list/msg-list"
+					})
+				} else {
+					// 扫一扫
+				}
 			})
 			
 			// 生成随机数据

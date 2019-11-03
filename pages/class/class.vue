@@ -1,7 +1,8 @@
 <template>
-	<view class="d-flex border-top border-light-secondary" style="height: 100%; box-sizing: border-box;">
+	<view class="d-flex border-top border-light-secondary animated fadeIn faster" style="height: 100%; box-sizing: border-box;">
 		
-		<loading :show="showLoading"></loading>
+		<loading-plus v-if="beforeReady"></loading-plus>
+		<!-- <loading :show="showLoading"></loading> -->
 		
 		<!-- 左边 分类列表 -->
 		<scroll-view id="leftScroll" scroll-y 
@@ -32,10 +33,12 @@
 </template>
 
 <script>
+	import loading from '@/common/mixin/loading.js';
+	
 	export default {
+		mixins: [loading],
 		data() {
 			return {
-				showLoading: true,
 				activeIndex: 0,
 				cate: [],
 				list: [],
@@ -126,9 +129,9 @@
 					}
 				}
 				// 将回调函数延迟到下次DOM更新循环之后执行
-				this.$nextTick(() => {
-					this.showLoading = false
-				})
+				// this.$nextTick(() => {
+				// 	this.showLoading = false
+				// })
 			},
 			
 			// 左边分类点击事件
