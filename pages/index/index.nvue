@@ -17,101 +17,79 @@
 					<text class="font-md text-muted">{{ list.refreshtext }}</text>
 				</refresh>
 				
+				<template v-if="list.data.length > 0 && list.firstLoad === 'after'">
 				
-				<!-- 首页模板 推荐 -->
-				<template v-if="tabBars[listIndex].template === 'index'">
-					<cell v-for="(listItem,ItemIndex) in list.data" :key="ItemIndex">
-						<!-- 轮播图组件 -->
-						<mi-slider v-if="listItem.type === 'swiper'" :sliders="listItem.data"></mi-slider>
-						
-						<template v-if="listItem.type === 'indexnavs'">
-							<!-- 图标分类组件 -->
-							<mi-index-navs :resdata="listItem.data"></mi-index-navs>
-							<!-- 封装全局分割线组件 -->
-							<divider></divider>
-						</template>
-						
-						<template v-if="listItem.type === 'threeAdv'">
-							<!-- 三图广告组件 -->
-							<mi-three-adv :resdata="listItem.data"></mi-three-adv>
-							<divider></divider>
-						</template>
-						
-						<!-- 大图广告 -->
-						<mi-one-adv v-if="listItem.type === 'oneAdv'" :resdata="listItem.data"></mi-one-adv>
-						
-						<!-- 公共列表组件 -->
-						<div class="row w-100" v-if="listItem.type === 'list'">
-							<block v-for="(item,index) in listItem.data" :key="index">
-								<common-list :item="item" :index="index"></common-list>
-							</block>
-						</div>
-					</cell>
-				</template>
-				
-				<!-- 关注页 -->
-				<template v-else-if="tabBars[listIndex].template === 'guanzhu'">
-					<cell v-for="(listItem,ItemIndex) in list.data" :key="ItemIndex">
-						<!-- 轮播图组件 -->
-						<mi-slider v-if="listItem.type === 'swiper'" :sliders="listItem.data"></mi-slider>
-						
-						<template v-if="listItem.type === 'indexnavs'">
-							<!-- 图标分类组件 -->
-							<mi-index-navs :resdata="listItem.data"></mi-index-navs>
-						</template>
-						
-						<!-- 公共列表组件 -->
-						<div class="w-100" v-if="listItem.type === 'list'">
-							<div class="p-2 border-bottom border-top">
-								<text class="text-dark font-md font-weight">热卖爆品</text>
+					<!-- 首页模板 推荐 -->
+					<template v-if="tabBars[listIndex].template === 'index'">
+						<cell v-for="(listItem,ItemIndex) in list.data" :key="ItemIndex">
+							<!-- 轮播图组件 -->
+							<mi-slider v-if="listItem.type === 'swiper'" :sliders="listItem.data"></mi-slider>
+							
+							<template v-if="listItem.type === 'indexnavs'">
+								<!-- 图标分类组件 -->
+								<mi-index-navs :resdata="listItem.data"></mi-index-navs>
+								<!-- 封装全局分割线组件 -->
+								<divider></divider>
+							</template>
+							
+							<template v-if="listItem.type === 'threeAdv'">
+								<!-- 三图广告组件 -->
+								<mi-three-adv :resdata="listItem.data"></mi-three-adv>
+								<divider></divider>
+							</template>
+							
+							<!-- 大图广告 -->
+							<mi-one-adv v-if="listItem.type === 'oneAdv'" :resdata="listItem.data"></mi-one-adv>
+							
+							<!-- 公共列表组件 -->
+							<div class="row w-100" v-if="listItem.type === 'list'">
+								<block v-for="(item,index) in listItem.data" :key="index">
+									<common-list :item="item" :index="index"></common-list>
+								</block>
 							</div>
-							<div>
-								<div class="row w-100">
-									<block v-for="(item,index) in listItem.data" :key="index">
-										<common-list :item="item" :index="index"></common-list>
-									</block>
+						</cell>
+					</template>
+					
+					<!-- 专题页 -->
+					<template v-else-if="tabBars[listIndex].template === 'special'">
+						<cell v-for="(listItem,ItemIndex) in list.data" :key="ItemIndex">
+							<!-- 轮播图组件 -->
+							<mi-slider v-if="listItem.type === 'swiper'" :sliders="listItem.data"></mi-slider>
+							
+							<template v-if="listItem.type === 'indexnavs'">
+								<!-- 图标分类组件 -->
+								<mi-index-navs :resdata="listItem.data"></mi-index-navs>
+							</template>
+							
+							<!-- 公共列表组件 -->
+							<div class="w-100" v-if="listItem.type === 'list'">
+								<div class="p-2 border-bottom border-top">
+									<text class="text-dark font-md font-weight">热卖爆品</text>
+								</div>
+								<div>
+									<div class="row w-100">
+										<block v-for="(item,index) in listItem.data" :key="index">
+											<common-list :item="item" :index="index"></common-list>
+										</block>
+									</div>
 								</div>
 							</div>
-						</div>
+						</cell>
+					</template>
+					
+				</template>
+				<!-- 数据加载中 -->
+				<template v-else-if="list.firstLoad === 'ing'">
+					<cell class="j-center a-center" style="padding-top: 100px;">
+						<text class="font-md text-light-muted">数据加载中...</text>
 					</cell>
 				</template>
-				
-				<!-- 体育页 -->
-				<template v-else-if="tabBars[listIndex].template === 'tiyu'">
-					<cell v-for="(listItem,ItemIndex) in list.data" :key="ItemIndex">
-						<template v-if="listItem.type === 'indexnavs'">
-							<!-- 图标分类组件 -->
-							<mi-index-navs :resdata="listItem.data"></mi-index-navs>
-						</template>
-						<!-- 公共列表组件 -->
-						<div class="w-100" v-if="listItem.type === 'list'">
-							<div class="p-2 border-bottom border-top">
-								<text class="text-dark font-md font-weight">热卖爆品</text>
-							</div>
-							<div>
-								<div class="row w-100">
-									<block v-for="(item,index) in listItem.data" :key="index">
-										<common-list :item="item" :index="index"></common-list>
-									</block>
-								</div>
-							</div>
-						</div>
+				<!-- tab下没有数据 -->
+				<template v-else>
+					<cell class="j-center a-center" style="padding-top: 100px;">
+						<text class="font-md text-light-muted">暂无数据</text>
 					</cell>
 				</template>
-				
-				<!-- 体育页 -->
-				<template v-else-if="tabBars[listIndex].template === 'hot'">
-					<cell v-for="(listItem,ItemIndex) in list.data" :key="ItemIndex">
-						<!-- 轮播图组件 -->
-						<mi-slider v-if="listItem.type === 'swiper'" :sliders="listItem.data"></mi-slider>
-						
-						<template v-if="listItem.type === 'indexnavs'">
-							<!-- 图标分类组件 -->
-							<mi-index-navs :resdata="listItem.data"></mi-index-navs>
-						</template>
-					</cell>
-				</template>
-				
 				
 				<!-- 上拉加载更多 -->
 				<loading style="height: 70px;" 
@@ -154,53 +132,7 @@
 				newsitems: [],
 				
 				tabIndex: 0,
-				tabBars: [
-					{
-						name: "推荐",
-						id: "index",
-						template: "index"
-					},
-					{
-						name: "关注",
-						id: "guanzhu",
-						template: "guanzhu"
-					},
-					{
-						name: "体育",
-						id: "tiyu",
-						template: "tiyu"
-					},
-					{
-						name: "热点",
-						id: "hot",
-						template: "hot"
-					},
-					{
-						name: "财经",
-						id: "caijin",
-						template: "caijin"
-					},
-					{
-						name: "娱乐",
-						id: "play",
-						template: "play"
-					},
-					{
-						name: "军事",
-						id: "junshi",
-						template: "junshi"
-					},
-					{
-						name: "历史",
-						id: "history",
-						template: "history"
-					},
-					{
-						name: "本地",
-						id: "local",
-						template: "local"
-					}
-				]
+				tabBars: []
 				
 			}
 		},
@@ -242,12 +174,10 @@
 			})
 			
 			// 生成随机数据
-			this.newsitems = this.randomfn()
+			// this.newsitems = this.randomfn()
 			
-			// 开发阶段使用 直接跳转到detail页面
-			// uni.navigateTo({
-			// 	url: "/pages/detail/detail"
-			// })
+			// 初始化数据
+			this.__init()
 		},
 		beforeDestroy: function() {
 			// 移除监听的事件
@@ -255,165 +185,197 @@
 		},
 		
 		methods: {
+			async __init() {
+				// 封装之后的调用方式一
+				// this.$api.get('/index_category/data').then((data) => {
+				// 	// 初始化tabbar数据
+				// 	this.tabBars = data.category
+				// 	// 初始化页面数据
+				// 	this.newsitems = this.setNewsItems(data)
+				// }).catch((err) => {
+				// 	console.log("请求失败")
+				// })
+				
+				// 封装之后的调用方式二
+				let data = await this.$api.get('/index_category/data')
+				if (data) {
+					// 初始化tabbar数据
+					this.tabBars = data.category
+					// 初始化页面数据
+					this.newsitems = this.setNewsItems(data)
+				}
+				
+				// let [error, result] = await uni.request({
+				// 	url: 'http://ceshi3.dishait.cn/api/index_category/data',
+				// 	method: 'GET'
+				// })
+				// // 请求错误 (比如没有网络)
+				// if (error) {
+				// 	return uni.showToast({
+				// 		title: error.errMsg,
+				// 		icon: 'none'
+				// 	});
+				// }
+				// // 请求失败
+				// if (result.statusCode !== 200) {
+				// 	return uni.showToast({
+				// 		title: result.data.msg,
+				// 		icon: 'none'
+				// 	});
+				// }
+				// // 请求成功
+				// console.log(result.data.data)
+				// let data = result.data.data
+			},
+			
+			// 演示request请求的三种方式
+			async __demo() {
+				// 请求的第一种方式
+				// uni.request({
+				// 	url: 'http://ceshi3.dishait.cn/api/index_category/data',
+				// 	method: 'GET',
+				// 	success: res => {
+				// 		console.log(res)
+				// 	},
+				// 	fail: () => {
+				// 		console.log('请求失败')
+				// 	},
+				// 	complete: () => {
+				// 		console.log('请求完成')
+				// 	}
+				// });
+				
+				// 请求的第二种方式
+				// uni.request({
+				// 	url: 'http://ceshi3.dishait.cn/api/index_category/data',
+				// 	method: 'GET'
+				// }).then(data => {
+				// 	let [error, result] = data
+				// 	// 请求错误 (比如没有网络)
+				// 	if (error) {
+				// 		return console.log(error.errMsg)
+				// 	}
+				// 	// 请求失败
+				// 	if (result.statusCode !== 200) {
+				// 		return console.log(result.data.msg)
+				// 	}
+				// 	// 请求成功
+				// 	console.log(result.data)
+				// })
+				
+				// 请求的第三种方式 async&await
+				let [error, result] = await uni.request({
+					url: 'http://ceshi3.dishait.cn/api/index_category/data',
+					method: 'GET'
+				})
+				// 请求错误 (比如没有网络)
+				if (error) {
+					return console.log(error.errMsg)
+				}
+				// 请求失败
+				if (result.statusCode !== 200) {
+					return console.log(result.data.msg)
+				}
+				// 请求成功
+				console.log(result.data)
+			},
+			
 			// 这个方法是由子组件emit触发 然后由父组件(当前组件)调用的 
 			tabChange: function(index) {
 				console.log('tabChange')
 				this.tabIndex = index
-				
-				if (this.newsitems[index].isLoadingData) return
-				this.newsitems[index].isLoadingData = true
-				this.tabChangeInitData(index)
 			},
-		
 			// 监听横向滚动列表的滚动
 			sliderChange: function(e) {
 				console.log('sliderChange')
 				this.tabIndex = e.index
-				
-				if (this.newsitems[e.index].isLoadingData) return
-				this.newsitems[e.index].isLoadingData = true
-				this.tabChangeInitData(e.index)
-			},
-			tabChangeInitData: function(index) {
-				if (this.newsitems[index].data.length > 0) {
-					this.newsitems[index].isLoadingData = false
-					return
-				}
-				setTimeout(() => {
-					// 调用接口 获取对应tab下的数据
+				// 判断当前tab是否已经加载过第一页的数据
+				if (this.newsitems[this.tabIndex].firstLoad === 'before') {
+					// 调用接口 获取对应tab下的第一页数据
 					this.addData(index)
-					this.newsitems[index].isLoadingData = false
-				}, 100)
+				}
 			},
 			
 			// 上拉加载事件
 			onLoading: function() {
 				console.log('上拉加载事件')
 				let index = this.tabIndex
-				if (this.newsitems[index].loadmoretext == '没有更多了') return
+				if (this.newsitems[index].loadmoretext === '没有更多了') {
+					uni.showToast({title: '没有更多了', icon: 'none'});
+					return
+				}
 				
 				this.newsitems[index].loadingShow = 'show'
 				this.newsitems[index].loadmoretext = "加载中..."
-				setTimeout(() => {
-					// 请求接口 获取下一页数据
-					let res = this.addData(index)
-					if (res != 'nomore') {
-						this.newsitems[index].loadingShow = 'hide'
-						this.newsitems[index].loadmoretext = "上拉可加载更多"
-					}
-				}, 2000)
+				
+				// 请求接口 获取下一页数据
+				this.addData(index, () => {
+					uni.showToast({title: '加载成功', icon: 'none'});
+					this.newsitems[index].loadingShow = 'hide'
+					this.newsitems[index].loadmoretext = "上拉可加载更多"
+				})
 			},
 			
 			// 下拉刷新事件
 			refresh: function(e) {
 				console.log('下拉刷新事件')
-				// console.log(e)
 				let index = this.tabIndex
 				
 				this.newsitems[index].refreshShow = 'show'
 				this.newsitems[index].refreshtext = "正在刷新中..."
-				setTimeout(() => {
-					// 重新向服务器端请求数据
-					// this.newsitems = this.randomfn()
-					
-					// 模拟重新从服务器端请求数据
-					// 先清空对应tab下的数据，再在对应的tab下添加新数据
-					this.newsitems[index].data = []
-					this.addData(index)
-					
+				
+				// 重新从服务器端请求第一页的数据
+				// 先清空对应tab下的数据，再在对应的tab下添加新数据
+				this.newsitems[index].data = []
+				this.addData(index, () => {
+					uni.showToast({title: '刷新成功', icon: 'none'});
 					this.newsitems[index].refreshShow = 'hide'
 					this.newsitems[index].refreshtext = "下拉刷新"
-				}, 2000);
+				})
 			},
 			pullingdown: function(e) {
-				// console.log(e)
+				let index = this.tabIndex
 				// 当下拉高度超过某个值 则提示可进行刷新
 				if (e.pullingDistance > e.viewHeight) {
-					this.refreshtext = "释放就能刷新"
+					this.newsitems[index].refreshtext = "释放就能刷新"
 				} else {
-					this.refreshtext = "下拉刷新"
+					this.newsitems[index].refreshtext = "下拉刷新"
 				}
 			},
 			
-			// 加载更多模拟数据
-			addData: function(e) { //拿到当前索引e
-				if (this.newsitems[e].data.length > 10) {
-					this.newsitems[e].loadingShow = 'show'
-					this.newsitems[e].loadmoretext = '没有更多了';
-					return 'nomore';
+			// 加载更多数据或刷新数据
+			async addData(e, callback = false) { // 拿到当前索引e
+				let id   = this.tabBars[e].id
+				let page = Math.ceil(this.newsitems[e].data.length / 5) + 1;  // api每次返回5条数据
+				
+				if (page === 1 && this.newsitems[e].refreshShow === 'hide') {
+					// 当前tab下的首次数据加载中
+					this.newsitems[e].firstLoad = 'ing'
 				}
-				let arr = [
-					{ 
-						type:"swiper",
-						data:[
-							{ src:"../../static/images/demo/demo4.jpg" },
-							{ src:"../../static/images/demo/demo4.jpg" },
-							{ src:"../../static/images/demo/demo4.jpg" }
-						]
-					},
-					{
-						type:"indexnavs",
-						data:[
-							{ src:"/static/images/indexnav/1.png",text:"新品发布" },
-							{ src:"/static/images/indexnav/2.gif",text:"小米众筹" },
-							{ src:"/static/images/indexnav/3.gif",text:"以旧换新" },
-							{ src:"/static/images/indexnav/4.gif",text:"一分换团" },
-							{ src:"/static/images/indexnav/5.gif",text:"超值特卖" },
-						]
-					},
-					{
-						type:"list",
-						data:[
-							{
-								cover:"/static/images/demo/list/1.jpg",
-								title:"米家空调",
-								desc:"1.5匹变频",
-								oprice:2699,
-								pprice:1399
-							},
-							{
-								cover:"/static/images/demo/list/1.jpg",
-								title:"米家空调",
-								desc:"1.5匹变频",
-								oprice:2699,
-								pprice:1399
-							},
-							{
-								cover:"/static/images/demo/list/1.jpg",
-								title:"米家空调",
-								desc:"1.5匹变频",
-								oprice:2699,
-								pprice:1399
-							},
-							{
-								cover:"/static/images/demo/list/1.jpg",
-								title:"米家空调",
-								desc:"1.5匹变频",
-								oprice:2699,
-								pprice:1399
-							},
-							{
-								cover:"/static/images/demo/list/1.jpg",
-								title:"米家空调",
-								desc:"1.5匹变频",
-								oprice:2699,
-								pprice:1399
-							},
-							{
-								cover:"/static/images/demo/list/1.jpg",
-								title:"米家空调",
-								desc:"1.5匹变频",
-								oprice:2699,
-								pprice:1399
-							}
-						]
+				// 执行api请求
+				let data = await this.$api.get('/index_category/'+ id +'/data/' + page)
+				
+				if (page === 1 && this.newsitems[e].refreshShow === 'hide') {
+					// 当前tab下的首次数据加载完成
+					this.newsitems[e].firstLoad = 'after'
+				}
+				if (data) {
+					// 合并数据
+					this.newsitems[e].data = [...this.newsitems[e].data, ...data];
+					// 执行回调函数
+					if (typeof callback === 'function') {
+						callback()
 					}
-				];
-				this.newsitems[e].data = [...this.newsitems[e].data,...arr];
+					
+					// api数据接口每次返回5条数据 如果不足5条 则说明没有更多数据了
+					if (data.length < 5) {
+						this.newsitems[e].loadmoretext = '没有更多了';
+					}
+				}
 			},
 			
-			// 生成随机数据
-			randomfn() {
+			// 初始化页面数据
+			setNewsItems(res) {
 				let ary = [];
 				// 拿到tabbars的长度，根据长度生成页面
 				let tablength = this.tabBars.length;
@@ -423,106 +385,14 @@
 						refreshtext: '下拉刷新',
 						loadingShow: 'hide',
 						loadmoretext: "上拉可加载更多",
-						isLoadingData: false,   // 是否正在加载数据中
+						firstLoad: i === 0 ? 'after' : 'before', // 当前tab是否已完成首次数据加载
 						
 						data: []
 					};
-					// 给页面添加数据
+					// 首屏初始化数据
 					if(this.tabBars[i].template === 'index'){
-						aryItem.data = [
-							{ 
-								type:"swiper",
-								data:[
-									{ src:"../../static/images/demo/demo4.jpg" },
-									{ src:"../../static/images/demo/demo4.jpg" },
-									{ src:"../../static/images/demo/demo4.jpg" }
-								]
-							},
-							{
-								type:"indexnavs",
-								data:[
-									{ src:"/static/images/indexnav/1.png",text:"新品发布" },
-									{ src:"/static/images/indexnav/2.gif",text:"小米众筹" },
-									{ src:"/static/images/indexnav/3.gif",text:"以旧换新" },
-									{ src:"/static/images/indexnav/4.gif",text:"一分换团" },
-									{ src:"/static/images/indexnav/5.gif",text:"超值特卖" },
-									{ src:"/static/images/indexnav/6.gif",text:"小米秒杀" },
-									{ src:"/static/images/indexnav/7.gif",text:"真心想要" },
-									{ src:"/static/images/indexnav/8.gif",text:"电视热卖" },
-									{ src:"/static/images/indexnav/9.gif",text:"家电热卖" },
-									{ src:"/static/images/indexnav/10.gif",text:"米粉卡" },
-								]
-							},
-							{
-								type:"threeAdv",
-								data:{
-									big:{
-										src:"/static/images/demo/demo1.jpg"
-									},
-									smalltop:{
-										src:"/static/images/demo/demo2.jpg"
-									},
-									smallbottom:{
-										src:"/static/images/demo/demo2.jpg"
-									},
-								}
-							},
-							{
-								type:"oneAdv",
-								data:{
-									title:"每日精选",
-									cover:"/static/images/demo/demo4.jpg"
-								}
-							},
-							{
-								type:"list",
-								data:[
-									{
-										cover:"/static/images/demo/list/1.jpg",
-										title:"米家空调",
-										desc:"1.5匹变频",
-										oprice:2699,
-										pprice:1399
-									},
-									{
-										cover:"/static/images/demo/list/1.jpg",
-										title:"米家空调",
-										desc:"1.5匹变频",
-										oprice:2699,
-										pprice:1399
-									},
-									{
-										cover:"/static/images/demo/list/1.jpg",
-										title:"米家空调",
-										desc:"1.5匹变频",
-										oprice:2699,
-										pprice:1399
-									},
-									{
-										cover:"/static/images/demo/list/1.jpg",
-										title:"米家空调",
-										desc:"1.5匹变频",
-										oprice:2699,
-										pprice:1399
-									},
-									{
-										cover:"/static/images/demo/list/1.jpg",
-										title:"米家空调",
-										desc:"1.5匹变频",
-										oprice:2699,
-										pprice:1399
-									},
-									{
-										cover:"/static/images/demo/list/1.jpg",
-										title:"米家空调",
-										desc:"1.5匹变频",
-										oprice:2699,
-										pprice:1399
-									}
-								]
-							}
-						];
-					} else if (this.tabBars[i].template === 'guanzhu') {
+						aryItem.data = res.data
+					} else if (this.tabBars[i].template === 'special') {
 						aryItem.data = []
 					} else {
 						aryItem.data = []
@@ -530,9 +400,8 @@
 					ary.push(aryItem);
 					
 				}
-				console.log(ary)
 				// json字符串化输出
-				console.log(JSON.stringify(ary))
+				// console.log(JSON.stringify(ary))
 				return ary;
 			}
 			
