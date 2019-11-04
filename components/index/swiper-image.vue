@@ -17,7 +17,7 @@
 <script>
 	export default {
 		props: {
-			resdata: Array,
+			resdata: [Array, Object],
 			height: {
 				type: String,
 				default: "350" 
@@ -34,8 +34,16 @@
 			},
 			getUrls() {
 				// 从图片组数据中提取出图片地址组装成图片预览所需要的数据格式
-				return this.resdata.map((v) => v.src)
+				// return this.resdata.map((v) => v.src)
+				let arr = []
+				for (let v in this.resdata) {
+					arr.push(this.resdata[v].src)
+				}
+				return arr
 			}
+		},
+		onReady:function(){
+			console.log(this.resdata)
 		},
 		methods: {
 			event: function(item, index) {

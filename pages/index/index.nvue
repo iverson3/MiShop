@@ -80,13 +80,13 @@
 				</template>
 				<!-- 数据加载中 -->
 				<template v-else-if="list.firstLoad === 'ing'">
-					<cell class="j-center a-center" style="padding-top: 100px;">
+					<cell class="w-100 j-center a-center" style="padding-top: 150px;">
 						<text class="font-md text-light-muted">数据加载中...</text>
 					</cell>
 				</template>
 				<!-- tab下没有数据 -->
 				<template v-else>
-					<cell class="j-center a-center" style="padding-top: 100px;">
+					<cell class="w-100 j-center a-center" style="padding-top: 150px;">
 						<text class="font-md text-light-muted">暂无数据</text>
 					</cell>
 				</template>
@@ -96,7 +96,7 @@
 				class="w-100 flex-row j-center a-center"
 				@loading="onLoading" 
 				:display="list.loadingShow">
-					<text class="font-md text-muted">{{ list.loadmoretext }}</text>
+					<text class="font-md text-muted">{{ list.loadmoretext }} {{list.loadingShow}}</text>
 				</loading>
 			</list>
 			
@@ -117,6 +117,8 @@
 	// 获取当前页面
 	const currentWebview = plus.webview.currentWebview()
 	
+	import $api from '@/common/lib/request.js';
+	
 	export default {
 		components: {
 			miTabbar,
@@ -133,7 +135,6 @@
 				
 				tabIndex: 0,
 				tabBars: []
-				
 			}
 		},
 		watch: {
@@ -157,7 +158,7 @@
 			uni.onNavigationBarSearchInputClicked(e => {
 				console.log('点击了搜索框')
 				uni.navigateTo({
-					url: '../search/search'
+					url: '/pages/search/search'
 				})
 			})
 	
@@ -187,7 +188,7 @@
 		methods: {
 			async __init() {
 				// 封装之后的调用方式一
-				// this.$api.get('/index_category/data').then((data) => {
+				// $api.get('/index_category/data').then((data) => {
 				// 	// 初始化tabbar数据
 				// 	this.tabBars = data.category
 				// 	// 初始化页面数据
@@ -197,35 +198,13 @@
 				// })
 				
 				// 封装之后的调用方式二
-				let data = await this.$api.get('/index_category/data')
+				let data = await $api.get('/index_category/data')
 				if (data) {
 					// 初始化tabbar数据
 					this.tabBars = data.category
 					// 初始化页面数据
 					this.newsitems = this.setNewsItems(data)
 				}
-				
-				// let [error, result] = await uni.request({
-				// 	url: 'http://ceshi3.dishait.cn/api/index_category/data',
-				// 	method: 'GET'
-				// })
-				// // 请求错误 (比如没有网络)
-				// if (error) {
-				// 	return uni.showToast({
-				// 		title: error.errMsg,
-				// 		icon: 'none'
-				// 	});
-				// }
-				// // 请求失败
-				// if (result.statusCode !== 200) {
-				// 	return uni.showToast({
-				// 		title: result.data.msg,
-				// 		icon: 'none'
-				// 	});
-				// }
-				// // 请求成功
-				// console.log(result.data.data)
-				// let data = result.data.data
 			},
 			
 			// 演示request请求的三种方式
@@ -290,9 +269,9 @@
 				console.log('sliderChange')
 				this.tabIndex = e.index
 				// 判断当前tab是否已经加载过第一页的数据
-				if (this.newsitems[this.tabIndex].firstLoad === 'before') {
+				if (this.newsitems[e.index].firstLoad === 'before') {
 					// 调用接口 获取对应tab下的第一页数据
-					this.addData(index)
+					this.addData(e.index)
 				}
 			},
 			
@@ -320,6 +299,7 @@
 			refresh: function(e) {
 				console.log('下拉刷新事件')
 				let index = this.tabIndex
+				console.log(index)
 				
 				this.newsitems[index].refreshShow = 'show'
 				this.newsitems[index].refreshtext = "正在刷新中..."
@@ -331,6 +311,9 @@
 					uni.showToast({title: '刷新成功', icon: 'none'});
 					this.newsitems[index].refreshShow = 'hide'
 					this.newsitems[index].refreshtext = "下拉刷新"
+					
+					console.log(this.newsitems[index].refreshShow)
+					console.log(this.newsitems[index].loadingShow)
 				})
 			},
 			pullingdown: function(e) {
@@ -353,7 +336,7 @@
 					this.newsitems[e].firstLoad = 'ing'
 				}
 				// 执行api请求
-				let data = await this.$api.get('/index_category/'+ id +'/data/' + page)
+				let data = await $api.get('/index_category/'+ id +'/data/' + page)
 				
 				if (page === 1 && this.newsitems[e].refreshShow === 'hide') {
 					// 当前tab下的首次数据加载完成
