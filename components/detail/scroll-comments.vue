@@ -16,7 +16,7 @@
 					style="width: 70upx;height: 70upx;"></image>
 					<view class="ml-2">
 						<text class="font-md line-h">{{ item.username }}</text>
-						<text class="d-block font text-light-muted line-h">{{ item.create_time }}</text>
+						<text class="d-block font text-light-muted line-h">{{ item.create_time | formatTime }}</text>
 					</view>
 					<view class="iconfont icon-dianzan font text-light-muted pl-1 ml-auto">{{ item.goods_num }}</view>
 				</view>
@@ -32,17 +32,31 @@
 			</view>
 		</scroll-view>
 		
-		<navigator url="/pages/detail-comment/detail-comment">
-			<view class="d-flex a-center j-center py-2 mt-2 text-primary" hover-class="bg-light-secondary">
-				更多评论 <view class="iconfont icon-you"></view>
-			</view>
-		</navigator>
+		<view class="d-flex a-center j-center py-2 mt-2 text-primary" 
+		@click="openCommentList"
+		hover-class="bg-light-secondary">
+			更多评论 <view class="iconfont icon-you"></view>
+		</view>
 	</view>
 </template>
 
 <script>
+	import utils from '@/common/lib/utils.js';
+	
 	export default {
-		props: ['comments']
+		props: ['comments', 'goods_id'],
+		filters: {
+			formatTime(value) {
+				return utils.formatTime(value)
+			}
+		},
+		methods: {
+			openCommentList: function() {
+				uni.navigateTo({
+					url: "/pages/detail-comment/detail-comment?id=" + this.goods_id
+				})
+			}
+		}
 	}
 </script>
 

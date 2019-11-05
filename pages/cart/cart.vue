@@ -4,12 +4,24 @@
 		<loading-plus v-if="beforeReady"></loading-plus>
 		
 		<!-- 自定义的顶部导航栏 -->
-		<uni-nav-bar :right-text="isedit?'完成':'编辑'" 
+		<!-- 在微信小程序平台不需要状态栏statusBar -->
+		<!-- #ifdef MP-WEIXIN -->
+		<uni-nav-bar :right-text="isedit?'完成':'编辑'"
+		@click-right="changeEditStatus"
+		title="购物车" 
+		:statusBar="false" 
+		:fixed="true"
+		:shadow="false"></uni-nav-bar>
+		<!-- #endif -->
+		<!-- #ifndef MP-WEIXIN -->
+		<uni-nav-bar :right-text="isedit?'完成':'编辑'"
 		@click-right="changeEditStatus"
 		title="购物车" 
 		:statusBar="true" 
 		:fixed="true"
 		:shadow="false"></uni-nav-bar>
+		<!-- #endif -->
+		
 		
 		<!-- 购物车为空 -->
 		<view v-if="disableSelectAll" class="py-5 d-flex j-center a-center bg-white border">

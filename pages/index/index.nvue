@@ -288,8 +288,12 @@
 				this.newsitems[index].loadmoretext = "加载中..."
 				
 				// 请求接口 获取下一页数据
-				this.addData(index, () => {
-					uni.showToast({title: '加载成功', icon: 'none'});
+				this.addData(index, (res) => {
+					if (res) {
+						uni.showToast({title: '加载成功', icon: 'none'});
+					} else {
+						uni.showToast({title: '加载失败', icon: 'none'});
+					}
 					this.newsitems[index].loadingShow = 'hide'
 					this.newsitems[index].loadmoretext = "上拉可加载更多"
 				})
@@ -299,7 +303,6 @@
 			refresh: function(e) {
 				console.log('下拉刷新事件')
 				let index = this.tabIndex
-				console.log(index)
 				
 				this.newsitems[index].refreshShow = 'show'
 				this.newsitems[index].refreshtext = "正在刷新中..."
@@ -307,8 +310,12 @@
 				// 重新从服务器端请求第一页的数据
 				// 先清空对应tab下的数据，再在对应的tab下添加新数据
 				this.newsitems[index].data = []
-				this.addData(index, () => {
-					uni.showToast({title: '刷新成功', icon: 'none'});
+				this.addData(index, (res) => {
+					if (res) {
+						uni.showToast({title: '刷新成功', icon: 'none'});
+					} else {
+						uni.showToast({title: '刷新失败', icon: 'none'});
+					}
 					this.newsitems[index].refreshShow = 'hide'
 					this.newsitems[index].refreshtext = "下拉刷新"
 					
@@ -346,14 +353,13 @@
 					// 合并数据
 					this.newsitems[e].data = [...this.newsitems[e].data, ...data];
 					// 执行回调函数
-					if (typeof callback === 'function') {
-						callback()
-					}
+					if (typeof callback === 'function') callback(true)
 					
 					// api数据接口每次返回5条数据 如果不足5条 则说明没有更多数据了
-					if (data.length < 5) {
-						this.newsitems[e].loadmoretext = '没有更多了';
-					}
+					this.newsitems[e].loadmoretext = data.length < 5 ? '没有更多了' : '上拉可加载更多';
+					
+				} else {
+					if (typeof callback === 'function') callback(false)
 				}
 			},
 			

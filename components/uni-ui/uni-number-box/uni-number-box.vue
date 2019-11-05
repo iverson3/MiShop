@@ -43,6 +43,13 @@
 				if (+newVal !== +oldVal) {
 					this.$emit('change', newVal)
 				}
+			},
+			// 最大库存
+			max(newVal, oldVal) {
+				// 防止在切换选择多规格属性的时候 出现用户操作的购买数超过了当前多规格组合下的最大库存数
+				if (this.inputValue > newVal) {
+					this.inputValue = newVal
+				}
 			}
 		},
 		created() {

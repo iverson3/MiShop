@@ -40,7 +40,7 @@
 			<swiper-item v-for="(item,index) in newsitems" :key="index">
 				<scroll-view @scrolltolower="loadmore" scroll-y :style="'height:' + scrollH + 'px;'"> 
 					
-					<template v-if="item.list.length > 0">
+					<template v-if="item.list.length > 0 && item.firstLoad === 'after'">
 						<block v-for="(list,listIndex) in item.list" :key="listIndex">
 							<!-- 轮播图组件 -->
 							<swiper-image v-if="list.type === 'swiper'" :resdata="list.data"></swiper-image>
@@ -134,6 +134,7 @@
 					// #ifndef MP
 					navbarH = 0
 					// #endif
+					// 在小程序平台下 有一个高90的自定义导航栏
 					// #ifdef MP
 					navbarH = uni.upx2px(90)
 					// #endif
@@ -192,11 +193,18 @@
 					// 合并数据
 					obj.list = [...obj.list, ...data];
 					
-					if (typeof callback === 'function') {
-						callback()
-					}
+					if (typeof callback === 'function') callback(true)
 					// api数据接口每次返回5条数据 如果不足5条 则说明没有更多数据了
 					obj.loadtext = data.length < 5 ? NOMORE : PULLLOADMORE;
+				} else {
+					if (page === 1) {
+						// 首次加载数据失败，则还原状态字段
+						obj.firstLoad = 'before'
+					} else {
+						// 加载更多数据失败，则还原对应的加载提示信息
+						obj.loadtext = PULLLOADMORE;
+					}
+					if (typeof callback === 'function') callback(false)
 				}
 			},
 			
@@ -207,11 +215,12 @@
 				if (item.loadtext !== PULLLOADMORE) return;
 				// 模拟请求api接口 获取对应的更多数据
 				item.loadtext = LOADING
-				this.addData(() => {
-					uni.showToast({
-						title: '加载成功',
-						icon: 'none'
-					});
+				this.addData((res) => {
+					if (res) {
+						uni.showToast({title: '加载成功', icon: 'none'});
+					} else {
+						uni.showToast({title: '加载失败', icon: 'none'});
+					}
 				})
 			},
 			

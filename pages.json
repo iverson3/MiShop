@@ -189,6 +189,7 @@
             "path" : "pages/detail-comment/detail-comment",
             "style" : {
 				"navigationBarTitleText":"商品评论",
+				"enablePullDownRefresh": true,
 				"app-plus": {
 					"scrollIndicator":"none",
 					"bounce":"none",

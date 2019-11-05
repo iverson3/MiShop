@@ -1,7 +1,7 @@
 <template>
 	<!-- 底部弹出框 -->
 	<view class="_popup" :class="popupClass">
-		<view class="_mask" @tap.stop="$emit('hide')"></view>
+		<view class="_mask" @tap.stop="$emit('hide')" @touchmove.stop.prevent="moveHandle"></view>
 		<view class="_body">
 			<slot></slot>
 		</view>
@@ -14,6 +14,12 @@
 			popupClass: {
 				type: String,
 				default: 'none'
+			}
+		},
+		methods: {
+			moveHandle: function() {
+				// @touchmove.stop.prevent  解决蒙版状态下页面仍然可以滚动的问题
+				// 啥也不用做   :catchtouchmove="false"
 			}
 		}
 	}
