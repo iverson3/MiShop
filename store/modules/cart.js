@@ -46,7 +46,7 @@ export default {
 				checked: false,
 				id: 2,
 				title: "商品标题222",
-				cover: "/static/images/demo/list/1.jpg",
+				cover: "/static/images/demo/list/2.jpg",
 				// 当前商品的可选属性
 				attrs: [
 					{
@@ -85,7 +85,7 @@ export default {
 				checked: false,
 				id: 3,
 				title: "商品标题333",
-				cover: "/static/images/demo/list/1.jpg",
+				cover: "/static/images/demo/list/3.jpg",
 				// 当前商品的可选属性
 				attrs: [
 					{

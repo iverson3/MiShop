@@ -255,8 +255,7 @@
 				item.num = e
 			},
 			gotoIndex: function() {
-				console.log('go index')
-				uni.navigateTo({
+				uni.switchTab({
 					url: "/pages/index/index"
 				})
 			},

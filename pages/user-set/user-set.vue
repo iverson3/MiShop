@@ -26,7 +26,7 @@
 					{
 						label: "账号管理",
 						value: [
-							{ title: "个人资料", path: "" },
+							{ title: "个人资料", path: "user-userinfo" },
 							{ title: "收货地址", path: "user-path-list" }
 						]
 					},

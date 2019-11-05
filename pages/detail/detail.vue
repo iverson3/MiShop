@@ -212,19 +212,9 @@
 				// 轮播图数据
 				banners: [],
 				
-				detail: {
-					id: 5,
-					title: "小米MIX3 6GB+128GB",
-					cover: "/static/images/demo/list/1.jpg",
-					desc: "磁动力滑盖全面屏 / 前后旗舰AI双摄 / 四曲面彩色陶瓷机身 / 高效10W无限充电",
-					pprice: 3299,
-					num: 1,
-					max: 102
-				},
+				detail: {},
 				context: "",
-				
 				baseAttrs: [],
-				
 				selects: [],
 				
 				comments: [],
@@ -301,7 +291,23 @@
 						}
 					})
 					// 商品基本信息
+					/*
+						id: 5,
+						title: "小米MIX3 6GB+128GB",
+						cover: "/static/images/demo/list/1.jpg",
+						desc: "磁动力滑盖全面屏 / 前后旗舰AI双摄 / 四曲面彩色陶瓷机身 / 高效10W无限充电",
+						pprice: 3299,
+						num: 1,
+						max: 102
+					*/
 					this.detail = res
+					this.detail.num = 1
+					
+					// 临时解决测试数据商品id相同的问题
+					let rand1 = Math.floor(Math.random() * (10 - 1)) + 1
+					let rand2 = Math.floor(Math.random() * (20 - 1)) + 1
+					this.detail.id = this.detail.id * rand1 + rand2
+					
 					// 设置页面标题
 					uni.setNavigationBarTitle({
 						title: res.title
@@ -369,6 +375,8 @@
 				let goods = this.detail
 				
 				goods['pprice'] = this.showPrice
+				goods['minnum'] = 1
+				goods['maxnum'] = this.maxStock
 				goods['checked'] = false
 				goods['attrs'] = this.selects
 				// 加入购物车
@@ -391,6 +399,7 @@
 				}, 200)
 			},
 			showPopup: function(key) {
+				console.log(this.detail);
 				this.popup[key] = "show"
 			},
 			

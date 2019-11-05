@@ -69,7 +69,7 @@
 			console.log(e)
 			if (e.index === 0) {
 				uni.navigateTo({
-					url: '../search-list/search-list',
+					url: '/pages/search-list/search-list',
 				});
 			}
 		},

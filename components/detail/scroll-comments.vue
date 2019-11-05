@@ -47,7 +47,7 @@
 		props: ['comments', 'goods_id'],
 		filters: {
 			formatTime(value) {
-				return utils.formatTime(value)
+				return utils.gettime(value)
 			}
 		},
 		methods: {

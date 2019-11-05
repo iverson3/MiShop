@@ -101,7 +101,7 @@
 		},
 		filters: {
 			formatTime(value) {
-				return utils.formatTime(value)
+				return utils.gettime(value)
 			},
 			ratingTitle(val) {
 				if (val === 3) {

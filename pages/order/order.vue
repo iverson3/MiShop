@@ -10,7 +10,7 @@
 			</view>
 		</view>
 		<!-- 占位 -->
-		<view class="w-100" style="height: 90upx;"></view>
+		<view class="w-100" style="height: 90upx;display: inline-table;"></view>
 		
 		<scroll-view scroll-y class="flex-1" style="background-color: #F5F5F5;" :scroll-top="scrollTop">
 			<!-- 订单列表 -->
@@ -80,7 +80,7 @@
 										num: 1
 									},
 									{
-										cover: "/static/images/demo/list/1.jpg",
+										cover: "/static/images/demo/list/2.jpg",
 										title: "小米8",
 										pprice: 1999.00,
 										attrs: "金色 标配",
@@ -95,7 +95,7 @@
 								status: "已发货",
 								order_items: [
 									{
-										cover: "/static/images/demo/list/1.jpg",
+										cover: "/static/images/demo/list/3.jpg",
 										title: "小米8",
 										pprice: 1999.00,
 										attrs: "金色 标配",
@@ -111,6 +111,12 @@
 						name:"待付款",
 						no_thing: "no_pay",
 						msg: "您还没有待付款订单",
+						list: []
+					},
+					{
+						name:"待发货",
+						no_thing: "no_receiving",
+						msg: "您还没有待发货订单",
 						list: []
 					},
 					{
@@ -178,6 +184,22 @@
 				console.log(this.scrollTop)
 				this.scrollTop = 0
 				console.log(this.scrollTop)
+			}
+		},
+		onNavigationBarButtonTap: function(e) {
+			if (e.index === 0) {
+				uni.switchTab({
+					url: '/pages/cart/cart'
+				})
+			} else {
+				uni.navigateTo({
+					url: '/pages/search/search',
+				});
+			}
+		},
+		onLoad: function(e) {
+			if (e.tab) {
+				this.tabIndex = parseInt(e.tab)
 			}
 		},
 		methods: {

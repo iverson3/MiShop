@@ -24,17 +24,20 @@
 		
 		<!-- 图标分类 -->
 		<card>
-			<view slot="title" class="d-flex a-center j-sb">
+			<view slot="title" class="d-flex a-center">
 				<text class="font-md font-weight">我的订单</text>
-				<view class="text-secondary font" @click="navigate('order')">
-					全部订单 <text class="iconfont icon-you font"></text>
-				</view>
+			</view>
+			<view slot="right" class="d-flex a-center text-secondary font" @tap="navigate('order')">
+				全部订单 <text class="iconfont icon-you font"></text>
 			</view>
 			<!-- 默认插槽 -->
 			<view class="d-flex a-center">
-				<view v-for="i in 4" :key="i" class="flex-1 d-flex flex-column a-center j-center py-3" hover-class="bg-light-secondary">
-					<view class="iconfont icon-cpu font-lg line-h"></view>
-					<view>待付款</view>
+				<view class="flex-1 d-flex flex-column a-center j-center py-3" 
+				v-for="(item,index) in orderStatus" :key="index"
+				@tap="openOrderList(item.tabIndex)"
+				hover-class="bg-light-secondary">
+					<view class="iconfont font-lg line-h" :class="item.icon"></view>
+					<view>{{ item.title }}</view>
 				</view>
 			</view>
 		</card>
@@ -64,7 +67,28 @@
 		},
 		data() {
 			return {
-				
+				orderStatus: [
+					{
+						title: "待付款",
+						icon: "icon-daifukuan",
+						tabIndex: 1
+					},
+					{
+						title: "待发货",
+						icon: "icon-daifahuo",
+						tabIndex: 2
+					},
+					{
+						title: "待收货",
+						icon: "icon-daishouhuo",
+						tabIndex: 3
+					},
+					{
+						title: "待评价",
+						icon: "icon-daipingjia",
+						tabIndex: 4
+					}
+				]
 			}
 		},
 		methods: {
@@ -72,6 +96,11 @@
 				if (!path) return
 				uni.navigateTo({
 					url: `/pages/${path}/${path}`
+				})
+			},
+			openOrderList: function(tab) {
+				uni.navigateTo({
+					url: "/pages/order/order?tab=" + tab
 				})
 			}
 		}
