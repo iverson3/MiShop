@@ -61,7 +61,7 @@
 		</card>
 		
 		<!-- 底部操作条 -->
-		<bottom-btn @showAttrPopup="showPopup('attr')"></bottom-btn>
+		<bottom-btn :goods_id="detail.id" @showAttrPopup="showPopup('attr')"></bottom-btn>
 		
 		
 		<!-- 属性筛选弹出框 -->
@@ -273,16 +273,16 @@
 			return false  // 让页面正常返回
 		},
 		onLoad: function(e) {
-			if (e.detail) {
-				this.__init(JSON.parse(e.detail))
+			if (e.goods_id) {
+				this.__init(e.goods_id)
 			}
 		},
 		methods: {
 			...mapMutations([
 				'addGoodsToCart'
 			]),
-			async __init(detail) {
-				let res = await this.$api.get('/goods/' + detail.id)
+			async __init(goods_id) {
+				let res = await this.$api.get('/goods/' + goods_id)
 				if (res) {
 					// 轮播图
 					this.banners = res.goodsBanner.map(v => {
@@ -304,9 +304,9 @@
 					this.detail.num = 1
 					
 					// 临时解决测试数据商品id相同的问题
-					let rand1 = Math.floor(Math.random() * (10 - 1)) + 1
-					let rand2 = Math.floor(Math.random() * (20 - 1)) + 1
-					this.detail.id = this.detail.id * rand1 + rand2
+					// let rand1 = Math.floor(Math.random() * (10 - 1)) + 1
+					// let rand2 = Math.floor(Math.random() * (20 - 1)) + 1
+					// this.detail.id = this.detail.id * rand1 + rand2
 					
 					// 设置页面标题
 					uni.setNavigationBarTitle({

@@ -12,7 +12,7 @@
 		<!-- 占位 -->
 		<view class="w-100" style="height: 90upx;display: inline-table;"></view>
 		
-		<scroll-view scroll-y class="flex-1" style="background-color: #F5F5F5;" :scroll-top="scrollTop">
+		<scroll-view scroll-y class="flex-1" style="background-color: #F5F5F5;">
 			<!-- 订单列表 -->
 			<block v-for="(tab,tabI) in tabBars" :key="tabI">
 				<view class="position-relative" v-show="tabI === tabIndex" style="min-height: 400upx;">
@@ -61,7 +61,6 @@
 		data() {
 			return {
 				tabIndex: 0,
-				scrollTop: 0,
 				tabBars: [
 					{
 						name:"全部",
@@ -73,6 +72,7 @@
 								status: "已发货",
 								order_items: [
 									{
+										id: 25,
 										cover: "/static/images/demo/list/1.jpg",
 										title: "小米8",
 										pprice: 1999.00,
@@ -80,6 +80,7 @@
 										num: 1
 									},
 									{
+										id: 25,
 										cover: "/static/images/demo/list/2.jpg",
 										title: "小米8",
 										pprice: 1999.00,
@@ -95,6 +96,7 @@
 								status: "已发货",
 								order_items: [
 									{
+										id: 25,
 										cover: "/static/images/demo/list/3.jpg",
 										title: "小米8",
 										pprice: 1999.00,
@@ -181,9 +183,7 @@
 		},
 		watch: {
 			async tabIndex(newValue, oldValue) {
-				console.log(this.scrollTop)
-				this.scrollTop = 0
-				console.log(this.scrollTop)
+				console.log(newValue)
 			}
 		},
 		onNavigationBarButtonTap: function(e) {
@@ -205,6 +205,11 @@
 		methods: {
 			changeTab: function(index) {
 				this.tabIndex = index
+				// 切换tab时 页面回到顶部
+				uni.pageScrollTo({
+					scrollTop: 0,
+					duration: 100
+				})
 			}
 		}
 	}

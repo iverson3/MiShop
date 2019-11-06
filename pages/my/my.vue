@@ -51,6 +51,8 @@
 		<uni-list-item title="小米之家" :showExtraIcon="true" leftIcon="icon-home" leftIconStyle="color:#FE8B42;"></uni-list-item>
 		<uni-list-item title="更多功能" :showExtraIcon="true" leftIcon="icon-gengduo" leftIconStyle="color:#9ED45A;"></uni-list-item>
 		<divider></divider>
+		<uni-list-item title="我的收藏" @click="navigate('collection')" :showExtraIcon="true" leftIcon="icon-shoucang" leftIconStyle="color:#808C98;"></uni-list-item>
+		<uni-list-item title="浏览历史" :showExtraIcon="true" leftIcon="icon-history" leftIconStyle="color:#808C98;"></uni-list-item>
 		<uni-list-item title="更多设置" @click="navigate('user-set')" :showExtraIcon="true" leftIcon="icon-icon_set_up" leftIconStyle="color:#808C98;"></uni-list-item>
 		
 	</view>

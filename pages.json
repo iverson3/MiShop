@@ -117,6 +117,7 @@
             				"backgroundColor":"#F7F7F7",
             				"borderRadius":"4px",
             				"disabled":"false",
+							"autoFocus":"true",
             				"placeholder":"kamaka ukulele",
             				"placeholderColor":"#CCCCCC"
             			},
@@ -137,6 +138,8 @@
         ,{
             "path" : "pages/search-list/search-list",
             "style": {
+				// 允许下拉刷新
+				"enablePullDownRefresh":true,
             	// 配置编译到 App 平台时的特定样式
             	"app-plus": {
             	    // 不显示滚动条
@@ -370,6 +373,27 @@
             "path" : "pages/about/about",
             "style" : {
 				"navigationBarTitleText":"关于Mi商城"
+			}
+        }
+        ,{
+            "path" : "pages/collection/collection",
+            "style" : {
+				"navigationBarTitleText":"我的收藏",
+				"app-plus": {
+					"scrollIndicator":"none",
+					"bounce":"none",
+					"titleNView": {
+						"buttons": [
+							{
+								"float":"right",
+								"fontSize":"16px",
+								"color":"#999999",
+								"colorPressed":"#BBBBBB",
+								"text": "清空"
+							}
+						]
+					}
+				}
 			}
         }
     ],

@@ -1,5 +1,5 @@
 <template>
-	<view @tap.stop="openGoodsDetail" class="d-flex a-center py-2 border-bottom border-light-secondary">
+	<view @tap.stop="openGoodsDetail(goods.id)" class="d-flex a-center py-2 border-bottom border-light-secondary">
 		<image :src="goods.cover" mode="widthFix"
 		class="rounded mx-2 flex-shrink"
 		style="width: 150upx;height: 150upx;"></image>
@@ -23,9 +23,9 @@
 			index: Number
 		},
 		methods: {
-			openGoodsDetail: function() {
+			openGoodsDetail: function(id) {
 				uni.navigateTo({
-					url: "/pages/detail/detail"
+					url: "/pages/detail/detail?goods_id=" + id
 				})
 			}
 		}

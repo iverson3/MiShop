@@ -116,15 +116,19 @@
 				})
 			},
 			getData: function() {
-				for (var i = 0; i < 20; i++) {
-					this.cate.push({name: "分类 " + i})
+				for (var i = 0; i < 17; i++) {
+					this.cate.push({name: "分类 " + (i + 1)})
 					this.list.push({list: []})
 				}
 				for (var i = 0; i < this.list.length; i++) {
 					for (var j = 0; j < 25; j++) {
+						// 生成【1-9】之间的随机数
+						let rand = Math.floor(Math.random() * (10 - 1)) + 1
+						let imgname = 'cate_0' + rand
+						
 						this.list[i].list.push({
-							src: "/static/images/demo/cate_03.png", 
-							name: `分类${i}-商品${j}`
+							src: `/static/images/demo/${imgname}.png`, 
+							name: `分类${i+1}-商品${j+1}`
 						})
 					}
 				}

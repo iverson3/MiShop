@@ -4,7 +4,7 @@
 		
 		<!-- 多色按钮 -->
 		<view class="px-1 mb-2">
-			<color-tag v-for="(item,index) in hot" :key="index" :item="item"></color-tag>
+			<color-tag v-for="(item,index) in hot" :key="index" @click="clickHistoryWord(item.name)" :item="item"></color-tag>
 		</view>
 		
 		<!-- 常用分类 -->
@@ -18,7 +18,9 @@
 			<!-- 搜索记录 -->
 			<card headTitle="搜索记录">
 				<view slot="right" class="font text-primary" @click="clearHistory">清除搜索记录</view>
-				<uni-list-item v-for="(item,index) in historyList" :key="index" :title="item" :showArrow="false"></uni-list-item>
+				<uni-list-item v-for="(item,index) in historyList" :key="index" 
+				@click="clickHistoryWord(item)"
+				:title="item" :showArrow="false"></uni-list-item>
 			</card>
 		</template>
 	</view>
@@ -60,26 +62,34 @@
 			}
 		},
 		onLoad: function() {
+			// 搜索框自动获取焦点 并弹出软键盘
+			// 自动获取焦点在pages.json中配置
+			// #ifdef APP-PLUS
+			plus.key.showSoftKeybord()
+			// #endif
+			
 			let history = uni.getStorageSync('searchHistory')
 			if (history) {
 				this.historyList = JSON.parse(history)
 			}
 		},
 		onNavigationBarButtonTap: function(e) {
-			console.log(e)
 			if (e.index === 0) {
-				uni.navigateTo({
-					url: '/pages/search-list/search-list',
-				});
+				this.search()
 			}
 		},
 		onNavigationBarSearchInputChanged: function(e) {
 			this.keyword = e.text
 		},
+		// 用户点击软键盘上的搜索按钮时触发
 		onNavigationBarSearchInputConfirmed: function() {
 			this.search()
 		},
 		methods: {
+			clickHistoryWord: function(word) {
+				this.keyword = word
+				this.search()
+			},
 			search: function() {
 				if (this.keyword === '') {
 					return uni.showToast({title: '请输入关键字', icon: 'none'});
@@ -95,6 +105,10 @@
 				// 开始搜索
 				console.log(this.keyword);
 				this.addHistory()
+				
+				uni.navigateTo({
+					url: '/pages/search-list/search-list?keyword=' + this.keyword,
+				});
 			},
 			// 加入搜索历史记录
 			addHistory: function() {
@@ -120,7 +134,7 @@
 					confirmText: '清除',
 					success: res => {
 						if (res.confirm) {
-							uni.clearStorageSync()
+							uni.removeStorageSync('searchHistory')
 							this.historyList = []
 						}
 					},

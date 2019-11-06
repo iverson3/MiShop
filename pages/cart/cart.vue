@@ -41,12 +41,15 @@
 					</label>
 					
 					<image :src="item.cover" mode="widthFix" 
+					@tap="openGoodsDetail(item.id)"
 					class="border border-light-secondary rounded p-2 flex-shrink"
 					style="width: 150upx;height: 150upx;"></image>
 					
 					<view class="d-flex flex-column flex-1">
 						<view class="flex-1 d-flex flex-column pl-2">
-							<view class="text-dark" style="font-size: 35upx;">{{ item.title }}</view>
+							<view @tap="openGoodsDetail(item.id)" class="text-dark" style="font-size: 35upx;">
+								{{ item.title }}
+							</view>
 							<!-- 商品的属性和规格 -->
 							<view @tap.stop="doShowPopup(index)" class="d-flex text-light-muted mb-1 p-1 pl-0" :class="isedit? 'bg-light-secondary':''">
 								<text class="mr-1" v-for="(attr,i) in item.attrs" :key="i">{{ attr.list[attr.selected].name }}</text>
@@ -257,6 +260,11 @@
 			gotoIndex: function() {
 				uni.switchTab({
 					url: "/pages/index/index"
+				})
+			},
+			openGoodsDetail: function(id) {
+				uni.navigateTo({
+					url: "/pages/detail/detail?goods_id=" + id
 				})
 			},
 			

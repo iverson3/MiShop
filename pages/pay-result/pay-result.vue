@@ -28,6 +28,11 @@
 				
 			}
 		},
+		// 监听页面返回事件，不允许返回到上一页，直接返回到首页
+		onBackPress: function() {
+			this.openIndex()
+			return true
+		},
 		methods: {
 			openOrderDetail: function() {
 				uni.navigateTo({

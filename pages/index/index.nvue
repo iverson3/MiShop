@@ -173,10 +173,6 @@
 					// 扫一扫
 				}
 			})
-			
-			// 生成随机数据
-			// this.newsitems = this.randomfn()
-			
 			// 初始化数据
 			this.__init()
 		},
