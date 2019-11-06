@@ -9,7 +9,7 @@
 		
 		<!-- 常用分类 -->
 		<card headTitle="常用分类" :bodyPadding="true" :headBorderBottom="false">
-			<color-tag v-for="(item,index) in cate" :key="index" :item="item" :color="false"></color-tag>
+			<color-tag v-for="(item,index) in cate" :key="index" @click="clickHistoryWord(item.name)" :item="item" :color="false"></color-tag>
 		</card>
 		
 		<template v-if="historyList.length > 0">
@@ -67,11 +67,10 @@
 			// #ifdef APP-PLUS
 			plus.key.showSoftKeybord()
 			// #endif
-			
+		},
+		onShow: function() {
 			let history = uni.getStorageSync('searchHistory')
-			if (history) {
-				this.historyList = JSON.parse(history)
-			}
+			this.historyList = history? JSON.parse(history) : []
 		},
 		onNavigationBarButtonTap: function(e) {
 			if (e.index === 0) {
@@ -102,13 +101,12 @@
 				uni.hideKeyboard()
 				// #endif
 				
-				// 开始搜索
-				console.log(this.keyword);
-				this.addHistory()
-				
 				uni.navigateTo({
-					url: '/pages/search-list/search-list?keyword=' + this.keyword,
+					url: '/pages/search-list/search-list?keyword=' + this.keyword
 				});
+				setTimeout(() => {
+					this.addHistory()
+				}, 500)
 			},
 			// 加入搜索历史记录
 			addHistory: function() {
@@ -122,6 +120,10 @@
 						this.historyList.splice(index, 1)
 						this.historyList.unshift(this.keyword)
 					}
+				}
+				// 超过6条之后 移除最后面的一个 保持搜索历史中最多只有6条记录
+				if (this.historyList.length > 6) {
+					this.historyList.splice(this.historyList.length - 1, 1)
 				}
 				uni.setStorageSync('searchHistory', JSON.stringify(this.historyList))
 			},

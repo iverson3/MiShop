@@ -61,7 +61,7 @@
 		</card>
 		
 		<!-- 底部操作条 -->
-		<bottom-btn :goods_id="detail.id" @showAttrPopup="showPopup('attr')"></bottom-btn>
+		<bottom-btn :goods_id="detail.id" :goodsInfo="goodsInfo" :hasCollect="hasCollect" @changeCollect="changeCollect" @showAttrPopup="showPopup('attr')"></bottom-btn>
 		
 		
 		<!-- 属性筛选弹出框 -->
@@ -218,7 +218,10 @@
 				selects: [],
 				
 				comments: [],
-				hotList: []
+				hotList: [],
+				
+				hasCollect: false,
+				goodsInfo: {}
 			}
 		},
 		computed: {
@@ -302,6 +305,16 @@
 					*/
 					this.detail = res
 					this.detail.num = 1
+					
+					// 注意：只有在detail被赋值了之后才能执行下面的代码来计算商品是否被收藏
+					this.hasCollect = this.isCollected()
+					this.goodsInfo = {
+						id: this.detail.id,
+						title: this.detail.title,
+						desc: this.detail.desc,
+						cover: this.detail.cover,
+						pprice: this.detail.min_price
+					}
 					
 					// 临时解决测试数据商品id相同的问题
 					// let rand1 = Math.floor(Math.random() * (10 - 1)) + 1
@@ -401,6 +414,20 @@
 			showPopup: function(key) {
 				console.log(this.detail);
 				this.popup[key] = "show"
+			},
+			
+			// 判断当前商品id是否在收藏记录里面
+			isCollected: function() {
+				if (this.detail.id === 0) return false
+				let collectList = uni.getStorageSync('collectList')
+				if (!collectList) return false
+				collectList = JSON.parse(collectList)
+				let index = collectList.indexOf(this.detail.id)
+				if (index === -1) return false
+				return true
+			},
+			changeCollect: function(collect) {
+				this.hasCollect = collect
 			},
 			
 			// 详情信息中的图片预览处理

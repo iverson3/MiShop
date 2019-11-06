@@ -25,37 +25,35 @@
 			goods_id: {
 				type: Number,
 				default: 0
-			}
-		},
-		computed: {
-			hasCollect() {
-				// 判断当前商品id是否在收藏记录里面
-				if (this.goods_id === 0) return false
-				let collectList = uni.getStorageSync('collectList')
-				if (!collectList) return false
-				collectList = JSON.parse(collectList)
-				let index = collectList.indexOf(this.goods_id)
-				if (index === -1) return false
-				return true
-			}
+			},
+			hasCollect: {
+				type: Boolean,
+				default: false
+			},
+			goodsInfo: Object
 		},
 		methods: {
 			addCollect: function() {
 				let collectList = uni.getStorageSync('collectList')
-				if (collectList) {
-					collectList = JSON.parse(collectList)
-				} else {
-					collectList = []
-				}
+				collectList = collectList? JSON.parse(collectList) : []				
+				let collectDetailList = uni.getStorageSync('collectDetailList')
+				collectDetailList = collectDetailList? JSON.parse(collectDetailList) : []
 				
+				let hasCollect = false
 				// 收藏状态下 则取消收藏
 				if (this.hasCollect) {
 					let index = collectList.indexOf(this.goods_id)
 					collectList.splice(index, 1)
+					collectDetailList.splice(index, 1)
 				} else { // 反之 则加入收藏
 					collectList.push(this.goods_id)
+					collectDetailList.push(this.goodsInfo)
+					hasCollect = true
 				}
 				uni.setStorageSync('collectList', JSON.stringify(collectList))
+				uni.setStorageSync('collectDetailList', JSON.stringify(collectDetailList))
+				// 触发changeCollect事件 让父组件去更新收藏字段
+				this.$emit('changeCollect', hasCollect)
 			},
 			toCart: function() {
 				uni.switchTab({

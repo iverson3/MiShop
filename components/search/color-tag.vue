@@ -1,5 +1,5 @@
 <template>
-	<view class="px-2 py-1 border d-inline-block m-1" :style="getStyle">{{ item.name }}</view>
+	<view @click="$emit('click')" class="px-2 py-1 border d-inline-block m-1" :style="getStyle">{{ item.name }}</view>
 </template>
 
 <script>

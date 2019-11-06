@@ -284,7 +284,25 @@
 				this.getData()
 			},
 			addHistory: function() {
+				let history = uni.getStorageSync('searchHistory')
+				history = history? JSON.parse(history) : []
 				
+				let index = history.indexOf(this.keyword)
+				// 不存在则加入
+				if (index === -1) {
+					history.unshift(this.keyword)
+				} else {
+					// 存在但不在历史记录列表的最前面则移到最前面
+					if (index !== 0) {
+						history.splice(index, 1)
+						history.unshift(this.keyword)
+					}
+				}
+				// 超过6条之后 移除最后面的一个 保持搜索历史中最多只有6条记录
+				if (history.length > 6) {
+					history.splice(history.length - 1, 1)
+				}
+				uni.setStorageSync('searchHistory', JSON.stringify(history))
 			}
 		}
 	}

@@ -74,6 +74,19 @@
 				}
 			}
 		},
+		// 监听导航栏searchinput搜索框点击事件
+		onNavigationBarSearchInputClicked: function() {
+			uni.navigateTo({
+				url: '/pages/search/search'
+			})
+		},
+		onNavigationBarButtonTap: function(e) {
+			if (e.index === 0) {
+				uni.navigateTo({
+					url: "/pages/msg-list/msg-list"
+				})
+			}
+		},
 		onLoad: function() {
 			this.getData()
 		},

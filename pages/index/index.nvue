@@ -86,18 +86,22 @@
 				</template>
 				<!-- tab下没有数据 -->
 				<template v-else>
-					<cell class="w-100 j-center a-center" style="padding-top: 150px;">
-						<text class="font-md text-light-muted">暂无数据</text>
-					</cell>
+					<template v-if="list.refreshShow !== 'show'">
+						<cell class="w-100 j-center a-center" style="padding-top: 150px;">
+							<text class="font-md text-light-muted">暂无数据</text>
+						</cell>
+					</template>
 				</template>
 				
-				<!-- 上拉加载更多 -->
-				<loading style="height: 70px;" 
-				class="w-100 flex-row j-center a-center"
-				@loading="onLoading" 
-				:display="list.loadingShow">
-					<text class="font-md text-muted">{{ list.loadmoretext }} {{list.loadingShow}}</text>
-				</loading>
+				<template v-if="list.data.length > 0">
+					<!-- 上拉加载更多 -->
+					<loading style="height: 70px;" 
+					class="w-100 flex-row j-center a-center"
+					@loading="onLoading" 
+					:display="list.loadingShow">
+						<text class="font-md text-muted">{{ list.loadmoretext }}</text>
+					</loading>
+				</template>
 			</list>
 			
 		</slider>
@@ -139,11 +143,7 @@
 		},
 		watch: {
 			newsitems(a, b) {
-				// console.log('a.length')
-				// console.log(a.length)
-				for (var i = 0; i < a.length; i++) {
-					// console.log(a[i].data.length)
-				}
+				
 			}
 		},
 		
@@ -156,7 +156,6 @@
 			
 			// 监听导航栏searchinput搜索框点击事件
 			uni.onNavigationBarSearchInputClicked(e => {
-				console.log('点击了搜索框')
 				uni.navigateTo({
 					url: '/pages/search/search'
 				})
@@ -205,21 +204,6 @@
 			
 			// 演示request请求的三种方式
 			async __demo() {
-				// 请求的第一种方式
-				// uni.request({
-				// 	url: 'http://ceshi3.dishait.cn/api/index_category/data',
-				// 	method: 'GET',
-				// 	success: res => {
-				// 		console.log(res)
-				// 	},
-				// 	fail: () => {
-				// 		console.log('请求失败')
-				// 	},
-				// 	complete: () => {
-				// 		console.log('请求完成')
-				// 	}
-				// });
-				
 				// 请求的第二种方式
 				// uni.request({
 				// 	url: 'http://ceshi3.dishait.cn/api/index_category/data',
