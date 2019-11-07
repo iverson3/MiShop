@@ -66,7 +66,7 @@
 					</view>
 				</view>
 				
-				<divider :key="index" v-if="index+1 !== list.length"></divider>
+				<divider :key="index"></divider>
 			</template>
 		</view>
 		

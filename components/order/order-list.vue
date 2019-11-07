@@ -1,5 +1,5 @@
 <template>
-	<view class="bg-white" @click.stop="openDetail">
+	<view class="bg-white" @click.stop="openDetail(item.statusNo)">
 		<divider></divider>
 		<!-- header -->
 		<view class="d-flex a-center p-2 border-bottom border-light-secondary">
@@ -36,9 +36,9 @@
 			index: Number
 		},
 		methods: {
-			openDetail: function() {
+			openDetail: function(status) {
 				uni.navigateTo({
-					url: "/pages/order-detail/order-detail"
+					url: "/pages/order-detail/order-detail?status=" + status
 				})
 			},
 			openLogistics: function() {

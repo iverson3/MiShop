@@ -70,6 +70,7 @@
 							{
 								create_time: "2019-08-12",
 								status: "已发货",
+								statusNo: 3,
 								order_items: [
 									{
 										id: 25,
@@ -93,7 +94,25 @@
 							},
 							{
 								create_time: "2019-08-12",
-								status: "已发货",
+								status: "待发货",
+								statusNo: 2,
+								order_items: [
+									{
+										id: 25,
+										cover: "/static/images/demo/list/3.jpg",
+										title: "小米8",
+										pprice: 1999.00,
+										attrs: "金色 标配",
+										num: 1
+									}
+								],
+								total_num: 1,
+								total_price: 1999.00
+							},
+							{
+								create_time: "2019-08-12",
+								status: "待评价",
+								statusNo: 4,
 								order_items: [
 									{
 										id: 25,
@@ -119,19 +138,81 @@
 						name:"待发货",
 						no_thing: "no_receiving",
 						msg: "您还没有待发货订单",
-						list: []
+						list: [
+							{
+								create_time: "2019-08-12",
+								status: "待发货",
+								statusNo: 2,
+								order_items: [
+									{
+										id: 25,
+										cover: "/static/images/demo/list/5.jpg",
+										title: "小米8",
+										pprice: 1999.00,
+										attrs: "金色 标配",
+										num: 1
+									}
+								],
+								total_num: 1,
+								total_price: 1999.00
+							}
+						]
 					},
 					{
 						name:"待收货",
 						no_thing: "no_receiving",
 						msg: "您还没有待收货订单",
-						list: []
+						list: [
+							{
+								create_time: "2019-08-12",
+								status: "已发货",
+								statusNo: 3,
+								order_items: [
+									{
+										id: 25,
+										cover: "/static/images/demo/list/1.jpg",
+										title: "小米8",
+										pprice: 1999.00,
+										attrs: "金色 标配",
+										num: 1
+									},
+									{
+										id: 25,
+										cover: "/static/images/demo/list/2.jpg",
+										title: "小米8",
+										pprice: 1999.00,
+										attrs: "金色 标配",
+										num: 1
+									}
+								],
+								total_num: 2,
+								total_price: 6999.00
+							}
+						]
 					},
 					{
 						name:"待评价",
 						no_thing: "no_comment",
 						msg: "您还没有待评价订单",
-						list: []
+						list: [
+							{
+								create_time: "2019-08-12",
+								status: "待评价",
+								statusNo: 4,
+								order_items: [
+									{
+										id: 25,
+										cover: "/static/images/demo/list/6.jpg",
+										title: "小米8",
+										pprice: 1999.00,
+										attrs: "金色 标配",
+										num: 1
+									}
+								],
+								total_num: 1,
+								total_price: 1999.00
+							}
+						]
 					}
 				],
 				

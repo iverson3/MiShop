@@ -46,6 +46,18 @@
 				
 			}
 		},
+		onBackPress: function() {
+			uni.showModal({
+				content: '确定要放弃支付吗？',
+				success: res => {
+					if (res.confirm) {
+						// 用户选择放弃支付 则直接跳转到订单详情页 并显示该订单处于待支付状态
+						uni.navigateTo({url: "/pages/order-detail/order-detail?status=1"});
+					}
+				}
+			});
+			return true
+		},
 		methods: {
 			confirmPay: function() {
 				uni.navigateTo({

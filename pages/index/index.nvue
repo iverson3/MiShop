@@ -1,6 +1,17 @@
 <template>
 	<div>
 		
+		<template v-if="initing">
+			<view class="w-100 j-center a-center" style="padding-top: 150px;">
+				<text class="font-md text-light-muted">首页加载中...</text>
+			</view>
+		</template>
+		<template v-if="!initing && tabBars.length === 0">
+			<view class="w-100 j-center a-center" style="padding-top: 150px;">
+				<text class="font-md text-light-muted">首页初始化失败，请检查网络</text>
+			</view>
+		</template>
+		
 		<!-- 横向滚动 顶部选项卡组件 -->
 		<mi-tabbar :tabBars="tabBars" :tabIndex="tabIndex" @tabchange="tabChange"></mi-tabbar>
 		
@@ -8,14 +19,17 @@
 		<slider class="flex-1" :index="tabIndex" :infinite="false" @change="sliderChange">
 			
 			<list :show-scrollbar="false" v-for="(list,listIndex) in newsitems" :key="listIndex">
-				<!-- 下拉刷新 -->
-				<refresh style="height: 80px;" 
-				class="w-100 flex-row j-center a-center"
-				@refresh="refresh" 
-				@pullingdown="pullingdown" 
-				:display="list.refreshShow">
-					<text class="font-md text-muted">{{ list.refreshtext }}</text>
-				</refresh>
+				
+				<template v-if="list.data.length > 0">
+					<!-- 下拉刷新 -->
+					<refresh style="height: 80px;" 
+					class="w-100 flex-row j-center a-center"
+					@refresh="refresh" 
+					@pullingdown="pullingdown" 
+					:display="list.refreshShow">
+						<text class="font-md text-muted">{{ list.refreshtext }}</text>
+					</refresh>
+				</template>
 				
 				<template v-if="list.data.length > 0 && list.firstLoad === 'after'">
 				
@@ -86,9 +100,14 @@
 				</template>
 				<!-- tab下没有数据 -->
 				<template v-else>
-					<template v-if="list.refreshShow !== 'show'">
+					<template v-if="list.refreshShow !== 'show' && !requestFail">
 						<cell class="w-100 j-center a-center" style="padding-top: 150px;">
 							<text class="font-md text-light-muted">暂无数据</text>
+						</cell>
+					</template>
+					<template v-if="list.data.length === 0 && requestFail">
+						<cell class="w-100 j-center a-center" style="padding-top: 150px;">
+							<text class="font-md text-light-muted">获取数据失败，请检查网络;</text>
 						</cell>
 					</template>
 				</template>
@@ -138,16 +157,15 @@
 				newsitems: [],
 				
 				tabIndex: 0,
-				tabBars: []
-			}
-		},
-		watch: {
-			newsitems(a, b) {
+				tabBars: [],
 				
+				initing: true,
+				requestFail: false
 			}
 		},
 		
 		created: function() {
+			// weex编译模式不支持onShow，但熟悉5+的话，可利用监听webview的addEventListener show事件实现onShow效果
 			// 添加对当前页面show事件的监听
 			// 替代nvue中没有的onShow()生命周期函数
 			currentWebview.addEventListener('show', e => {
@@ -194,6 +212,7 @@
 				
 				// 封装之后的调用方式二
 				let data = await $api.get('/index_category/data')
+				this.initing = false
 				if (data) {
 					// 初始化tabbar数据
 					this.tabBars = data.category
@@ -263,7 +282,6 @@
 					uni.showToast({title: '没有更多了', icon: 'none'});
 					return
 				}
-				
 				this.newsitems[index].loadingShow = 'show'
 				this.newsitems[index].loadmoretext = "加载中..."
 				
@@ -274,6 +292,7 @@
 					} else {
 						uni.showToast({title: '加载失败', icon: 'none'});
 					}
+					console.log('xxxxxxxxvvgggvccxx')
 					this.newsitems[index].loadingShow = 'hide'
 					this.newsitems[index].loadmoretext = "上拉可加载更多"
 				})
@@ -283,24 +302,25 @@
 			refresh: function(e) {
 				console.log('下拉刷新事件')
 				let index = this.tabIndex
-				
 				this.newsitems[index].refreshShow = 'show'
 				this.newsitems[index].refreshtext = "正在刷新中..."
 				
 				// 重新从服务器端请求第一页的数据
 				// 先清空对应tab下的数据，再在对应的tab下添加新数据
 				this.newsitems[index].data = []
-				this.addData(index, (res) => {
+				this.addData(index, (res, errInfo) => {
 					if (res) {
 						uni.showToast({title: '刷新成功', icon: 'none'});
 					} else {
 						uni.showToast({title: '刷新失败', icon: 'none'});
 					}
-					this.newsitems[index].refreshShow = 'hide'
-					this.newsitems[index].refreshtext = "下拉刷新"
+					this.requestFail = errInfo === 'requestFail'? true : false
 					
-					console.log(this.newsitems[index].refreshShow)
-					console.log(this.newsitems[index].loadingShow)
+					this.newsitems[index].refreshtext = "下拉刷新"
+					// 这里必须使用$nextTick() 才能隐藏"下拉刷新"这个提示文字
+					this.$nextTick(() => {
+						this.newsitems[index].refreshShow = 'hide'
+					})
 				})
 			},
 			pullingdown: function(e) {
@@ -323,7 +343,7 @@
 					this.newsitems[e].firstLoad = 'ing'
 				}
 				// 执行api请求
-				let data = await $api.get('/index_category/'+ id +'/data/' + page)
+				let data = await $api.get('/index_category/'+ id +'/data/' + page, {}, {}, callback)
 				
 				if (page === 1 && this.newsitems[e].refreshShow === 'hide') {
 					// 当前tab下的首次数据加载完成

@@ -43,8 +43,15 @@
 			<search-list :item="item" :index="index"></search-list>
 		</block>
 		
+		<!-- 搜索中提示 -->
+		<template v-if="searching">
+			<view class="w-100 d-flex j-center a-center" style="padding-top: 150upx;">
+				<text class="font-md text-light-muted">搜索中...</text>
+			</view>
+		</template>
+		
 		<!-- 数据结果为空 -->
-		<no-thing v-if="list.length === 0" msg="搜索结果为空"></no-thing>
+		<no-thing v-if="list.length === 0 && !searching" msg="搜索结果为空"></no-thing>
 		
 		<template v-if="list.length > 0">
 			<!-- 上拉加载更多 -->
@@ -82,6 +89,8 @@
 				keyword: "",
 				page: 1,
 				list: [],
+				// 是否正在搜索请求中
+				searching: false,
 				loadtext: "",
 				
 				showRigth: false,
@@ -177,6 +186,7 @@
 					// 如果页面需要刷新 则清空页数和已经加载的数据
 					this.page = 1
 					this.list = []
+					this.searching = true
 				}
 				let paras = {
 					title: this.keyword,
@@ -185,6 +195,8 @@
 					...this.condition
 				}
 				let res = await this.$api.post("/goods/search", paras)
+				
+				if (refresh) this.searching = false
 				if (res) {
 					let list = this.formatData(res)
 					this.list = [...this.list, ...list]
