@@ -51,10 +51,70 @@
 			</uni-list-item>
 		</card>
 		
+		
+		<divider></divider>
 		<!-- 如果是待支付状态 可以取消订单/去支付 -->
+		<!-- 如果是支付失败状态 可以去支付/取消订单 -->
+		<template v-if="orderStatus === 1 || orderStatus === 5">
+			<view class="w-100 d-flex a-center">
+				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
+				@tap="openPayMethod"
+				hover-class="main-bg-hover-color">去支付</view>
+				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color border-left border-light-secondary" 
+				@tap="cancelOrder"
+				hover-class="main-bg-hover-color">取消订单</view>
+			</view>
+		</template>
+		
 		<!-- 如果是待发货状态 可以取消订单 -->
+		<template v-if="orderStatus === 2">
+			<view class="w-100 d-flex a-center">
+				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
+				@tap="cancelOrder"
+				hover-class="main-bg-hover-color">取消订单</view>
+			</view>
+		</template>
+		
 		<!-- 如果是待收货状态 可以取消订单/确认收货 -->
+		<template v-if="orderStatus === 3">
+			<view class="w-100 d-flex a-center">
+				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
+				hover-class="main-bg-hover-color">确认收货</view>
+				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color border-left border-light-secondary"
+				hover-class="main-bg-hover-color">查看物流</view>
+				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color border-left border-light-secondary" 
+				hover-class="main-bg-hover-color">申请退货退款</view>
+			</view>
+		</template>
+		
 		<!-- 如果是待评价状态 可以申请退货/去评价/再买一单 -->
+		<template v-if="orderStatus === 4">
+			<view class="w-100 d-flex a-center">
+				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
+				hover-class="main-bg-hover-color">再买一单</view>
+				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color border-left border-light-secondary" 
+				hover-class="main-bg-hover-color">去评价</view>
+				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color border-left border-light-secondary"
+				hover-class="main-bg-hover-color">申请售后</view>
+			</view>
+		</template>
+		
+		<!-- 如果是已取消状态  可以删除订单/重新下单 -->
+		<template v-if="orderStatus === 6">
+			<view class="w-100 d-flex a-center">
+				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
+				hover-class="main-bg-hover-color">重新下单</view>
+				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color border-left border-light-secondary" 
+				hover-class="main-bg-hover-color">删除订单</view>
+			</view>
+		</template>
+		<!-- 如果是退货退款状态 可以退货退款完成 -->
+		<template v-if="orderStatus === 7">
+			<view class="w-100 d-flex a-center">
+				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
+				hover-class="main-bg-hover-color">退货退款完成</view>
+			</view>
+		</template>
 	</view>
 </template>
 
@@ -92,7 +152,7 @@
 					}
 				],
 				
-				// 状态值： 0-未知 1-待支付 2-待发货 3-待收货 4-待评价  (5-退货退款中)
+				// 状态值： 0-未知 1-待支付 2-待发货 3-待收货 4-待评价 5-支付失败 6-已取消 7-退货退款中
 				orderStatus: 0,
 				statusInfoList: [
 					{
@@ -121,6 +181,16 @@
 						icon: "icon-daipingjia"
 					},
 					{
+						title: "支付失败",
+						desc: "支付失败，请重新支付",
+						icon: "icon-daipingjia"
+					},
+					{
+						title: "已取消，交易关闭",
+						desc: "取消订单的原因信息",
+						icon: "icon-daipingjia"
+					},
+					{
 						title: "退货退款订单",
 						desc: "您的订单退货退款请求正在处理中",
 						icon: "icon-tuihuo"
@@ -135,10 +205,35 @@
 			// 不同订单状态下 有不同的页面提示信息 有不同的操作按钮
 		},
 		onBackPress: function() {
-			// 如果上一页页面是支付选择页面 则不允许返回
+			let pages = getCurrentPages()
+			// switch (pages[pages.length - 2].route){
+			// 	case 'pages/pay-methods/pay-methods':
+			// 		uni.reLaunch({
+			// 			url: "/pages/order/order?tab=1"
+			// 		})
+			// 		return true
+			// 		break;
+			// 	case 'pages/pay-result/pay-result':
+			// 		uni.reLaunch({
+			// 			url: "/pages/order/order?tab=2",
+			// 		})
+			// 		return true
+			// 		break;
+			// 	default:
+			// 		break;
+			// }
+			return false
 		},
 		methods: {
-			
+			openPayMethod: function() {
+				uni.navigateTo({
+					url: "/pages/pay-methods/pay-methods"
+				});
+			},
+			// 取消订单
+			cancelOrder: function() {
+				
+			}
 		}
 	}
 </script>

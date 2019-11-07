@@ -38,6 +38,17 @@
 		
 		onLaunch: function() {
 			console.log('App Launch')
+			
+			// 设置"未读的红点"
+			setTimeout(() => {
+				uni.setTabBarBadge({
+					index: 3,
+					text: '3'
+				});
+				uni.showTabBarRedDot({
+					index: 2
+				});
+			}, 1000);
 		},
 		onShow: function() {
 			// 检查网络状况

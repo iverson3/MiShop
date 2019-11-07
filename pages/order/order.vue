@@ -69,6 +69,23 @@
 						list: [
 							{
 								create_time: "2019-08-12",
+								status: "已取消",
+								statusNo: 6,
+								order_items: [
+									{
+										id: 25,
+										cover: "/static/images/demo/list/5.jpg",
+										title: "小米8",
+										pprice: 1999.00,
+										attrs: "金色 标配",
+										num: 1
+									}
+								],
+								total_num: 1,
+								total_price: 1999.00
+							},
+							{
+								create_time: "2019-08-12",
 								status: "已发货",
 								statusNo: 3,
 								order_items: [

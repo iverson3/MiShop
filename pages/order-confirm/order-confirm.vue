@@ -113,7 +113,7 @@
 				})
 			},
 			openPayMethods: function() {
-				uni.navigateTo({
+				uni.redirectTo({
 					url: "/pages/pay-methods/pay-methods"
 				})
 			}
