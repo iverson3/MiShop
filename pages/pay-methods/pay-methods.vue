@@ -2,7 +2,7 @@
 	<view>
 		<view class="py-5 d-flex flex-column j-center a-center my-3">
 			<text class="text-light-muted font-md mb-1">支付金额</text>
-			<price priceSize="font-lg" unitSize="font-md">38.00</price>
+			<price priceSize="font-lg" unitSize="font-md">{{ orderInfo.pay_price }}</price>
 		</view>
 		
 		<view class="px-5">
@@ -36,6 +36,7 @@
 	import price from '@/components/common/price.vue';
 	import uniListItem from '@/components/uni-ui/uni-list-item/uni-list-item.vue';
 	
+	import {mapGetters, mapMutations} from 'vuex'
 	export default {
 		components: {
 			price,
@@ -43,12 +44,15 @@
 		},
 		data() {
 			return {
-				orderid: 0
+				orderInfo: {}
 			}
+		},
+		computed: {
+			...mapGetters(['getOrderInfoById'])
 		},
 		onLoad: function(e) {
 			if (e.orderid) {
-				this.orderid = e.orderid
+				this.orderInfo = this.getOrderInfoById(parseInt(e.orderid))
 			}
 		},
 		onBackPress: function() {
@@ -62,16 +66,41 @@
 				success: res => {
 					if (res.confirm) {
 						// 用户选择放弃支付 则直接跳转到订单详情页 并显示该订单处于待支付状态
-						uni.redirectTo({url: "/pages/order-detail/order-detail?orderid=" + this.orderid});
+						uni.redirectTo({url: "/pages/order-detail/order-detail?orderid=" + this.orderInfo.id});
 					}
 				}
 			});
 			return true
 		},
 		methods: {
+			...mapMutations(['changeOrderStatus']),
+			
 			confirmPay: function() {
+				// 支付结果 1-成功 2-失败
+				let payres = 1
+				
+				let rand = Math.floor(Math.random() * 10)
+				if (rand < 5) payres = 2
+				
+				if (payres === 1) {
+					// 支付成功 则修改订单状态为待发货
+					let new_status = 2
+					if (rand % 2 === 0) new_status = 3
+					this.changeOrderStatus({
+						id: this.orderInfo.id,
+						old_status: this.orderInfo.statusNo,
+						new_status: new_status
+					})
+				} else {
+					// 支付失败 则修改订单状态为支付失败
+					this.changeOrderStatus({
+						id: this.orderInfo.id,
+						old_status: this.orderInfo.statusNo,
+						new_status: 5
+					})
+				}
 				uni.redirectTo({
-					url: "/pages/pay-result/pay-result"
+					url: `/pages/pay-result/pay-result?orderid=${this.orderInfo.id}&payres=${payres}`
 				})
 			}
 		}

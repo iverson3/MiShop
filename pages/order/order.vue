@@ -19,7 +19,7 @@
 					<template v-if="tab.list.length > 0">
 						<!-- 列表 -->
 						<block v-for="(item,index) in tab.list" :key="index">
-							<order-list :item="item" :index="index"></order-list>
+							<order-list :item="item" :index="index" @refreshView="__init()"></order-list>
 						</block>
 						<divider></divider>
 					</template>
@@ -153,7 +153,11 @@
 		},
 		watch: {
 			async tabIndex(newValue, oldValue) {
-				console.log(newValue)
+				// console.log(newValue)
+			},
+			list(a, b) {
+				// console.log('list change');
+				// this.__init()
 			}
 		},
 		onNavigationBarButtonTap: function(e) {
@@ -173,6 +177,9 @@
 			}
 			this.__init()
 		},
+		onShow: function() {
+			this.__init()
+		},
 		methods: {
 			async __init() {
 				for (let key in this.list) {
@@ -184,6 +191,7 @@
 			
 			changeTab: function(index) {
 				this.tabIndex = index
+				this.__init()
 				// 切换tab时 页面回到顶部
 				uni.pageScrollTo({
 					scrollTop: 0,

@@ -2,8 +2,8 @@
 	<view>
 		
 		<view class="d-flex flex-column j-center a-center py-5 my-3">
-			<text class="iconfont icon-iconfontxuanzhong4 line-h" style="font-size: 130upx;color:#09BB07;"></text>
-			<text class="font-lg text-dark line-h-md mt-1">支付成功</text>
+			<text class="iconfont line-h" :class="payres === 1?'icon-iconfontxuanzhong4':'icon-shanchu'" :style="getStyle"></text>
+			<text class="font-lg text-dark line-h-md mt-1">{{ payres === 1? '支付成功':'支付失败' }}</text>
 		</view>
 		
 		<view class="px-5">
@@ -25,13 +25,27 @@
 	export default {
 		data() {
 			return {
-				
+				orderid: 0,
+				payres: 0
+			}
+		},
+		computed: {
+			getStyle() {
+				let color = "#09BB07"
+				if (this.payres !== 1) color = "#f00"
+				return `font-size: 130upx;color:${color};`
+			}
+		},
+		onLoad: function(e) {
+			if (e.orderid && e.payres) {
+				this.orderid = parseInt(e.orderid)
+				this.payres  = parseInt(e.payres)
 			}
 		},
 		methods: {
 			openOrderDetail: function() {
 				uni.redirectTo({
-					url: "/pages/order-detail/order-detail?status=2"
+					url: "/pages/order-detail/order-detail?orderid=" + this.orderid
 				})
 			},
 			openIndex: function() {

@@ -179,6 +179,10 @@ export default {
 		addTempOrder(state, data) {
 			state.tempOrder = data
 		},
+		// 删除临时订单
+		deleteTempOrder(state) {
+			state.tempOrder = {}
+		},
 		// 创建新订单
 		createOrder(state, data) {
 			state.list[0].data.unshift(data)
@@ -186,11 +190,6 @@ export default {
 			// 修改数据之后持久化
 			uni.setStorageSync('orderList', JSON.stringify(state.list))
 		},
-		// 删除临时订单
-		deleteTempOrder(state) {
-			state.tempOrder = {}
-		},
-		
 		// 修改订单状态
 		changeOrderStatus(state, obj) {
 			let item = state.list[0].data.find(v => {
@@ -203,7 +202,7 @@ export default {
 			// 修改状态
 			item.statusNo = obj.new_status
 			item.status = state.statusList[obj.new_status].status
-			// 再插入到最前面
+			// 再插入到所有订单列表的最前面
 			state.list[0].data.unshift(item)
 			
 			
@@ -214,14 +213,53 @@ export default {
 				// 修改状态
 				item2.statusNo = obj.new_status
 				item2.status = state.statusList[obj.new_status].status
-				// 再插入到最前面
+				// 插入到对应tab列表的最前面
 				state.list[obj.new_status].data.unshift(item2)
 			}
-			// 先移除  
-			state.list[obj.old_status].data = state.list[obj.old_status].data.filter(v => {
-				return v.id !== obj.id
-			})
+			if (obj.old_status <= 4) {
+				// 从对应的tab下移除
+				state.list[obj.old_status].data = state.list[obj.old_status].data.filter(v => {
+					return v.id !== obj.id
+				})
+			}
+			// 修改数据之后持久化
+			uni.setStorageSync('orderList', JSON.stringify(state.list))
+		},
+		// 重新下单 (已取消状态的订单可以重新下单)
+		reCreateOrder(state, item) {
+			let id = item.id
+			// 初始化相关字段
+			item.id = 0
+			item.orderNo = ""
+			item.create_time = 0
+			item.status = "临时订单"
+			item.statusNo = 0
+			item.path_id = 0
+			state.tempOrder = item
 			
+			// 从"所有订单"列表中移除该id对应的订单
+			state.list[0].data = state.list[0].data.filter(v => {
+				return v.id !== id
+			})
+			// 修改数据之后持久化
+			uni.setStorageSync('orderList', JSON.stringify(state.list))
+		},
+		// 删除订单
+		deleteOrderById(state, id) {
+			// 删除之前拿到该订单
+			let item = state.list[0].data.find(v => {
+				return v.id === id
+			})
+			// 从"所有订单"列表中移除该id对应的订单  
+			state.list[0].data = state.list[0].data.filter(v => {
+				return v.id !== id
+			})
+			if (item.statusNo <= 4) {
+				// 从对应tab下的订单列表中移除该id对应的订单
+				state.list[item.statusNo].data = state.list[item.statusNo].data.filter(v => {
+					return v.id !== id
+				})
+			}
 			// 修改数据之后持久化
 			uni.setStorageSync('orderList', JSON.stringify(state.list))
 		}

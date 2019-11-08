@@ -61,10 +61,10 @@
 		<template v-if="orderInfo.statusNo === 1 || orderInfo.statusNo === 5">
 			<view class="w-100 d-flex a-center">
 				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
-				@tap="openPayMethod"
+				@tap="openPayMethod(orderInfo.id)"
 				hover-class="main-bg-hover-color">去支付</view>
 				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color border-left border-light-secondary" 
-				@tap="cancelOrder"
+				@tap="cancelOrder(orderInfo)"
 				hover-class="main-bg-hover-color">取消订单</view>
 			</view>
 		</template>
@@ -73,7 +73,7 @@
 		<template v-if="orderInfo.statusNo === 2">
 			<view class="w-100 d-flex a-center">
 				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
-				@tap="cancelOrder"
+				@tap="cancelOrder(orderInfo)"
 				hover-class="main-bg-hover-color">取消订单</view>
 			</view>
 		</template>
@@ -81,9 +81,9 @@
 		<!-- 如果是待收货状态 可以取消订单/确认收货 -->
 		<template v-if="orderInfo.statusNo === 3">
 			<view class="w-100 d-flex a-center">
-				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
+				<view @tap="completeOrder(orderInfo)" class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
 				hover-class="main-bg-hover-color">确认收货</view>
-				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color border-left border-light-secondary"
+				<view @tap="openLogistics(orderInfo.id)" class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color border-left border-light-secondary"
 				hover-class="main-bg-hover-color">查看物流</view>
 				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color border-left border-light-secondary" 
 				hover-class="main-bg-hover-color">申请退货退款</view>
@@ -95,9 +95,9 @@
 			<view class="w-100 d-flex a-center">
 				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
 				hover-class="main-bg-hover-color">再买一单</view>
-				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color border-left border-light-secondary" 
+				<view @tap="toComment(orderInfo.id)" class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color border-left border-light-secondary" 
 				hover-class="main-bg-hover-color">去评价</view>
-				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color border-left border-light-secondary"
+				<view @tap="openAfterSale(orderInfo.id)" class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color border-left border-light-secondary"
 				hover-class="main-bg-hover-color">申请售后</view>
 			</view>
 		</template>
@@ -105,9 +105,9 @@
 		<!-- 如果是已取消状态  可以删除订单/重新下单 -->
 		<template v-if="orderInfo.statusNo === 6">
 			<view class="w-100 d-flex a-center">
-				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
+				<view @tap="reOrder(orderInfo)" class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
 				hover-class="main-bg-hover-color">重新下单</view>
-				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color border-left border-light-secondary" 
+				<view @tap="deleteOrder(orderInfo.id)" class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color border-left border-light-secondary" 
 				hover-class="main-bg-hover-color">删除订单</view>
 			</view>
 		</template>
@@ -128,7 +128,7 @@
 	import card from '@/components/common/card.vue'
 	import utils from '@/common/lib/utils.js';
 	
-	import {mapGetters} from 'vuex'
+	import {mapGetters, mapMutations} from 'vuex'
 	export default {
 		components: {
 			orderListItem,
@@ -224,15 +224,64 @@
 			return false
 		},
 		methods: {
-			openPayMethod: function() {
+			...mapMutations(['changeOrderStatus', 'deleteOrderById', 'reCreateOrder']),
+			
+			// 查看物流
+			openLogistics: function(id) {
 				uni.navigateTo({
-					url: "/pages/pay-methods/pay-methods?orderid=" + this.orderInfo.id
+					url: "/pages/logistics-detail/logistics-detail?orderid=" + id
+				})
+			},
+			// 申请售后
+			openAfterSale: function(id) {
+				uni.navigateTo({
+					url: "/pages/after-sale/after-sale?orderid=" + id
+				})
+			},
+			// 去支付
+			openPayMethod: function(id) {
+				uni.navigateTo({
+					url: "/pages/pay-methods/pay-methods?orderid=" + id
 				});
 			},
+			// 确认收货
+			completeOrder: function(item) {
+				this.changeOrderStatus({
+					id: item.id,
+					old_status: item.statusNo,
+					new_status: 4
+				})
+				uni.showToast({title: '订单已完成', icon: 'none'});
+			},
 			// 取消订单
-			cancelOrder: function() {
-				
-			}
+			cancelOrder: function(item) {
+				this.changeOrderStatus({
+					id: item.id,
+					old_status: item.statusNo,
+					new_status: 6
+				})
+				uni.showToast({title: '取消成功', icon: 'none'});
+			},
+			// 重新下单
+			reOrder: function(item) {
+				this.reCreateOrder(item)
+				uni.navigateTo({
+					url: '/pages/order-confirm/order-confirm'
+				});
+			},
+			// 去评价
+			toComment: function(id) {
+				uni.navigateTo({
+					url: '/pages/comment/comment?orderid=' + id
+				});
+			},
+			// 删除订单
+			deleteOrder: function(id) {
+				this.deleteOrderById(id)
+				uni.showToast({title: '删除成功', icon: 'none'});
+				uni.navigateBack({delta: 1});
+			},
+			
 		}
 	}
 </script>

@@ -22,15 +22,22 @@
 			<view class="bg-white">
 				<uni-list-item showArrow>
 					<view class="d-flex a-center">
-						<image src="/static/images/demo/demo6.jpg" class="rounded mr-2" style="width: 100upx;height: 100upx;"></image>
-						<image src="/static/images/demo/demo6.jpg" class="rounded mr-2" style="width: 100upx;height: 100upx;"></image>
-						<image src="/static/images/demo/demo6.jpg" class="rounded mr-2" style="width: 100upx;height: 100upx;"></image>
+						<template v-if="order.order_items.length > 3">
+							<template v-for="i in 3">
+								<image :key="i" :src="order.order_items[i].cover" class="rounded mr-2" style="width: 100upx;height: 100upx;"></image>
+							</template>
+						</template>
+						<template v-else>
+							<template v-for="(item,index) in order.order_items">
+								<image :key="index" :src="item.cover" class="rounded mr-2" style="width: 100upx;height: 100upx;"></image>
+							</template>
+						</template>
 					</view>
-					<view slot="rightContent" class="">共3件</view>
+					<view slot="rightContent" class="">共{{ order.order_items.length }}件</view>
 				</uni-list-item>
 				<uni-list-item title="商品总价" :showArrowIcon="false">
 					<view slot="rightContent">
-						<price color="text-dark">20.00</price>
+						<price color="text-dark">{{ order.total_price }}</price>
 					</view>
 				</uni-list-item>
 				<uni-list-item title="运费" :showArrowIcon="false">
@@ -45,7 +52,7 @@
 				<uni-list-item :showArrowIcon="false">
 					<text class="main-text-color">小计</text>
 					<view slot="rightContent">
-						<price>20.00</price>
+						<price>{{ order.pay_price }}</price>
 					</view>
 				</uni-list-item>
 				<divider></divider>
@@ -56,7 +63,7 @@
 		</view>
 		
 		<view class="w-100 position-fixed bottom-0 left-0 right-0 d-flex a-center j-end bg-white p-2 font-md border-top">
-			合计：<price>25.00</price>
+			合计：<price>{{ order.pay_price }}</price>
 			<view class="main-bg-color px-2 py-1 rounded text-white mx-4 font-md" 
 			@tap="openPayMethods"
 			hover-class="main-bg-hover-color">
@@ -91,6 +98,10 @@
 		},
 		onLoad: function() {
 			this.order = JSON.parse(JSON.stringify(this.tempOrder))
+			// 给个初始值 后面再根据页面的选择进行修改
+			this.order.pay_price = this.order.total_price
+			this.order.freight = 0
+			this.order.coupon_id = 0
 			
 			if (this.order.path_id !== 0) {
 				// 通过path_id获取path完整信息
@@ -142,12 +153,13 @@
 				this.order.create_time = timestamp
 				this.order.statusNo = 1
 				this.order.status = "待支付"
-				this.order.pay_price = this.order.total_price
+				// 后续再完善运费计算和优惠券逻辑
 				this.order.freight = 0
 				this.order.coupon_id = 0
+				// 实际支付金额 = 商品总价 + 运费 - 优惠券金额 
+				this.order.pay_price = this.order.total_price + this.order.freight - this.order.coupon_id
 				
 				this.doCreateOrder(this.order)
-				
 				// 下订单后 删除进入订单的商品(即选中的商品)
 				this.doDelGoods(false)
 				

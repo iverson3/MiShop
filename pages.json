@@ -396,6 +396,12 @@
 				}
 			}
         }
+        ,{
+            "path" : "pages/comment/comment",
+            "style" : {
+				"navigationBarTitleText":"对订单进行评价"
+			}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
