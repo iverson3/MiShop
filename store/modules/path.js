@@ -2,6 +2,7 @@ export default {
 	state: {
 		list: [
 			{
+				id: 1,
 				name: "张三",
 				phone: "13458698574",
 				path: "广东省 惠州市 ABC区",
@@ -9,11 +10,12 @@ export default {
 				isdefault: false
 			},
 			{
+				id: 2,
 				name: "Stefan",
 				phone: "13396095889",
 				path: "广东省 深圳市 南山区",
 				detailPath: "xxxx公司 2栋 122",
-				isdefault: false
+				isdefault: true
 			}
 		],
 	},
@@ -31,6 +33,10 @@ export default {
 				city = getters.defaultPath[0].path
 			}
 			return city
+		},
+		getPathById: (state) => (id) => {
+			let res = state.list.find(v => v.id === id)
+			return res
 		}
 	},
 	mutations: {

@@ -53,6 +53,9 @@ export default {
 							case "Route Not Found":
 								errorInfo = "服务端出错"
 								break;
+							case "request:fail timeout":
+								errorInfo = "请求超时"
+								break;
 							default:
 								break;
 						}

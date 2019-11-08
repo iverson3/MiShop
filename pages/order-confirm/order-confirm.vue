@@ -69,8 +69,9 @@
 <script>
 	import uniListItem from '@/components/uni-ui/uni-list-item/uni-list-item.vue'
 	import price from '@/components/common/price.vue'
+	import utils from '@/common/lib/utils.js';
 	
-	import {mapGetters} from 'vuex'
+	import {mapState, mapGetters, mapMutations, mapActions} from 'vuex'
 	export default {
 		components: {
 			uniListItem,
@@ -78,22 +79,29 @@
 		},
 		data() {
 			return {
-				path: false
+				path: false,
+				order: {}
 			}
 		},
 		computed: {
-			...mapGetters(['defaultPath'])
+			...mapState({
+				tempOrder: state => state.order.tempOrder
+			}),
+			...mapGetters(['defaultPath', 'getPathById'])
 		},
 		onLoad: function() {
-			if (this.defaultPath.length > 0) {
-				this.path = this.defaultPath[0]
-			} else {
-				this.path = false
+			this.order = JSON.parse(JSON.stringify(this.tempOrder))
+			
+			if (this.order.path_id !== 0) {
+				// 通过path_id获取path完整信息
+				let path = this.getPathById(this.order.path_id)
+				this.path = path ? path : false
 			}
 			
 			// 监听选择收货地址事件
 			uni.$on('choosePath', (res) => {
 				this.path = res
+				this.order.path_id = res.id
 			})
 		},
 		onUnload: function() {
@@ -101,7 +109,14 @@
 				console.log('卸载选择收货地址的事件监听器')
 			})
 		},
+		onBackPress: function() {
+			this.deleteTempOrder()
+			return false
+		},
 		methods: {
+			...mapMutations(['deleteTempOrder']),
+			...mapActions(['doCreateOrder', 'doDelGoods']),
+			
 			openPathList: function() {
 				uni.navigateTo({
 					url: '/pages/user-path-list/user-path-list?type=choose'
@@ -113,8 +128,31 @@
 				})
 			},
 			openPayMethods: function() {
+				if (this.order.path_id === 0) {
+					return uni.showToast({title: '请选择收货地址', icon: 'none'});
+				}
+			
+				let time = new Date()
+				let timestamp = time.getTime()
+				let id = parseInt((timestamp + "").slice(-6))
+				let timeStr = utils.dateFormat(time, "{Y}{MM}{DD}{tt}{ii}{ss}")
+				
+				this.order.id = id
+				this.order.orderNo = 'orderno' + timeStr
+				this.order.create_time = timestamp
+				this.order.statusNo = 1
+				this.order.status = "待支付"
+				this.order.pay_price = this.order.total_price
+				this.order.freight = 0
+				this.order.coupon_id = 0
+				
+				this.doCreateOrder(this.order)
+				
+				// 下订单后 删除进入订单的商品(即选中的商品)
+				this.doDelGoods(false)
+				
 				uni.redirectTo({
-					url: "/pages/pay-methods/pay-methods"
+					url: "/pages/pay-methods/pay-methods?orderid=" + this.order.id
 				})
 			}
 		}

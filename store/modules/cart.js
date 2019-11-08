@@ -129,6 +129,10 @@ export default {
 		popupIndex: -1,
 	},
 	getters: {
+		// 判断是否有商品被选中
+		someChecked: (state) => {
+			return state.selectedList.length > 0
+		},
 		// 判断是否全选
 		checkedAll: (state) => {
 			return state.list.length === state.selectedList.length
@@ -150,6 +154,16 @@ export default {
 		// 获取当前需要修改属性的商品
 		popupData: (state) => {
 			return state.popupIndex > -1 ? state.list[state.popupIndex] : {}
+		},
+		// 获取购物车中选中的商品的详细信息列表
+		selectedInfoList: (state) => {
+			let infoList = []
+			state.list.forEach(v => {
+				if (state.selectedList.indexOf(v.id) > -1) {
+					infoList.push(v)
+				}
+			})
+			return infoList
 		}
 	},
 	mutations: {
@@ -230,7 +244,11 @@ export default {
 				commit('selectAll')
 			}
 		},
-		doDelGoods({state, commit}) {
+		doDelGoods({state, commit}, needShowModal) {
+			if (!needShowModal) {
+				commit('delGoods')
+				return
+			}
 			// 判断是否有商品被选中
 			if (state.selectedList.length === 0) {
 				uni.showToast({title: "请先选择商品"})

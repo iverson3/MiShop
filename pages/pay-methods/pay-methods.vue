@@ -43,7 +43,12 @@
 		},
 		data() {
 			return {
-				
+				orderid: 0
+			}
+		},
+		onLoad: function(e) {
+			if (e.orderid) {
+				this.orderid = e.orderid
 			}
 		},
 		onBackPress: function() {
@@ -57,7 +62,7 @@
 				success: res => {
 					if (res.confirm) {
 						// 用户选择放弃支付 则直接跳转到订单详情页 并显示该订单处于待支付状态
-						uni.redirectTo({url: "/pages/order-detail/order-detail?status=1"});
+						uni.redirectTo({url: "/pages/order-detail/order-detail?orderid=" + this.orderid});
 					}
 				}
 			});

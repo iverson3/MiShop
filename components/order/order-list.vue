@@ -1,9 +1,9 @@
 <template>
-	<view class="bg-white" @click.stop="openDetail(item.statusNo)">
+	<view class="bg-white" @click.stop="openDetail(item.id)">
 		<divider></divider>
 		<!-- header -->
 		<view class="d-flex a-center p-2 border-bottom border-light-secondary">
-			<text class="text-light-muted font-md ">{{ item.create_time }}</text>
+			<text class="text-light-muted font-md ">{{ item.create_time | formatTime }}</text>
 			<text class="main-text-color ml-auto font-md">{{ item.status }}</text>
 		</view>
 		<!-- body -->
@@ -21,13 +21,13 @@
 			<!-- 如果是待支付状态 可以取消订单/去支付 -->
 			<!-- 如果是支付失败状态 可以去支付/取消订单 -->
 			<template v-if="item.statusNo === 1 || item.statusNo === 5">
-				<view @click.stop="openPayMethod" class="rounded border border-light-secondary px-2 py-1 text-secondary" hover-class="bg-light-secondary">去支付</view>
-				<view @click.stop="cancelOrder" class="rounded border border-light-secondary px-2 py-1 text-secondary ml-2" hover-class="bg-light-secondary">取消订单</view>
+				<view @click.stop="openPayMethod(item.id)" class="rounded border border-light-secondary px-2 py-1 text-secondary" hover-class="bg-light-secondary">去支付</view>
+				<view @click.stop="cancelOrder(item)" class="rounded border border-light-secondary px-2 py-1 text-secondary ml-2" hover-class="bg-light-secondary">取消订单</view>
 			</template>
 			
 			<!-- 如果是待发货状态 可以取消订单 -->
 			<template v-if="item.statusNo === 2">
-				<view @click.stop="cancelOrder" class="rounded border border-light-secondary px-2 py-1 text-secondary" hover-class="bg-light-secondary">取消订单</view>
+				<view @click.stop="cancelOrder(item)" class="rounded border border-light-secondary px-2 py-1 text-secondary" hover-class="bg-light-secondary">取消订单</view>
 			</template>
 			
 			<!-- 如果是待收货状态 可以取消订单/确认收货 -->
@@ -60,7 +60,9 @@
 
 <script>
 	import orderListItem from '@/components/order/order-list-item.vue'
+	import utils from '@/common/lib/utils.js';
 	
+	import {mapMutations} from 'vuex'
 	export default {
 		components: {
 			orderListItem
@@ -69,10 +71,17 @@
 			item: Object,
 			index: Number
 		},
+		filters: {
+			formatTime(value) {
+				return utils.gettime(value)
+			}
+		},
 		methods: {
-			openDetail: function(status) {
+			...mapMutations(['changeOrderStatus']),
+			
+			openDetail: function(id) {
 				uni.navigateTo({
-					url: "/pages/order-detail/order-detail?status=" + status
+					url: "/pages/order-detail/order-detail?orderid=" + id
 				})
 			},
 			// 查看物流
@@ -88,9 +97,9 @@
 				})
 			},
 			// 去支付
-			openPayMethod: function() {
+			openPayMethod: function(id) {
 				uni.navigateTo({
-					url: "/pages/pay-methods/pay-methods"
+					url: "/pages/pay-methods/pay-methods?orderid=" + id
 				});
 			},
 			// 确认收货
@@ -98,8 +107,16 @@
 				
 			},
 			// 取消订单
-			cancelOrder: function() {
-				
+			cancelOrder: function(item) {
+				this.changeOrderStatus({
+					id: item.id,
+					old_status: item.statusNo,
+					new_status: 6
+				})
+				uni.showToast({
+					title: '取消成功',
+					icon: 'none'
+				});
 			},
 			// 去评价
 			toComment: function() {

@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 import cart from '@/store/modules/cart.js'
 import user from '@/store/modules/user.js'
 import path from '@/store/modules/path.js'
+import order from '@/store/modules/order.js'
 
 Vue.use(Vuex)
 
@@ -17,6 +18,7 @@ export default new Vuex.Store({
 	modules: {
 		cart,
 		user,
-		path
+		path,
+		order
 	}
 })

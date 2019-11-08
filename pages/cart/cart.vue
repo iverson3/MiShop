@@ -103,7 +103,7 @@
 				<view class="flex-1 d-flex a-center j-center font-md main-bg-color text-white">
 					移入收藏
 				</view>
-				<view @tap="doDelGoods"
+				<view @tap="doDelGoods(true)"
 				class="flex-1 d-flex a-center j-center bg-danger text-white font-md" 
 				hover-class="main-bg-hover-color">
 					删除
@@ -237,15 +237,20 @@
 			}),
 			...mapGetters([
 				'checkedAll',
+				'someChecked',
 				'totalPrice',
 				'disableSelectAll',
-				'popupData'
+				'popupData',
+				'selectedInfoList',
+				
+				'defaultPath',
 			])
 		},
 		methods: {
 			...mapMutations([
 				'selectItem',
-				'changeEditStatus'
+				'changeEditStatus',
+				'addTempOrder'
 			]),
 			...mapActions([
 				'doSelectAll',
@@ -269,6 +274,60 @@
 			},
 			
 			orderConfirm: function() {
+				// 判断是否有选中商品
+				if (!this.someChecked) {
+					return uni.showToast({title: '请先选择商品', icon: 'none'});
+				}
+				// 初始化临时订单的字段
+				let data = {
+					id: 0,
+					orderNo: '',   
+					create_time: 0,
+					status: "临时订单",
+					statusNo: 0,
+					order_items: [],
+					total_num: 1, 
+					total_price: 0, 
+					pay_price: 0,
+					freight: 0,  
+					coupon_id: 0, 
+					path_id: 0
+				}
+				// 处理商品信息中的字段
+				this.selectedInfoList.forEach(goods => {
+					// 删除订单中不需要的商品字段
+					delete goods.checked
+					delete goods.minnum
+					delete goods.maxnum
+					// 处理商品属性字段
+					let attrs = ""
+					goods.attrs.forEach(v => {
+						attrs = (attrs === "")? v.list[v.selected].name : (attrs + " " + v.list[v.selected].name)
+					})
+					goods.attrs = attrs
+				})
+				
+				data.order_items = this.selectedInfoList
+				
+				console.log(data.order_items[0]);
+				// 计算总的商品数
+				let sum = 0
+				data.order_items.forEach(v => {
+					console.log(v.num);
+					sum = sum + v.num
+				})
+				console.log(data.order_items[0]);
+				data.total_num = sum
+				data.total_price = this.totalPrice
+				// 判断是否有默认收货地址
+				if (this.defaultPath.length > 0) {
+					data.path_id = this.defaultPath[0].id
+				} else {
+					data.path_id = 0
+				}
+				// 添加临时订单
+				this.addTempOrder(data)
+				
 				uni.navigateTo({
 					url: "/pages/order-confirm/order-confirm"
 				})

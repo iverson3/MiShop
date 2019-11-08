@@ -52,6 +52,7 @@
 	import noThing from '@/components/common/no-thing.vue'
 	import orderList from '@/components/order/order-list.vue'
 	
+	import {mapState, mapGetters, mapMutations, mapActions} from 'vuex'
 	export default {
 		components: {
 			commonList,
@@ -64,172 +65,38 @@
 				tabBars: [
 					{
 						name:"全部",
+						orderStatus: 0,
 						no_thing: "no_comment",
 						msg: "您还没有任何订单",
-						list: [
-							{
-								create_time: "2019-08-12",
-								status: "已取消",
-								statusNo: 6,
-								order_items: [
-									{
-										id: 25,
-										cover: "/static/images/demo/list/5.jpg",
-										title: "小米8",
-										pprice: 1999.00,
-										attrs: "金色 标配",
-										num: 1
-									}
-								],
-								total_num: 1,
-								total_price: 1999.00
-							},
-							{
-								create_time: "2019-08-12",
-								status: "已发货",
-								statusNo: 3,
-								order_items: [
-									{
-										id: 25,
-										cover: "/static/images/demo/list/1.jpg",
-										title: "小米8",
-										pprice: 1999.00,
-										attrs: "金色 标配",
-										num: 1
-									},
-									{
-										id: 25,
-										cover: "/static/images/demo/list/2.jpg",
-										title: "小米8",
-										pprice: 1999.00,
-										attrs: "金色 标配",
-										num: 1
-									}
-								],
-								total_num: 2,
-								total_price: 6999.00
-							},
-							{
-								create_time: "2019-08-12",
-								status: "待发货",
-								statusNo: 2,
-								order_items: [
-									{
-										id: 25,
-										cover: "/static/images/demo/list/3.jpg",
-										title: "小米8",
-										pprice: 1999.00,
-										attrs: "金色 标配",
-										num: 1
-									}
-								],
-								total_num: 1,
-								total_price: 1999.00
-							},
-							{
-								create_time: "2019-08-12",
-								status: "待评价",
-								statusNo: 4,
-								order_items: [
-									{
-										id: 25,
-										cover: "/static/images/demo/list/3.jpg",
-										title: "小米8",
-										pprice: 1999.00,
-										attrs: "金色 标配",
-										num: 1
-									}
-								],
-								total_num: 1,
-								total_price: 1999.00
-							}
-						]
+						list: []
 					},
 					{
 						name:"待付款",
+						orderStatus: 1,
 						no_thing: "no_pay",
 						msg: "您还没有待付款订单",
 						list: []
 					},
 					{
 						name:"待发货",
+						orderStatus: 2,
 						no_thing: "no_receiving",
 						msg: "您还没有待发货订单",
-						list: [
-							{
-								create_time: "2019-08-12",
-								status: "待发货",
-								statusNo: 2,
-								order_items: [
-									{
-										id: 25,
-										cover: "/static/images/demo/list/5.jpg",
-										title: "小米8",
-										pprice: 1999.00,
-										attrs: "金色 标配",
-										num: 1
-									}
-								],
-								total_num: 1,
-								total_price: 1999.00
-							}
-						]
+						list: []
 					},
 					{
 						name:"待收货",
+						orderStatus: 3,
 						no_thing: "no_receiving",
 						msg: "您还没有待收货订单",
-						list: [
-							{
-								create_time: "2019-08-12",
-								status: "已发货",
-								statusNo: 3,
-								order_items: [
-									{
-										id: 25,
-										cover: "/static/images/demo/list/1.jpg",
-										title: "小米8",
-										pprice: 1999.00,
-										attrs: "金色 标配",
-										num: 1
-									},
-									{
-										id: 25,
-										cover: "/static/images/demo/list/2.jpg",
-										title: "小米8",
-										pprice: 1999.00,
-										attrs: "金色 标配",
-										num: 1
-									}
-								],
-								total_num: 2,
-								total_price: 6999.00
-							}
-						]
+						list: []
 					},
 					{
 						name:"待评价",
+						orderStatus: 4,
 						no_thing: "no_comment",
 						msg: "您还没有待评价订单",
-						list: [
-							{
-								create_time: "2019-08-12",
-								status: "待评价",
-								statusNo: 4,
-								order_items: [
-									{
-										id: 25,
-										cover: "/static/images/demo/list/6.jpg",
-										title: "小米8",
-										pprice: 1999.00,
-										attrs: "金色 标配",
-										num: 1
-									}
-								],
-								total_num: 1,
-								total_price: 1999.00
-							}
-						]
+						list: []
 					}
 				],
 				
@@ -279,6 +146,11 @@
 				]
 			}
 		},
+		computed: {
+			...mapState({
+				list: state => state.order.list,
+			})
+		},
 		watch: {
 			async tabIndex(newValue, oldValue) {
 				console.log(newValue)
@@ -299,8 +171,17 @@
 			if (e.tab) {
 				this.tabIndex = parseInt(e.tab)
 			}
+			this.__init()
 		},
 		methods: {
+			async __init() {
+				for (let key in this.list) {
+					if (this.tabBars[key].orderStatus === this.list[key].typeNo) {
+						this.tabBars[key].list = this.list[key].data
+					}
+				}
+			},
+			
 			changeTab: function(index) {
 				this.tabIndex = index
 				// 切换tab时 页面回到顶部

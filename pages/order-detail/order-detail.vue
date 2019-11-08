@@ -2,24 +2,24 @@
 	<view>
 		<view class="main-bg-color p-4 text-white d-flex a-end j-sb" style="height: 300upx;">
 			<view class="mb-3">
-				<view class="font-lg">{{ statusInfoList[orderStatus].title }}</view>
-				<view class="font">{{ statusInfoList[orderStatus].desc }}</view>
+				<view class="font-lg">{{ statusInfoList[orderInfo.statusNo].title }}</view>
+				<view class="font">{{ statusInfoList[orderInfo.statusNo].desc }}</view>
 			</view>
-			<view class="iconfont line-h mb-3" :class="statusInfoList[orderStatus].icon" style="font-size: 100upx;"></view>
+			<view class="iconfont line-h mb-3" :class="statusInfoList[orderInfo.statusNo].icon" style="font-size: 100upx;"></view>
 		</view>
 		
 		<view class="p-3">
 			<view class="text-light-muted font-md">
-				<text class="font-lg text-dark mr-2">小贱</text>
-				13396095889
+				<text class="font-lg text-dark mr-2">{{ pathInfo.name }}</text>
+				{{ pathInfo.phone }}
 			</view>
 			<view class="text-light-muted font-md">
-				广东省 深圳市 南山区 xxx街道 明亮科技园 2栋122
+				{{ pathInfo.path }} {{ pathInfo.detailPath }}
 			</view>
 		</view>
 		<divider></divider>
 		<view class="px-2">
-			<block v-for="(item,index) in order_items" :key="index">
+			<block v-for="(item,index) in orderInfo.order_items" :key="index">
 				<order-list-item :goods="item" :index="index"></order-list-item>
 			</block>
 		</view>
@@ -27,27 +27,30 @@
 		
 		<uni-list-item>
 			<text class="font-md text-light-muted">商品总价</text>
-			<view slot="right" class="font-md text-light-muted">￥128.00</view>
+			<view slot="right" class="font-md text-light-muted">￥{{ orderInfo.total_price }}</view>
 		</uni-list-item>
 		<uni-list-item>
 			<text class="font-md text-light-muted">快递</text>
-			<view slot="right" class="font-md text-light-muted">免邮</view>
+			<view slot="right" class="font-md text-light-muted">{{ orderInfo.freight === 0? '免邮' : orderInfo.freight }}</view>
 		</uni-list-item>
-		<uni-list-item>
+		<uni-list-item extraWidth="40%">
 			<text class="font-md text-light-muted">优惠券</text>
-			<view slot="right" class="font-md text-light-muted">-￥20.00</view>
+			<view slot="right" class="font-md text-light-muted">{{ orderInfo.coupon_id === 0? '没使用优惠券' : '-￥'+orderInfo.coupon_id }}</view>
 		</uni-list-item>
 		<uni-list-item>
 			<text class="font-md main-text-color">实际付款</text>
 			<view slot="right" class="font-md main-text-color">
-				<price>108.00</price>
+				<price>{{ orderInfo.pay_price }}</price>
 			</view>
 		</uni-list-item>
 		<divider></divider>
 		
 		<card headTitle="订单信息">
 			<uni-list-item title="订单编号" extraWidth="40%">
-				<view slot="right" class="font-md text-light-muted">1235346523745</view>
+				<view slot="right" class="font-md text-light-muted">{{ orderInfo.orderNo }}</view>
+			</uni-list-item>
+			<uni-list-item title="支付时间" extraWidth="40%">
+				<view slot="right" class="font-md text-light-muted">{{ orderInfo.create_time | formatTime }}</view>
 			</uni-list-item>
 		</card>
 		
@@ -55,7 +58,7 @@
 		<divider></divider>
 		<!-- 如果是待支付状态 可以取消订单/去支付 -->
 		<!-- 如果是支付失败状态 可以去支付/取消订单 -->
-		<template v-if="orderStatus === 1 || orderStatus === 5">
+		<template v-if="orderInfo.statusNo === 1 || orderInfo.statusNo === 5">
 			<view class="w-100 d-flex a-center">
 				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
 				@tap="openPayMethod"
@@ -67,7 +70,7 @@
 		</template>
 		
 		<!-- 如果是待发货状态 可以取消订单 -->
-		<template v-if="orderStatus === 2">
+		<template v-if="orderInfo.statusNo === 2">
 			<view class="w-100 d-flex a-center">
 				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
 				@tap="cancelOrder"
@@ -76,7 +79,7 @@
 		</template>
 		
 		<!-- 如果是待收货状态 可以取消订单/确认收货 -->
-		<template v-if="orderStatus === 3">
+		<template v-if="orderInfo.statusNo === 3">
 			<view class="w-100 d-flex a-center">
 				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
 				hover-class="main-bg-hover-color">确认收货</view>
@@ -88,7 +91,7 @@
 		</template>
 		
 		<!-- 如果是待评价状态 可以申请退货/去评价/再买一单 -->
-		<template v-if="orderStatus === 4">
+		<template v-if="orderInfo.statusNo === 4">
 			<view class="w-100 d-flex a-center">
 				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
 				hover-class="main-bg-hover-color">再买一单</view>
@@ -100,7 +103,7 @@
 		</template>
 		
 		<!-- 如果是已取消状态  可以删除订单/重新下单 -->
-		<template v-if="orderStatus === 6">
+		<template v-if="orderInfo.statusNo === 6">
 			<view class="w-100 d-flex a-center">
 				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
 				hover-class="main-bg-hover-color">重新下单</view>
@@ -109,7 +112,7 @@
 			</view>
 		</template>
 		<!-- 如果是退货退款状态 可以退货退款完成 -->
-		<template v-if="orderStatus === 7">
+		<template v-if="orderInfo.statusNo === 7">
 			<view class="w-100 d-flex a-center">
 				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
 				hover-class="main-bg-hover-color">退货退款完成</view>
@@ -123,7 +126,9 @@
 	import uniListItem from '@/components/uni-ui/uni-list-item/uni-list-item.vue'
 	import price from '@/components/common/price.vue'
 	import card from '@/components/common/card.vue'
+	import utils from '@/common/lib/utils.js';
 	
+	import {mapGetters} from 'vuex'
 	export default {
 		components: {
 			orderListItem,
@@ -133,27 +138,10 @@
 		},
 		data() {
 			return {
-				order_items: [
-					{
-						id: 25,
-						cover: "/static/images/demo/list/1.jpg",
-						title: "小米8",
-						pprice: 1999.00,
-						attrs: "金色 标配",
-						num: 1
-					},
-					{
-						id: 26,
-						cover: "/static/images/demo/list/1.jpg",
-						title: "小米8",
-						pprice: 1999.00,
-						attrs: "金色 标配",
-						num: 1
-					}
-				],
+				orderInfo: {},
+				pathInfo: {},
 				
 				// 状态值： 0-未知 1-待支付 2-待发货 3-待收货 4-待评价 5-支付失败 6-已取消 7-退货退款中
-				orderStatus: 0,
 				statusInfoList: [
 					{
 						title: "未知状态订单",
@@ -198,9 +186,20 @@
 				]
 			}
 		},
+		computed: {
+			...mapGetters(['getOrderInfoById', 'getPathById'])
+		},
+		filters: {
+			formatTime(value) {
+				return utils.gettime(value)
+			}
+		},
 		onLoad: function(e) {
-			if (e.status) {
-				this.orderStatus = parseInt(e.status)
+			if (e.orderid) {
+				this.orderInfo = this.getOrderInfoById(parseInt(e.orderid))
+				this.pathInfo = this.getPathById(this.orderInfo.path_id)
+				
+				console.log(this.orderInfo);
 			}
 			// 不同订单状态下 有不同的页面提示信息 有不同的操作按钮
 		},
@@ -227,7 +226,7 @@
 		methods: {
 			openPayMethod: function() {
 				uni.navigateTo({
-					url: "/pages/pay-methods/pay-methods"
+					url: "/pages/pay-methods/pay-methods?orderid=" + this.orderInfo.id
 				});
 			},
 			// 取消订单
