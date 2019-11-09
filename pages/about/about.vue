@@ -14,7 +14,7 @@
 			<uni-list-item title="廉洁小米" showArrow></uni-list-item>
 			<uni-list-item title="APP分享" showArrow></uni-list-item>
 			<uni-list-item title="授权直供店" showArrow></uni-list-item>
-			<uni-list-item title="清除缓存" showArrow></uni-list-item>
+			<uni-list-item @click="clearCache" title="清除缓存" showArrow></uni-list-item>
 		</view>
 	</view>
 </template>
@@ -32,7 +32,13 @@
 			}
 		},
 		methods: {
-			
+			clearCache: function() {
+				uni.removeStorageSync('orderList')
+				uni.showToast({
+					title: '缓存清除成功',
+					icon: 'none'
+				});
+			}
 		}
 	}
 </script>

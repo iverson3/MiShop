@@ -1,7 +1,7 @@
 <template>
 	<view class="uni-numbox">
 		<view :class="{'uni-numbox--disabled': inputValue <= min || disabled}" class="uni-numbox__minus" @click="_calcValue('minus')">-</view>
-		<input :disabled="disabled" v-model="inputValue" class="uni-numbox__value" type="number" @blur="_onBlur">
+		<input :disabled="inputDisabled" v-model="inputValue" class="uni-numbox__value" type="number" @blur="_onBlur">
 		<view :class="{'uni-numbox--disabled': inputValue >= max || disabled}" class="uni-numbox__plus" @click="_calcValue('plus')">+</view>
 	</view>
 </template>
@@ -28,6 +28,10 @@
 			disabled: {
 				type: Boolean,
 				default: false
+			},
+			inputDisabled: {
+				type: Boolean,
+				default: true
 			}
 		},
 		data() {
@@ -105,7 +109,7 @@
 		display: inline-flex;
 		flex-direction: row;
 		justify-content: flex-start;
-		height: 70upx;
+		height: 50upx;
 		position: relative
 	}
 
@@ -128,10 +132,10 @@
 	.uni-numbox__plus {
 		margin: 0;
 		background-color: #f8f8f8;
-		width: 70upx;
-		font-size: 40upx;
+		width: 50upx;
+		font-size: 30upx;
 		height: 100%;
-		line-height: 70upx;
+		line-height: 50upx;
 		text-align: center;
 		display: inline-flex;
 		align-items: center;

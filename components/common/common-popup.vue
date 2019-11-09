@@ -1,8 +1,8 @@
 <template>
 	<!-- 底部弹出框 -->
-	<view class="_popup" :class="popupClass">
+	<view class="_popup" :class="popupClass" :style="getPopupStyle">
 		<view class="_mask" @tap.stop="$emit('hide')" @touchmove.stop.prevent="moveHandle"></view>
-		<view class="_body">
+		<view class="_body" :style="getPopupStyle">
 			<slot></slot>
 		</view>
 	</view>
@@ -14,6 +14,15 @@
 			popupClass: {
 				type: String,
 				default: 'none'
+			},
+			popupHeight: {
+				type: Number,
+				default: 1035
+			}
+		},
+		computed: {
+			getPopupStyle() {
+				return `height: ${this.popupHeight}upx;bottom: -${this.popupHeight}upx;`
 			}
 		},
 		methods: {
@@ -42,10 +51,11 @@
 	}
 	._popup ._body {
 		position: fixed;
-		bottom: -1035upx;  /* 注意，这里bottom不能设置为0 要设置为跟弹出框body高度一样的负值 */
+		/* 注意，这里bottom不能设置为0 要设置为跟弹出框body高度一样的负值 */
+		/* bottom: -1035upx;  */
 		width: 92%;
 		padding: 0 4%;
-		height: 1035upx;
+		/* height: 1035upx; */
 		border-radius: 20upx 20upx 0 0;
 		background: #FFFFFF;
 		z-index: 2003;

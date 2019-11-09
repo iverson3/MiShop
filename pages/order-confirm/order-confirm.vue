@@ -20,7 +20,7 @@
 		
 		<view style="border-top-left-radius: 25upx;border-top-right-radius: 25upx;margin-top: -25upx;overflow: hidden;">
 			<view class="bg-white">
-				<uni-list-item showArrow>
+				<uni-list-item showArrow @click="changePopup('show')">
 					<view class="d-flex a-center">
 						<template v-if="order.order_items.length > 3">
 							<template v-for="i in 3">
@@ -70,24 +70,38 @@
 				去支付
 			</view>
 		</view>
+		
+		<!-- 商品信息列表弹出框 -->
+		<common-popup :popupClass="isShowPopup" :popupHeight="popupHeight" @hide="changePopup('none')">
+			<block v-for="(item,index) in order.order_items" :key="index">
+				<order-list-item :goods="item" :index="index"></order-list-item>
+			</block>
+		</common-popup>
 	</view>
 </template>
 
 <script>
 	import uniListItem from '@/components/uni-ui/uni-list-item/uni-list-item.vue'
 	import price from '@/components/common/price.vue'
+	import commonPopup from '@/components/common/common-popup.vue'
+	import orderListItem from '@/components/order/order-list-item.vue'
 	import utils from '@/common/lib/utils.js';
 	
 	import {mapState, mapGetters, mapMutations, mapActions} from 'vuex'
 	export default {
 		components: {
 			uniListItem,
-			price
+			price,
+			commonPopup,
+			orderListItem
 		},
 		data() {
 			return {
 				path: false,
-				order: {}
+				order: {},
+				isShowPopup: 'none',
+				// 弹出框的高度是250的整数倍
+				popupHeight: 250
 			}
 		},
 		computed: {
@@ -107,6 +121,13 @@
 				// 通过path_id获取path完整信息
 				let path = this.getPathById(this.order.path_id)
 				this.path = path ? path : false
+			}
+			
+			// 根据当前订单所包含的商品的数量 计算弹出框所需的高度
+			if (this.order.order_items.length > 4) {
+				this.popupHeight = this.popupHeight * 4
+			} else {
+				this.popupHeight = this.popupHeight * this.order.order_items.length
 			}
 			
 			// 监听选择收货地址事件
@@ -138,13 +159,25 @@
 					url: '/pages/order-invoice/order-invoice'
 				})
 			},
+			changePopup: function(isShow) {
+				if (isShow === 'none') {
+					this.isShowPopup = 'hide'
+					setTimeout(() => {
+						this.isShowPopup = 'none'
+					}, 200)
+				} else {
+					this.isShowPopup = 'show'
+				}
+			},
 			openPayMethods: function() {
 				if (this.order.path_id === 0) {
 					return uni.showToast({title: '请选择收货地址', icon: 'none'});
 				}
 			
 				let time = new Date()
+				// 获取时间戳
 				let timestamp = time.getTime()
+				// 截取时间戳的最后6位数字作为订单id
 				let id = parseInt((timestamp + "").slice(-6))
 				let timeStr = utils.dateFormat(time, "{Y}{MM}{DD}{tt}{ii}{ss}")
 				

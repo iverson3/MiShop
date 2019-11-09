@@ -21,7 +21,7 @@
 			<!-- 如果是待支付状态 可以取消订单/去支付 -->
 			<!-- 如果是支付失败状态 可以去支付/取消订单 -->
 			<template v-if="item.statusNo === 1 || item.statusNo === 5">
-				<view @click.stop="openPayMethod(item.id)" class="rounded border border-light-secondary px-2 py-1 text-secondary" hover-class="bg-light-secondary">去支付</view>
+				<view @click.stop="openPayMethod(item)" class="rounded border border-light-secondary px-2 py-1 text-secondary" hover-class="bg-light-secondary">{{ item.statusNo === 1?'去支付':'重新支付'}}</view>
 				<view @click.stop="cancelOrder(item)" class="rounded border border-light-secondary px-2 py-1 text-secondary ml-2" hover-class="bg-light-secondary">取消订单</view>
 			</template>
 			
@@ -73,7 +73,7 @@
 		},
 		filters: {
 			formatTime(value) {
-				return utils.gettime(value)
+				return utils.gettime(value, true)
 			}
 		},
 		methods: {
@@ -97,9 +97,17 @@
 				})
 			},
 			// 去支付
-			openPayMethod: function(id) {
+			openPayMethod: function(item) {
+				// 处于支付失败状态的订单 在去支付之前先修改订单状态为"待支付"
+				if (item.statusNo === 5) {
+					this.changeOrderStatus({
+						id: item.id,
+						old_status: item.statusNo,
+						new_status: 1
+					})
+				}
 				uni.navigateTo({
-					url: "/pages/pay-methods/pay-methods?orderid=" + id
+					url: "/pages/pay-methods/pay-methods?orderid=" + item.id
 				});
 			},
 			// 确认收货

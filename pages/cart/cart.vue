@@ -34,25 +34,27 @@
 		<view v-else class="bg-white px-2">
 			<!-- 列表 -->
 			<template v-for="(item,index) in list">
-				<view :key="index" class="d-flex a-center py-1 border-bottom border-light-secondary" style="height: 260upx;">
+				<view :key="index" class="d-flex a-start py-2 border-bottom border-light-secondary" style="min-height: 200upx;height: auto;">
 					
-					<label @click="selectItem(index)" class="radio d-flex a-center j-center flex-shrink" style="width: 80upx;height: 80upx;">
+					<label @click="selectItem(index)" class="radio d-flex a-center j-center flex-shrink mt-4" style="width: 80upx;height: 80upx;">
 						<radio :value="item.id" :checked="item.checked" color="#FD6801"/>
-					</label>
+					</label> 
 					
 					<image :src="item.cover" mode="widthFix" 
 					@tap="openGoodsDetail(item.id)"
-					class="border border-light-secondary rounded p-2 flex-shrink"
+					class="border border-light-secondary rounded p-1 flex-shrink"
 					style="width: 150upx;height: 150upx;"></image>
 					
 					<view class="d-flex flex-column flex-1">
 						<view class="flex-1 d-flex flex-column pl-2">
-							<view @tap="openGoodsDetail(item.id)" class="text-dark" style="font-size: 35upx;">
+							<view @tap="openGoodsDetail(item.id)" class="text-dark mb-1" style="font-size: 32upx;line-height: 1.3;">
 								{{ item.title }}
 							</view>
 							<!-- 商品的属性和规格 -->
-							<view @tap.stop="doShowPopup(index)" class="d-flex text-light-muted mb-1 p-1 pl-0" :class="isedit? 'bg-light-secondary':''">
-								<text class="mr-1" v-for="(attr,i) in item.attrs" :key="i">{{ attr.list[attr.selected].name }}</text>
+							<view @tap.stop="doShowPopup(index)" class="d-flex a-center text-light-muted mb-2 p-1 pl-0" :class="isedit? 'bg-light-secondary':''">
+								<text class="line-h mr-1">
+									{{ item.attrs | getAttrsStr }}
+								</text>
 								<view v-if="isedit" class="iconfont icon-bottom font ml-auto"></view>
 							</view>
 						</view>
@@ -60,7 +62,7 @@
 						<view class="mt-auto d-flex j-sb pl-2">
 							<price>{{ item.pprice }}</price>
 							<view class="a-self-end">
-								<uni-number-box @change="changeNum($event, item)" :value="item.num" :min="item.minnum" :max="item.maxnum"></uni-number-box>
+								<uni-number-box @change="changeNum($event, item, index)" :value="item.num" :min="item.minnum" :max="item.maxnum"></uni-number-box>
 							</view>
 						</view>
 					</view>
@@ -124,9 +126,9 @@
 				class="border rounded"
 				mode="widthFix"></image>
 				<view class="pl-2">
-				 	<price priceSize="font-lg" unitSize="font">2365</price>
+				 	<price priceSize="font-lg" unitSize="font">{{ showPrice }}</price>
 					<view class="d-block">
-						<text class="mr-1" v-for="(attr,i) in popupData.attrs" :key="i">{{ attr.list[attr.selected].name }}</text>
+						<text class="mr-1">{{ checkedSkus }}</text>
 					</view>
 				</view>
 			</view>
@@ -134,22 +136,22 @@
 			<!-- 表单部分 h660 -->
 			<scroll-view scroll-y class="w-100" style="height: 660upx;">
 			 	<card :headTitle="item.title" 
-				v-for="(item,index) in popupData.attrs"
+				v-for="(item,index) in attrsDataList"
 				:key="index"
 				:headTitleWeight="false" 
 				:headBorderBottom="false">
 					<mi-radio-group :label="item" :selected.sync="item.selected"></mi-radio-group>
 				</card>
-				<view class="d-flex j-sb a-center p-2 border-top border-light-secondary">
+				<view class="d-flex j-sb a-center px-2 py-3 mt-2 border-top border-light-secondary">
 					<text>购买数量</text>
-					<uni-number-box :value="popupData.num" :min="popupData.minnum" :max="popupData.maxnum" @change="changeNum($event, popupData)"></uni-number-box>
+					<uni-number-box :value="popupData_local.num" :min="popupData_local.minnum" :max="maxStock" @change="changeNum($event, popupData_local, popupIndex)"></uni-number-box>
 				</view>
 			</scroll-view>
 			 
 			<!-- 按钮 h100 -->
 			<view class="main-bg-color text-white font-md d-flex j-center a-center"
 			hover-class="main-bg-hover-color"
-			@tap.stop="doHidePopup"
+			@tap.stop="changeAttr"
 			style="height: 100upx;margin-left: -30upx;margin-right: -30upx;">
 				确定
 			</view>
@@ -160,7 +162,6 @@
 
 <script>
 	import loading from '@/common/mixin/loading.js';
-	
 	import uniNavBar from '@/components/uni-ui/uni-nav-bar/uni-nav-bar.vue'
 	import price from '@/components/common/price.vue'
 	import uniNumberBox from '@/components/uni-ui/uni-number-box/uni-number-box.vue'
@@ -183,6 +184,9 @@
 		},
 		data() {
 			return {
+				attrsDataList: [],
+				popupData_local: {},
+				
 				hotList: [
 					{
 						cover:"/static/images/demo/list/1.jpg",
@@ -232,7 +236,9 @@
 		computed: {
 			...mapState({
 				isedit: state => state.cart.isedit,
+				popupIndex: state => state.cart.popupIndex,
 				list: state => state.cart.list,
+				attrsData: state => state.cart.attrsData,
 				popupShow: state => state.cart.popupShow,
 			}),
 			...mapGetters([
@@ -244,13 +250,79 @@
 				'selectedInfoList',
 				
 				'defaultPath',
-			])
+			]),
+			
+			// 最大库存根据多规格属性的改变进行动态的改变
+			maxStock() {
+				if (!this.popupData_local.goodsSkus) return 0
+				if (this.checkedSkusIndex < 0) return this.popupData_local.min_stock
+				return this.popupData_local.goodsSkus[this.checkedSkusIndex].stock || 100
+			},
+			
+			// 拿到选中的skus组成的多规格字符串
+			checkedSkus() {
+				let checkedSkus = this.attrsDataList.map(v => {
+					return v.list[v.selected].name
+				})
+				return checkedSkus.join(",")
+			},
+			// 选中的多规格属性组 对应在价格对照表中的索引
+			checkedSkusIndex() {
+				let index = 0
+				if (this.popupData_local.goodsSkus) {
+					index = this.popupData_local.goodsSkus.findIndex((item) => {
+						return item.skusText === this.checkedSkus
+					})
+				}
+				return index
+			},
+			// 根据多规格属性的选择而动态计算的价格
+			showPrice() {
+				if (this.checkedSkusIndex < 0) return this.popupData_local.min_price || 0.00
+				if (!this.popupData_local.goodsSkus) return 0.00
+				return this.popupData_local.goodsSkus[this.checkedSkusIndex].pprice
+			}
+		},
+		watch: {
+			popupData(a, b) {
+				if (typeof a.attrs === 'undefined') {
+					this.popupData_local = {}
+					this.attrsDataList = []
+					return 
+				}
+				this.popupData_local = JSON.parse(JSON.stringify(a))
+				this.attrsDataList = JSON.parse(JSON.stringify(a.attrs)) 
+			}
+		},
+		filters: {
+			// 拼接属性字段
+			getAttrsStr(arr) {
+				let attrStr = ""
+				for (let attr of arr) {
+					attrStr = attrStr + attr.list[attr.selected].name + ","
+				}
+				return attrStr.substr(0, attrStr.length - 1)
+			},
+			// 去除字符串最后一个逗号
+			trimString(value) {
+				let lastChar = value.charAt(value.length - 1)
+				if (lastChar === ',') {
+					return value.substr(0, value.length - 1)
+				}
+				return value
+			}
+		},
+		onShow: function() {
+			
 		},
 		methods: {
 			...mapMutations([
 				'selectItem',
 				'changeEditStatus',
-				'addTempOrder'
+				'addTempOrder',
+				
+				'attrsChange',
+				'numChange'
 			]),
 			...mapActions([
 				'doSelectAll',
@@ -259,8 +331,22 @@
 				'doHidePopup'
 			]),
 			
-			changeNum: function(e, item) {
-				item.num = e
+			changeNum: function(num, item, index) {
+				if (this.popupIndex === -1 && index === -1) return
+				item.num = num
+				this.numChange({
+					index: (this.popupIndex === -1)? index : this.popupIndex,
+					num: num
+				})
+			},
+			changeAttr: function() {
+				this.attrsChange({
+					index: this.popupIndex,
+					attrs: this.attrsDataList,
+					pprice: this.showPrice,
+					maxnum: this.maxStock
+				})
+				this.doHidePopup()
 			},
 			gotoIndex: function() {
 				uni.switchTab({
@@ -293,8 +379,10 @@
 					coupon_id: 0, 
 					path_id: 0
 				}
+				// 不可以直接修改getter字段
+				let selectedList = JSON.parse(JSON.stringify(this.selectedInfoList))
 				// 处理商品信息中的字段
-				this.selectedInfoList.forEach(goods => {
+				selectedList.forEach(goods => {
 					// 删除订单中不需要的商品字段
 					delete goods.checked
 					delete goods.minnum
@@ -306,17 +394,13 @@
 					})
 					goods.attrs = attrs
 				})
+				data.order_items = selectedList
 				
-				data.order_items = this.selectedInfoList
-				
-				console.log(data.order_items[0]);
 				// 计算总的商品数
 				let sum = 0
 				data.order_items.forEach(v => {
-					console.log(v.num);
 					sum = sum + v.num
 				})
-				console.log(data.order_items[0]);
 				data.total_num = sum
 				data.total_price = this.totalPrice
 				// 判断是否有默认收货地址

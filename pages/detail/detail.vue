@@ -294,15 +294,6 @@
 						}
 					})
 					// 商品基本信息
-					/*
-						id: 5,
-						title: "小米MIX3 6GB+128GB",
-						cover: "/static/images/demo/list/1.jpg",
-						desc: "磁动力滑盖全面屏 / 前后旗舰AI双摄 / 四曲面彩色陶瓷机身 / 高效10W无限充电",
-						pprice: 3299,
-						num: 1,
-						max: 102
-					*/
 					this.detail = res
 					this.detail.num = 1
 					
@@ -385,13 +376,19 @@
 				}
 			},
 			addCart: function() {
-				let goods = this.detail
+				let goods = JSON.parse(JSON.stringify(this.detail))
 				
 				goods['pprice'] = this.showPrice
 				goods['minnum'] = 1
 				goods['maxnum'] = this.maxStock
 				goods['checked'] = false
 				goods['attrs'] = this.selects
+				delete goods.goodsAttrs
+				delete goods.content
+				delete goods.hotComments
+				delete goods.hotList
+				delete goods.goodsBanner
+				
 				// 加入购物车
 				this.addGoodsToCart(goods)
 				// 隐藏属性选择弹出框

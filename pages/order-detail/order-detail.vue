@@ -49,7 +49,7 @@
 			<uni-list-item title="订单编号" extraWidth="40%">
 				<view slot="right" class="font-md text-light-muted">{{ orderInfo.orderNo }}</view>
 			</uni-list-item>
-			<uni-list-item title="支付时间" extraWidth="40%">
+			<uni-list-item title="支付时间" extraWidth="60%">
 				<view slot="right" class="font-md text-light-muted">{{ orderInfo.create_time | formatTime }}</view>
 			</uni-list-item>
 		</card>
@@ -61,8 +61,8 @@
 		<template v-if="orderInfo.statusNo === 1 || orderInfo.statusNo === 5">
 			<view class="w-100 d-flex a-center">
 				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color" 
-				@tap="openPayMethod(orderInfo.id)"
-				hover-class="main-bg-hover-color">去支付</view>
+				@tap="openPayMethod(orderInfo)"
+				hover-class="main-bg-hover-color">{{ orderInfo.statusNo === 1?'去支付':'重新支付'}}</view>
 				<view class="flex-1 d-flex a-center j-center py-3 font-md text-white main-bg-color border-left border-light-secondary" 
 				@tap="cancelOrder(orderInfo)"
 				hover-class="main-bg-hover-color">取消订单</view>
@@ -191,36 +191,28 @@
 		},
 		filters: {
 			formatTime(value) {
-				return utils.gettime(value)
+				if (value) return utils.gettime(value, true)
+				return ''
 			}
 		},
 		onLoad: function(e) {
 			if (e.orderid) {
 				this.orderInfo = this.getOrderInfoById(parseInt(e.orderid))
 				this.pathInfo = this.getPathById(this.orderInfo.path_id)
-				
-				console.log(this.orderInfo);
 			}
-			// 不同订单状态下 有不同的页面提示信息 有不同的操作按钮
 		},
 		onBackPress: function() {
 			let pages = getCurrentPages()
-			// switch (pages[pages.length - 2].route){
-			// 	case 'pages/pay-methods/pay-methods':
-			// 		uni.reLaunch({
-			// 			url: "/pages/order/order?tab=1"
-			// 		})
-			// 		return true
-			// 		break;
-			// 	case 'pages/pay-result/pay-result':
-			// 		uni.reLaunch({
-			// 			url: "/pages/order/order?tab=2",
-			// 		})
-			// 		return true
-			// 		break;
-			// 	default:
-			// 		break;
-			// }
+			switch (pages[pages.length - 2].route){
+				case 'pages/order-detail/order-detail':
+					uni.redirectTo({
+						url: "/pages/order/order"
+					})
+					return true
+					break;
+				default:
+					break;
+			}
 			return false
 		},
 		methods: {
@@ -239,9 +231,17 @@
 				})
 			},
 			// 去支付
-			openPayMethod: function(id) {
+			openPayMethod: function(item) {
+				// 处于支付失败状态的订单 在去支付之前先修改订单状态为"待支付"
+				if (item.statusNo === 5) {
+					this.changeOrderStatus({
+						id: item.id,
+						old_status: item.statusNo,
+						new_status: 1
+					})
+				}
 				uni.navigateTo({
-					url: "/pages/pay-methods/pay-methods?orderid=" + id
+					url: "/pages/pay-methods/pay-methods?orderid=" + item.id
 				});
 			},
 			// 确认收货

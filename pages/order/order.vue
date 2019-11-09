@@ -149,15 +149,12 @@
 		computed: {
 			...mapState({
 				list: state => state.order.list,
-			})
+			}),
+			...mapGetters(['getOrderListByStatus'])
 		},
 		watch: {
 			async tabIndex(newValue, oldValue) {
 				// console.log(newValue)
-			},
-			list(a, b) {
-				// console.log('list change');
-				// this.__init()
 			}
 		},
 		onNavigationBarButtonTap: function(e) {
@@ -182,9 +179,12 @@
 		},
 		methods: {
 			async __init() {
-				for (let key in this.list) {
-					if (this.tabBars[key].orderStatus === this.list[key].typeNo) {
-						this.tabBars[key].list = this.list[key].data
+				this.tabBars[0].list = this.list
+				for (let k in this.tabBars) {
+					// 索引变量 k 的类型是 string
+					let key = parseInt(k)
+					if (key !== 0) {
+						this.tabBars[key].list = this.getOrderListByStatus(key)
 					}
 				}
 			},

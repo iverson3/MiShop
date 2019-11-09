@@ -5,7 +5,7 @@
 		style="width: 150upx;height: 150upx;"></image>
 		<view class="flex-1">
 			<view class="d-flex a-center">
-				<text class="font-md text-dark">{{ goods.title }}</text>
+				<text class="font-md text-dark" style="line-height: 1.3;">{{ goods.title }}</text>
 				<text class="font-md text-light-muted ml-auto">￥{{ goods.pprice }}</text>
 			</view>
 			<view class="d-flex a-center">

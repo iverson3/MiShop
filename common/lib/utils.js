@@ -300,10 +300,12 @@ export default {
 		}
 	},
 	// 人性化时间格式
-	gettime(shorttime){
+	gettime(shorttime, whole = false){
 		shorttime=shorttime.toString().length<13 ? shorttime*1000 : shorttime;
 		let now = (new Date()).getTime();
 		let cha = (now-parseInt(shorttime))/1000;
+		
+		if (whole) return this.dateFormat(new Date(shorttime),"{Y}-{MM}-{DD} {tt}:{ii}:{ss}");
 		
 		if (cha < 43200) {
 			// 当天
