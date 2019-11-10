@@ -6,7 +6,7 @@
 		</card>
 		
 		<view class="p-3">
-			<button type="default" class="bg-white">退出登录</button>
+			<button @click="doLogout" type="default" class="bg-white">退出登录</button>
 		</view>
 	</view>
 </template>
@@ -15,6 +15,7 @@
 	import card from '@/components/common/card.vue'
 	import uniListItem from '@/components/uni-ui/uni-list-item/uni-list-item.vue'
 	
+	import {mapState, mapMutations} from 'vuex'
 	export default {
 		components: {
 			card,
@@ -44,11 +45,32 @@
 				]
 			}
 		},
+		computed: {
+			...mapState({
+				token: state => state.user.token
+			})
+		},
 		methods: {
+			...mapMutations(['logout']),
+			
 			navigate: function(path) {
 				if (!path) return
 				uni.navigateTo({
 					url: `/pages/${path}/${path}`
+				})
+			},
+			doLogout: function() {
+				let options = {
+					header: {
+						token: this.token
+					}
+				}
+				this.$api.post('/logout', {}, options).then(res => {
+					this.logout()
+					uni.showToast({title: '退出登录成功', icon: 'none'});
+					setTimeout(() => {
+						uni.navigateBack({delta: 1})
+					}, 500)
 				})
 			}
 		}

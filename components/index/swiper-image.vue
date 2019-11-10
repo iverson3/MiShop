@@ -43,7 +43,7 @@
 			}
 		},
 		onReady:function(){
-			console.log(this.resdata)
+			
 		},
 		methods: {
 			event: function(item, index) {

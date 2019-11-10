@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<!-- 排序筛选 -->
-		<view class="d-flex border-top border-bottom a-center" style="height: 100upx;">
+		<view class="d-flex border-top border-bottom a-center position-fixed top-0 left-0 right-0 bg-white" style="height: 100upx;z-index: 100;">
 			<view v-for="(item,index) in screen.list" :key="index" 
 			@tap="changeScreen(index)"
 			class="flex-1 d-flex j-center a-center font-md">
@@ -14,6 +14,8 @@
 			
 			<view @tap="showDrawer" class="flex-1 d-flex j-center a-center main-text-color">筛选</view>
 		</view>
+		<!-- 占位 -->
+		<view class="w-100" style="height: 100upx;"></view>
 		
 		<!-- 筛选功能的抽屉 -->
 		<uni-drawer :visible="showRigth" mode="right" @close="closeDrawer">
@@ -278,7 +280,12 @@
 					price: item.rule + ',' + item.value 
 				}
 			},
-			
+			// 搜索之前的相关初始化处理
+			initSearch: function() {
+				this.label.selected = 0
+				this.condition = {}
+			},
+			// 搜索
 			search: function() {
 				if (this.keyword === '') {
 					return uni.showToast({title: '请输入关键字', icon: 'none'});
@@ -292,6 +299,7 @@
 				// #endif
 				
 				this.addHistory()
+				this.initSearch()
 				// 开始搜索
 				this.getData()
 			},

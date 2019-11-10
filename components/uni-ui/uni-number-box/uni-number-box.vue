@@ -31,7 +31,7 @@
 			},
 			inputDisabled: {
 				type: Boolean,
-				default: true
+				default: false
 			}
 		},
 		data() {
@@ -44,6 +44,13 @@
 				this.inputValue = +val
 			},
 			inputValue(newVal, oldVal) {
+				let temp = parseInt(newVal)
+				// input的值不能为空 也不能为0
+				if (!newVal || temp === 0) {
+					this.inputValue = this.value
+					this.$emit('change', this.inputValue)
+					return
+				}
 				if (+newVal !== +oldVal) {
 					this.$emit('change', newVal)
 				}
@@ -87,8 +94,12 @@
 			},
 			_onBlur(event) {
 				let value = event.detail.value
-				if (!value) {
-					this.inputValue = 0
+				// 校验正整数
+				let reg = /^[1-9]+[0-9]*]*$/
+				if (!value || !reg.test(value)) {
+					// 如果输入为空或者非正整数 则还原input的值 并且使用$emit通知父组件强制更新当前组件
+					this.inputValue = this.value
+					this.$emit('forceUpdate')
 					return
 				}
 				value = +value

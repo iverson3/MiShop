@@ -4,8 +4,8 @@
 		class="rounded mx-2 flex-shrink"
 		style="width: 150upx;height: 150upx;"></image>
 		<view class="flex-1">
-			<view class="d-flex a-center">
-				<text class="font-md text-dark" style="line-height: 1.3;">{{ goods.title }}</text>
+			<view class="d-flex a-center mb-1">
+				<text class="font-md text-dark pr-1" style="line-height: 1.3;height: 76upx;text-overflow: ellipsis;overflow: hidden;">{{ goods.title | subTitle }}</text>
 				<text class="font-md text-light-muted ml-auto">￥{{ goods.pprice }}</text>
 			</view>
 			<view class="d-flex a-center">
@@ -21,6 +21,11 @@
 		props: {
 			goods: Object,
 			index: Number
+		},
+		filters: {
+			subTitle(value) {
+				return value.length > 38 ? (value.substr(0, 36) + '...') : value
+			}
 		},
 		methods: {
 			openGoodsDetail: function(id) {

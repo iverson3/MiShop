@@ -1,16 +1,38 @@
+let loginStatus = uni.getStorageSync('loginStatus')
+let token = uni.getStorageSync('token')
+let userInfo = uni.getStorageSync('userInfo')
+
+loginStatus = loginStatus? JSON.parse(loginStatus) : false
+token = token? JSON.parse(token) : null
+userInfo = userInfo? JSON.parse(userInfo) : {}
+
 export default {
 	state: {
-		token: "",
-		userinfo: {}
+		loginStatus: loginStatus,
+		token: token,
+		userInfo: userInfo
 	},
 	getters: {
-		getUserinfo: (state) => {
-			return userinfo
-		}
+		
 	},
 	mutations: {
-		resetToken(state, token) {
-			state.token = token
+		login(state, userinfo) {
+			state.loginStatus = true
+			state.token = userinfo.token
+			delete userinfo.token
+			state.userInfo = userinfo
+			// 持久化存储
+			uni.setStorageSync('loginStatus', JSON.stringify(state.loginStatus))
+			uni.setStorageSync('token', JSON.stringify(state.token))
+			uni.setStorageSync('userInfo', JSON.stringify(state.userInfo))
+		},
+		logout(state) {
+			state.loginStatus = false
+			state.token = null
+			state.userInfo = {}
+			uni.removeStorageSync('loginStatus')
+			uni.removeStorageSync('token')
+			uni.removeStorageSync('userInfo')
 		}
 	},
 	actions: {

@@ -151,7 +151,7 @@
 					{
 						title: "待支付订单",
 						desc: "您还有xxxx时间去进行支付，过期将自动取消",
-						icon: "icon-daizhifu"
+						icon: "icon-daifukuan"
 					},
 					{
 						title: "待发货订单",

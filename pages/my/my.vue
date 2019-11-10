@@ -9,15 +9,16 @@
 			<image src="/static/images/bg.jpg" style="width: 100%;height: 320upx;"></image>
 			
 			<view class="d-flex a-center position-absolute left-0 right-0" style="bottom: 50upx;">
-				<image src="/static/images/demo/demo6.jpg" class="rounded-circle border-light ml-4" 
+				<image :src="loginStatus? userInfo.avatar : '/static/images/demo/demo6.jpg'" 
+				class="rounded-circle border-light ml-4" 
 				style="width: 145upx;height: 145upx;border: 5upx solid;"></image>
-				<navigator url="/pages/login/login">
-					<view class="ml-2 text-white font-md">测试昵称</view>
-				</navigator>
+				<view @tap="openLogin" class="ml-2 text-white font-md">
+					{{ loginStatus? userInfo.nickname : '登录/注册'}}
+				</view>
 				<view class="d-flex a-center j-center ml-auto a-self-end px-2" 
 				style="height: 70upx;background: #FFD43F;color: #CC4A00;border-top-left-radius: 35upx;border-bottom-left-radius: 35upx;">
 					<view class="iconfont icon-huangguan line-h mr-2"></view>
-					会员积分 1.99
+					会员积分 {{ loginStatus? '12.99' : '0.00'}}
 				</view>
 			</view>
 		</view>
@@ -62,6 +63,7 @@
 	import card from '@/components/common/card.vue'
 	import uniListItem from '@/components/uni-ui/uni-list-item/uni-list-item.vue'
 	
+	import {mapState} from 'vuex';
 	export default {
 		components: {
 			card,
@@ -93,11 +95,23 @@
 				]
 			}
 		},
+		computed: {
+			...mapState({
+				loginStatus: state => state.user.loginStatus,
+				userInfo: state => state.user.userInfo
+			})
+		},
 		methods: {
 			navigate: function(path) {
 				if (!path) return
 				uni.navigateTo({
 					url: `/pages/${path}/${path}`
+				})
+			},
+			openLogin: function() {
+				if (this.loginStatus) return
+				uni.navigateTo({
+					url: "/pages/login/login"
 				})
 			},
 			openOrderList: function(tab) {

@@ -42,7 +42,47 @@
 */
 
 // 所有购物车数据
-let defaultData = []
+let defaultData = [
+	{
+		checked: false,
+		id: 25,
+		title: "韩国ins柠檬黄边框苹果X手机壳Iphonexsmax/8plus/7p/XR透明6软壳",
+		cover: "/static/images/demo/list/1.jpg",
+		// 当前商品的可选属性
+		attrs: [
+			{
+				title: "颜色",
+				selected: 0,
+				list: [
+					{ name: "火焰色" },
+					{ name: "炭黑" },
+					{ name: "冰川蓝" }
+				]
+			},
+			{
+				title: "容量",
+				selected: 0,
+				list: [
+					{ name: "64GB" },
+					{ name: "128GB" }
+				]
+			},
+			{
+				title: "套餐",
+				selected: 0,
+				list: [
+					{ name: "标配" },
+					{ name: "套餐一" },
+					{ name: "套餐二" }
+				]
+			}
+		],
+		pprice: 998,
+		num: 1,
+		minnum: 1,
+		maxnum: 10   // 商品库存
+	}
+]
 
 let cartList = uni.getStorageSync('cartList')
 let initData = cartList? JSON.parse(cartList) : defaultData
@@ -253,10 +293,10 @@ export default {
 		// 显示弹出框
 		doShowPopup({state, commit, getters}, index) {
 			// 只有在编辑状态下才能显示弹出框
-			if (state.isedit) {
+			// if (state.isedit) {
 				commit('initPopupIndex', index)
 				state.popupShow = 'show'
-			}
+			// }
 		},
 		// 隐藏弹出框
 		doHidePopup({state, commit}) {

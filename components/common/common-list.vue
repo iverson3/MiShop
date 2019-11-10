@@ -25,7 +25,7 @@
 		},
 		methods: {
 			openDetail: function() {
-				uni.navigateTo({
+				uni.redirectTo({
 					url: "/pages/detail/detail?goods_id=" + this.item.id
 				})
 			}

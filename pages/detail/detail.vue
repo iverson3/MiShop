@@ -285,7 +285,12 @@
 				'addGoodsToCart'
 			]),
 			async __init(goods_id) {
+				uni.showLoading({
+					title: "商品详情加载中...",
+					mask: true
+				})
 				let res = await this.$api.get('/goods/' + goods_id)
+				uni.hideLoading()
 				if (res) {
 					// 轮播图
 					this.banners = res.goodsBanner.map(v => {

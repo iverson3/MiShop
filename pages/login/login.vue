@@ -38,6 +38,7 @@
 <script>
 	import uniNavBar from '@/components/uni-ui/uni-nav-bar/uni-nav-bar.vue'
 	
+	import {mapState, mapMutations} from 'vuex';
 	export default {
 		components: {
 			uniNavBar
@@ -52,7 +53,7 @@
 				rules: {
 					username: [
 						{
-							rule: /^[a-zA-Z]\w{5,17}$/,
+							rule: /^[a-zA-Z0-9_-]{5,17}$/,
 							msg: "用户名格式不正确"
 						},
 						// {
@@ -74,7 +75,12 @@
 				}
 			}
 		},
+		computed: {
+			
+		},
 		methods: {
+			...mapMutations(['login']),
+			
 			clickLeft: function() {
 				uni.navigateBack({delta: 1})
 			},
@@ -109,14 +115,16 @@
 				if (!this.validate('username')) return
 				if (!this.validate('password')) return
 				
-				console.log('login success')
-				uni.showLoading({
-					title: "登录中...",
-					mask: true
-				})
+				uni.showLoading({title: "登录中...", mask: true})
 				// 请求服务器端 进行登录处理
-				
-				setTimeout(() => {
+				this.$api.post('/login', {
+					username: this.username,
+					password: this.password
+				}).then(res => {
+					console.log(res);
+					
+					this.login(res)
+					
 					uni.hideLoading()
 					uni.showToast({
 						title: "登录成功",
@@ -125,7 +133,7 @@
 					setTimeout(() => {
 						uni.navigateBack({delta: 1})
 					}, 1000)
-				}, 2000)
+				})
 				
 			}
 		}

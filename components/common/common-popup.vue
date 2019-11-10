@@ -3,6 +3,9 @@
 	<view class="_popup" :class="popupClass" :style="getPopupStyle">
 		<view class="_mask" @tap.stop="$emit('hide')" @touchmove.stop.prevent="moveHandle"></view>
 		<view class="_body" :style="getPopupStyle">
+			<view class="position-absolute iconfont icon-shanchu1 rounded-circle bg-light-secondary" 
+			@tap.stop="$emit('hide')"
+			style="top: 40upx; right: 40upx;font-size: 16upx;padding: 6upx 12upx;"></view>
 			<slot></slot>
 		</view>
 	</view>

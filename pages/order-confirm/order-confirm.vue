@@ -73,9 +73,11 @@
 		
 		<!-- 商品信息列表弹出框 -->
 		<common-popup :popupClass="isShowPopup" :popupHeight="popupHeight" @hide="changePopup('none')">
-			<block v-for="(item,index) in order.order_items" :key="index">
-				<order-list-item :goods="item" :index="index"></order-list-item>
-			</block>
+			<card headTitle="订单商品列表">
+				<block v-for="(item,index) in order.order_items" :key="index">
+					<order-list-item :goods="item" :index="index"></order-list-item>
+				</block>
+			</card>
 		</common-popup>
 	</view>
 </template>
@@ -85,6 +87,7 @@
 	import price from '@/components/common/price.vue'
 	import commonPopup from '@/components/common/common-popup.vue'
 	import orderListItem from '@/components/order/order-list-item.vue'
+	import card from '@/components/common/card.vue'
 	import utils from '@/common/lib/utils.js';
 	
 	import {mapState, mapGetters, mapMutations, mapActions} from 'vuex'
@@ -93,7 +96,8 @@
 			uniListItem,
 			price,
 			commonPopup,
-			orderListItem
+			orderListItem,
+			card
 		},
 		data() {
 			return {
@@ -122,17 +126,16 @@
 				let path = this.getPathById(this.order.path_id)
 				this.path = path ? path : false
 			}
-			
-			// 根据当前订单所包含的商品的数量 计算弹出框所需的高度
+			// 根据当前订单所包含的商品的数量 计算弹出框所需的高度 (多加的100高度是给弹出框标题用的)
 			if (this.order.order_items.length > 4) {
-				this.popupHeight = this.popupHeight * 4
+				this.popupHeight = this.popupHeight * 4 + 100
 			} else {
-				this.popupHeight = this.popupHeight * this.order.order_items.length
+				this.popupHeight = this.popupHeight * this.order.order_items.length + 100
 			}
-			
 			// 监听选择收货地址事件
 			uni.$on('choosePath', (res) => {
 				this.path = res
+				// 用户选择新地址之后 修改订单里面的地址id
 				this.order.path_id = res.id
 			})
 		},

@@ -51,18 +51,18 @@
 								{{ item.title }}
 							</view>
 							<!-- 商品的属性和规格 -->
-							<view @tap.stop="doShowPopup(index)" class="d-flex a-center text-light-muted mb-2 p-1 pl-0" :class="isedit? 'bg-light-secondary':''">
-								<text class="line-h mr-1">
+							<view @tap.stop="doShowPopup(index)" class="d-flex a-center text-light-muted mb-2 px-1 py-0 bg-light-secondary" style="width: auto;border-radius: 20upx;display: inline-table;">
+								<text class="line-h mr-2 font-sm">
 									{{ item.attrs | getAttrsStr }}
 								</text>
-								<view v-if="isedit" class="iconfont icon-bottom font ml-auto"></view>
+								<text class="iconfont icon-bottom line-h font-sm"></text>
 							</view>
 						</view>
 						
 						<view class="mt-auto d-flex j-sb pl-2">
 							<price>{{ item.pprice }}</price>
 							<view class="a-self-end">
-								<uni-number-box @change="changeNum($event, item, index)" :value="item.num" :min="item.minnum" :max="item.maxnum"></uni-number-box>
+								<uni-number-box v-if="updateNum" @forceUpdate="forceRefreshNumber()" @change="changeNum($event, item, index)" :value="item.num" :min="item.minnum" :max="item.maxnum"></uni-number-box>
 							</view>
 						</view>
 					</view>
@@ -144,7 +144,7 @@
 				</card>
 				<view class="d-flex j-sb a-center px-2 py-3 mt-2 border-top border-light-secondary">
 					<text>购买数量</text>
-					<uni-number-box :value="popupData_local.num" :min="popupData_local.minnum" :max="maxStock" @change="changeNum($event, popupData_local, popupIndex)"></uni-number-box>
+					<uni-number-box v-if="updateNum" @forceUpdate="forceRefreshNumber()" @change="changeNum($event, popupData_local, popupIndex)" :value="popupData_local.num" :min="popupData_local.minnum" :max="maxStock"></uni-number-box>
 				</view>
 			</scroll-view>
 			 
@@ -186,9 +186,11 @@
 			return {
 				attrsDataList: [],
 				popupData_local: {},
+				updateNum: true,
 				
 				hotList: [
 					{
+						id: 25,
 						cover:"/static/images/demo/list/1.jpg",
 						title:"米家空调",
 						desc:"1.5匹变频",
@@ -196,6 +198,7 @@
 						pprice:1399
 					},
 					{
+						id: 25,
 						cover:"/static/images/demo/list/1.jpg",
 						title:"米家空调",
 						desc:"1.5匹变频",
@@ -203,6 +206,7 @@
 						pprice:1399
 					},
 					{
+						id: 25,
 						cover:"/static/images/demo/list/1.jpg",
 						title:"米家空调",
 						desc:"1.5匹变频",
@@ -210,6 +214,7 @@
 						pprice:1399
 					},
 					{
+						id: 25,
 						cover:"/static/images/demo/list/1.jpg",
 						title:"米家空调",
 						desc:"1.5匹变频",
@@ -217,6 +222,7 @@
 						pprice:1399
 					},
 					{
+						id: 25,
 						cover:"/static/images/demo/list/1.jpg",
 						title:"米家空调",
 						desc:"1.5匹变频",
@@ -224,6 +230,7 @@
 						pprice:1399
 					},
 					{
+						id: 25,
 						cover:"/static/images/demo/list/1.jpg",
 						title:"米家空调",
 						desc:"1.5匹变频",
@@ -240,6 +247,8 @@
 				list: state => state.cart.list,
 				attrsData: state => state.cart.attrsData,
 				popupShow: state => state.cart.popupShow,
+				
+				loginStatus: state => state.user.loginStatus,
 			}),
 			...mapGetters([
 				'checkedAll',
@@ -312,6 +321,10 @@
 				return value
 			}
 		},
+		onLoad: function() {
+			// 未登录时 不显示购物车列表
+			// if (!this.loginStatus) this.list = []
+		},
 		onShow: function() {
 			
 		},
@@ -331,6 +344,16 @@
 				'doHidePopup'
 			]),
 			
+			// 强制更新numberBox子组件  一种hack的强制更新子组件的方式 (组件依赖的state字段没有变化的情况下 需要强制的方式组件才会更新)
+			forceRefreshNumber() {
+				// 移除组件
+				this.updateNum = false
+				// 在组件移除后，重新渲染组件
+				// this.$nextTick可实现在DOM 状态更新后，执行传入的方法。
+				this.$nextTick(() => {
+					this.updateNum = true
+				})
+			},
 			changeNum: function(num, item, index) {
 				if (this.popupIndex === -1 && index === -1) return
 				item.num = num
