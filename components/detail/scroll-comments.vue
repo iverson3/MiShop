@@ -33,7 +33,7 @@
 		</scroll-view>
 		
 		<!-- 暂无评论 -->
-		<view v-if="!comments || comments.length === 0" class="w-100 py-5 d-flex a-center j-center font-md text-light-muted text-center bg-light-secondary">
+		<view v-if="!comments || comments.length === 0" class="w-100 py-3 d-flex a-center j-center font-md text-light-muted text-center bg-light-secondary">
 			暂无评论
 		</view>
 		<view class="d-flex a-center j-center py-2 mt-2 text-primary" 

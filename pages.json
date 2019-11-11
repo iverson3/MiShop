@@ -140,33 +140,40 @@
             "style": {
 				// 允许下拉刷新
 				"enablePullDownRefresh":true,
-            	// 配置编译到 App 平台时的特定样式
-            	"app-plus": {
-            	    // 不显示滚动条
-            		"scrollIndicator":"none",
-            		// app顶部导航栏自定义设置
-            		"titleNView": {
-            			// 搜索框
-            			"searchInput": {
-            				"align":"left",
-            				"backgroundColor":"#F7F7F7",
-            				"borderRadius":"4px",
-            				"disabled":"false",
-            				"placeholder":"kamaka ukulele",
-            				"placeholderColor":"#CCCCCC"
-            			},
-            			// 按钮
-            			"buttons": [
-            				{
-            					"color":"#989898",
-            					"colorPressed":"#FD6801",
-            					"float":"right",
-            					"fontSize":"16px",
-            					"text": "搜索"
-            				}
-            			]
-            		}
-            	}
+				// 配置编译到 App 平台时的特定样式
+				"app-plus": {
+					// 取消app中默认的顶部导航栏，在页面中使用自定义的导航栏
+					"titleNView": false,
+					"scrollIndicator":"none",
+					"bounce":"none"
+				}
+         
+            	// "app-plus": {
+            	//     // 不显示滚动条
+            	// 	"scrollIndicator":"none",
+            	// 	// app顶部导航栏自定义设置
+            	// 	"titleNView": {
+            	// 		// 搜索框
+            	// 		"searchInput": {
+            	// 			"align":"left",
+            	// 			"backgroundColor":"#F7F7F7",
+            	// 			"borderRadius":"4px",
+            	// 			"disabled":"false",
+            	// 			"placeholder":"kamaka ukulele",
+            	// 			"placeholderColor":"#CCCCCC"
+            	// 		},
+            	// 		// 按钮
+            	// 		"buttons": [
+            	// 			{
+            	// 				"color":"#989898",
+            	// 				"colorPressed":"#FD6801",
+            	// 				"float":"right",
+            	// 				"fontSize":"16px",
+            	// 				"text": "搜索"
+            	// 			}
+            	// 		]
+            	// 	}
+            	// },
             }
         }
         ,{

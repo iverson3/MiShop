@@ -5,6 +5,10 @@
 	id: 25,
 	title: "测试专用商品只有这个测试专用商品只有这个测试专用商品只有这个测试专用商品只有这个测试专用商品只有这个",
 	cover: "/static/images/demo/list/1.jpg",
+	pprice: 998,
+	num: 1,
+	minnum: 1,
+	maxnum: 10,   // 商品库存
 	// 当前商品的可选属性
 	attrs: [
 		{
@@ -33,11 +37,7 @@
 				{ name: "套餐二" }
 			]
 		}
-	],
-	pprice: 998,
-	num: 1,
-	minnum: 1,
-	maxnum: 10   // 商品库存
+	]
 }
 */
 

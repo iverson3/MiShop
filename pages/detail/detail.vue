@@ -396,9 +396,9 @@
 			addCart: function() {
 				let goods = JSON.parse(JSON.stringify(this.detail))
 				
-				goods['pprice'] = this.showPrice
+				goods['pprice'] = parseFloat(this.showPrice)
 				goods['minnum'] = 1
-				goods['maxnum'] = this.maxStock
+				goods['maxnum'] = parseInt(this.maxStock)
 				goods['checked'] = false
 				goods['attrs'] = this.selects
 				delete goods.goodsAttrs

@@ -1,11 +1,39 @@
 <template>
 	<view>
+		<!-- 顶部的自定义导航栏 -->
+		<view class="w-100 position-fixed top-0 left-0 right-0 bg-white" 
+		:style="'z-index: 100;height: '+navbarHeight+'upx;'">
+		    <!-- 非微信小程序平台 需要加一个状态栏的占位 -->
+			<!-- #ifndef MP-WEIXIN -->
+			<view class="uni-status-bar"></view>
+			<!-- #endif -->
+			
+			<view class="w-100 d-flex a-center" style="height: 90upx;">
+				<view style="width: 85upx;" class="d-flex a-center j-center" @click="goback">
+					<text class="iconfont icon-back" style="font-size: 46upx;color:#6D6D72"></text>
+				</view>
+				<view class="flex-1 bg-light rounded d-flex a-center text-light-muted" style="height: 65upx;">
+					<text class="iconfont icon-sousuo mx-2"></text>
+					<input class="flex-1" type="text" v-model="keyword" confirm-type="搜索" />
+				</view>
+				<view @click="searchBtnClick" style="width: 96upx;" class="d-flex a-center j-center">
+					<text style="font-size: 32upx;color: #6D6D72;">搜索</text>
+				</view>
+			</view>
+		</view>
+		<!-- 占位 -->
+		<view class="w-100" :style="'height: '+navbarHeight+'upx;'"></view>
+		
+		
 		<!-- 排序筛选 -->
-		<view class="d-flex border-top border-bottom a-center position-fixed top-0 left-0 right-0 bg-white" style="height: 100upx;z-index: 100;">
+		<view class="d-flex border-top border-bottom a-center position-fixed left-0 right-0 bg-white" 
+		:style="'height: 100upx;z-index: 100;top: '+navbarHeight+'upx;'">
 			<view v-for="(item,index) in screen.list" :key="index" 
 			@tap="changeScreen(index)"
 			class="flex-1 d-flex j-center a-center font-md">
-				<text :class="screen.currentIndex === index ? 'main-text-color':'text-muted'">{{ item.name }}</text>
+				<text :class="screen.currentIndex === index ? 'main-text-color':'text-muted'">
+					{{ item.name }}
+				</text>
 				<view>
 					<view :class="item.status===1?'main-text-color':'text-light-muted'" class="iconfont icon-paixu-shengxu line-h0"></view>
 					<view :class="item.status===2?'main-text-color':'text-light-muted'" class="iconfont icon-paixu-jiangxu line-h0"></view>
@@ -18,7 +46,7 @@
 		<view class="w-100" style="height: 100upx;"></view>
 		
 		<!-- 筛选功能的抽屉 -->
-		<uni-drawer :visible="showRigth" mode="right" @close="closeDrawer">
+		<uni-drawer :visible="showRigth" mode="right" :fixedTop="navbarHeight" @close="closeDrawer">
 			<card headTitle="价格范围" :headBorderBottom="false" :headTitleWeight="false">
 				<!-- 单选按钮组 -->
 				<mi-radio-group :label="label" :selected.sync="label.selected"></mi-radio-group>
@@ -29,7 +57,7 @@
 			</card>
 			
 			<!-- 最底下的两个按钮 -->
-			<view class="d-flex position-fixed bottom-0 right-0 w-100 border-top border-light-secondary">
+			<view class="d-flex position-fixed right-0 w-100 border-top border-light-secondary" :style="'bottom: '+navbarHeight+'upx;'">
 				<view class="flex-1 main-bg-color text-white font-md py-2 text-center" 
 				@tap="drawerConfirm"
 				hover-class="main-bg-hover-color">确定</view>
@@ -72,6 +100,7 @@
 	import miRadioGroup from '@/components/common/mi-radio-group.vue'
 	import searchList from '@/components/search-list/search-list.vue'
 	import noThing from '@/components/common/no-thing.vue'
+	import uniStatusBar from '@/components/uni-ui/uni-status-bar/uni-status-bar.vue'
 	
 	// 三种状态显示的文字
 	const PULLLOADMORE = '上拉加载更多'
@@ -84,7 +113,8 @@
 			card,
 			miRadioGroup,
 			searchList,
-			noThing
+			noThing,
+			uniStatusBar
 		},
 		data() {
 			return {
@@ -94,6 +124,8 @@
 				// 是否正在搜索请求中
 				searching: false,
 				loadtext: "",
+				statusBarHeight: 0,
+				navbarHeight: 90,
 				
 				showRigth: false,
 				screen: {
@@ -139,32 +171,22 @@
 			}
 		},
 		onLoad: function(e) {
+			// #ifndef MP-WEIXIN
+			this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight
+			// #endif
+			// 如果不是微信小程序平台，则获取状态栏高度 并设置自定义导航栏高度要加上状态栏的高度
+			// 状态栏的高度*2 是因为获取的这个高度值的单位是 px  转成 upx单位 需要*2
+			// 另外 这里获取的状态栏高度 应该和css中的变量 var(--status-bar-height) 是相同的值
+			this.navbarHeight = this.navbarHeight + this.statusBarHeight * 2
+			
 			if (e.keyword) {
 				this.keyword = e.keyword
 				this.getData()
 			}
 		},
-		onNavigationBarSearchInputChanged: function(e) {
-			this.keyword = e.text
-		},
 		onNavigationBarSearchInputConfirmed: function() {
+			console.log('onNavigationBarSearchInputConfirmed');
 			this.search()
-		},
-		onNavigationBarButtonTap: function(e) {
-			if (e.index === 0) {
-				this.search()
-			}
-		},
-		// 下拉刷新
-		onPullDownRefresh: function() {
-			this.getData(true, (res) => {
-				uni.stopPullDownRefresh()
-				if (res) {
-					uni.showToast({title: '刷新成功', icon: 'none'});
-				} else {
-					uni.showToast({title: '刷新失败', icon: 'none'});
-				}
-			})
 		},
 		// 触底则加载下一页数据
 		onReachBottom: function() {
@@ -182,6 +204,13 @@
 			})
 		},
 		methods: {
+			searchBtnClick: function() {
+				this.search()
+			},
+			goback: function() {
+				uni.navigateBack({delta: 1})
+			},
+			
 			// 请求接口 获取搜索结果数据
 			async getData(refresh = true, callback = false) {
 				if (refresh) {
@@ -328,6 +357,11 @@
 	}
 </script>
 
-<style>
-
+<style scoped>
+.uni-status-bar {
+	display: block;
+	width: 100%;
+	height: 20px;
+	height: var(--status-bar-height);
+}
 </style>

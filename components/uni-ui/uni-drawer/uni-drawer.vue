@@ -1,5 +1,5 @@
 <template>
-	<view v-if="visibleSync" :class="{ 'uni-drawer--visible': showDrawer, 'uni-drawer--right': rightMode }" class="uni-drawer" @touchmove.stop.prevent="moveHandle">
+	<view v-if="visibleSync" :class="{ 'uni-drawer--visible': showDrawer, 'uni-drawer--right': rightMode }" class="uni-drawer" :style="'top: '+fixedTop+'upx;'" @touchmove.stop.prevent="moveHandle">
 		<view class="uni-drawer__mask" @tap="close" />
 		<view class="uni-drawer__content">
 			<slot />
@@ -31,6 +31,12 @@
 			mask: {
 				type: Boolean,
 				default: true
+			},
+			// 增加一个自定义的props
+			// fixed定位 top值
+			fixedTop: {
+				type: Number,
+				default: 0
 			}
 		},
 		data() {
@@ -86,7 +92,6 @@
 	.uni-drawer {
 		display: block;
 		position: fixed;
-		top: 0;
 		left: 0;
 		right: 0;
 		bottom: 0;
