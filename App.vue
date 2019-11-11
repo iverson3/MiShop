@@ -39,6 +39,17 @@
 		onLaunch: function() {
 			console.log('App Launch')
 			
+			// 应用启动的时候，调用user模块里面的mutation对用户状态进行初始化
+			this.$store.commit('initUserStatus')
+			
+			// 判断用户是否处于登录状态 来决定是否初始化一些相关数据
+			let loginStatus = uni.getStorageSync('loginStatus')
+			// let token = uni.getStorageSync('token')
+			if (loginStatus && loginStatus === true) {
+				this.$store.commit('initCartData')
+				this.$store.commit('initOrderData')
+			}
+			
 			// 设置"未读的红点"
 			setTimeout(() => {
 				uni.setTabBarBadge({

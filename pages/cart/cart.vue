@@ -47,11 +47,11 @@
 					
 					<view class="d-flex flex-column flex-1">
 						<view class="flex-1 d-flex flex-column pl-2">
-							<view @tap="openGoodsDetail(item.id)" class="text-dark mb-1" style="font-size: 32upx;line-height: 1.3;">
+							<view @tap="openGoodsDetail(item.id)" class="text-dark" :class="item.sku_type === 1?'mb-1':'mb-5 mt-2'" style="font-size: 32upx;line-height: 1.3;">
 								{{ item.title }}
 							</view>
 							<!-- 商品的属性和规格 -->
-							<view @tap.stop="doShowPopup(index)" class="d-flex a-center text-light-muted mb-2 px-1 py-0 bg-light-secondary" style="width: auto;border-radius: 20upx;display: inline-table;">
+							<view v-if="item.sku_type === 1" @tap.stop="doShowPopup(index)" class="d-flex a-center text-light-muted mb-2 px-1 py-0 bg-light-secondary" style="width: auto;border-radius: 20upx;display: inline-table;">
 								<text class="line-h mr-2 font-sm">
 									{{ item.attrs | getAttrsStr }}
 								</text>
@@ -299,8 +299,11 @@
 					this.attrsDataList = []
 					return 
 				}
+				// 判断商品是否是多规格
+				if (a.sku_type === 1) {
+					this.attrsDataList = JSON.parse(JSON.stringify(a.attrs))
+				}
 				this.popupData_local = JSON.parse(JSON.stringify(a))
-				this.attrsDataList = JSON.parse(JSON.stringify(a.attrs)) 
 			}
 		},
 		filters: {

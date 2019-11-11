@@ -1,11 +1,15 @@
 <template>
 	<view>
-		
-		<card v-for="(item,index) in list" :key="index" :headTitle="item.label" bodyStyle="background: #FFFFFF;">
-			<uni-list-item v-for="(v,i) in item.value" :key="i" :title="v.title" @click="navigate(v.path)"></uni-list-item>
+		<card v-if="loginStatus" headTitle="账号管理" bodyStyle="background: #FFFFFF;">
+			<uni-list-item title="个人资料" @click="navigate('user-userinfo')"></uni-list-item>
+			<uni-list-item title="收货地址" @click="navigate('user-path-list')"></uni-list-item>
 		</card>
 		
-		<view class="p-3">
+		<card headTitle="关于" bodyStyle="background: #FFFFFF;">
+			<uni-list-item v-for="(item,index) in list" :key="index" :title="item.title" @click="navigate(item.path)"></uni-list-item>
+		</card>
+		
+		<view v-if="loginStatus" class="p-3">
 			<button @click="doLogout" type="default" class="bg-white">退出登录</button>
 		</view>
 	</view>
@@ -24,34 +28,22 @@
 		data() {
 			return {
 				list: [
-					{
-						label: "账号管理",
-						value: [
-							{ title: "个人资料", path: "user-userinfo" },
-							{ title: "收货地址", path: "user-path-list" }
-						]
-					},
-					{
-						label: "关于",
-						value: [
-							{ title: "关于商城", path: "about" },
-							{ title: "意见反馈", path: "" },
-							{ title: "协议规则", path: "" },
-							{ title: "资质证件", path: "" },
-							{ title: "用户协议", path: "" },
-							{ title: "隐私政策", path: "" }
-						]
-					}
+					{ title: "关于商城", path: "about" },
+					{ title: "意见反馈", path: "" },
+					{ title: "协议规则", path: "" },
+					{ title: "资质证件", path: "" },
+					{ title: "用户协议", path: "" },
+					{ title: "隐私政策", path: "" }
 				]
 			}
 		},
 		computed: {
 			...mapState({
-				token: state => state.user.token
+				loginStatus: state => state.user.loginStatus
 			})
 		},
 		methods: {
-			...mapMutations(['logout']),
+			...mapMutations(['logout', 'hideCartData', 'hideOrderData']),
 			
 			navigate: function(path) {
 				if (!path) return
@@ -60,17 +52,18 @@
 				})
 			},
 			doLogout: function() {
-				let options = {
-					header: {
-						token: this.token
-					}
-				}
-				this.$api.post('/logout', {}, options).then(res => {
+				this.$api.post('/logout', {}, {token: true, checkToken: true}).then(res => {
 					this.logout()
+					this.hideCartData()
+					this.hideOrderData()
+					
 					uni.showToast({title: '退出登录成功', icon: 'none'});
 					setTimeout(() => {
 						uni.navigateBack({delta: 1})
 					}, 500)
+				}).catch(err => {
+					// 请求失败之后的处理
+					console.log(err);
 				})
 			}
 		}

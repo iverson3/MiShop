@@ -32,7 +32,12 @@
 			</view>
 		</scroll-view>
 		
+		<!-- 暂无评论 -->
+		<view v-if="!comments || comments.length === 0" class="w-100 py-5 d-flex a-center j-center font-md text-light-muted text-center bg-light-secondary">
+			暂无评论
+		</view>
 		<view class="d-flex a-center j-center py-2 mt-2 text-primary" 
+		v-if="comments && comments.length !== 0"
 		@click="openCommentList"
 		hover-class="bg-light-secondary">
 			更多评论 <view class="iconfont icon-you"></view>

@@ -13,7 +13,7 @@
 		<!-- 属性选择 -->
 		<view class="p-2">
 			<view class="rounded border bg-light-secondary">
-				<uni-list-item @tap="showPopup('attr')">
+				<uni-list-item v-if="detail.sku_type === 1" @tap="showPopup('attr')">
 					<view class="d-flex">
 						<text class="mr-2 text-muted">已选</text>
 						<text>{{ checkedSkus }}</text>
@@ -234,6 +234,10 @@
 			
 			// 最大库存根据多规格属性的改变进行动态的改变
 			maxStock() {
+				// 判断商品的规格类型： 单规格的商品，不需要动态计算库存，直接返回该商品的库存stock
+				if (this.detail.sku_type === 0) {
+					return this.detail.stock 
+				}
 				if (!this.detail.goodsSkus) return 0
 				if (this.checkedSkusIndex < 0) return this.detail.min_stock
 				return this.detail.goodsSkus[this.checkedSkusIndex].stock || 100
@@ -241,6 +245,7 @@
 			
 			// 拿到选中的skus组成的多规格字符串
 			checkedSkus() {
+				if (!this.selects || this.selects.length === 0) return ""
 				let checkedSkus = this.selects.map(v => {
 					return v.list[v.selected].name
 				})
@@ -258,6 +263,10 @@
 			},
 			// 根据多规格属性的选择而动态计算的价格
 			showPrice() {
+				// 判断商品的规格类型： 单规格的商品，不需要动态计算价格，直接返回该商品的价格
+				if (this.detail.sku_type === 0) {
+					return this.detail.min_price
+				}
 				if (this.checkedSkusIndex < 0) return this.detail.min_price || 0.00
 				if (!this.detail.goodsSkus) return 0.00
 				return this.detail.goodsSkus[this.checkedSkusIndex].pprice
@@ -311,7 +320,6 @@
 						cover: this.detail.cover,
 						pprice: this.detail.min_price
 					}
-					
 					// 临时解决测试数据商品id相同的问题
 					// let rand1 = Math.floor(Math.random() * (10 - 1)) + 1
 					// let rand2 = Math.floor(Math.random() * (20 - 1)) + 1
@@ -355,29 +363,34 @@
 							pprice: v.min_price
 						}
 					})
-					// 商品多规格弹出框数据
-					this.selects = res.goodsSkusCard.map(v => {
-						var list = v.goodsSkusCardValue.map(v2 => {
+					
+					// 多规格商品才需要处理多规格数据
+					if (this.detail.sku_type === 1) {
+						// 商品多规格弹出框数据
+						this.selects = res.goodsSkusCard.map(v => {
+							var list = v.goodsSkusCardValue.map(v2 => {
+								return {
+									id: v2.id,
+									name: v2.value
+								}
+							})
 							return {
-								id: v2.id,
-								name: v2.value
+								id: v.id,
+								title: v.name,
+								selected: 0,
+								list: list
 							}
 						})
-						return {
-							id: v.id,
-							title: v.name,
-							selected: 0,
-							list: list
-						}
-					})
-					// 商品多规格 匹配价格
-					this.detail.goodsSkus.forEach(item => {
-						let arr = []
-						for (let key in item.skus) {
-							arr.push(item.skus[key].value)
-						}
-						item.skusText = arr.join(",")
-					})
+						// 商品多规格 匹配价格
+						this.detail.goodsSkus.forEach(item => {
+							let arr = []
+							for (let key in item.skus) {
+								arr.push(item.skus[key].value)
+							}
+							item.skusText = arr.join(",")
+						})
+					}
+					
 				}
 			},
 			addCart: function() {

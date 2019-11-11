@@ -2,10 +2,8 @@
 	<view>
 		<!-- 头部 -->
 		<view class="position-relative d-flex a-center" style="height: 320upx;">
-			<navigator url="/pages/msg-list/msg-list">
-				<view class="iconfont icon-xiaoxi position-absolute text-white"
-				style="font-size: 50upx;top: 75upx;right: 20upx;z-index: 100;"></view>
-			</navigator>
+			<view @click="navigate('msg-list')" class="iconfont icon-xiaoxi position-absolute text-white"
+			style="font-size: 50upx;top: 75upx;right: 20upx;z-index: 100;"></view>
 			<image src="/static/images/bg.jpg" style="width: 100%;height: 320upx;"></image>
 			
 			<view class="d-flex a-center position-absolute left-0 right-0" style="bottom: 50upx;">
@@ -54,7 +52,7 @@
 		<divider></divider>
 		<uni-list-item title="我的收藏" @click="navigate('collection')" :showExtraIcon="true" leftIcon="icon-shoucang" leftIconStyle="color:#808C98;"></uni-list-item>
 		<uni-list-item title="浏览历史" :showExtraIcon="true" leftIcon="icon-history" leftIconStyle="color:#808C98;"></uni-list-item>
-		<uni-list-item title="更多设置" @click="navigate('user-set')" :showExtraIcon="true" leftIcon="icon-icon_set_up" leftIconStyle="color:#808C98;"></uni-list-item>
+		<uni-list-item title="更多设置" @click="navigate('user-set', false)" :showExtraIcon="true" leftIcon="icon-icon_set_up" leftIconStyle="color:#808C98;"></uni-list-item>
 		
 	</view>
 </template>
@@ -102,8 +100,15 @@
 			})
 		},
 		methods: {
-			navigate: function(path) {
+			navigate: function(path, check = true) {
 				if (!path) return
+				// 是否需要进行登录权限的检查
+				if (check) {
+					this.navigateTo({
+						url: `/pages/${path}/${path}`
+					})
+					return
+				}
 				uni.navigateTo({
 					url: `/pages/${path}/${path}`
 				})
@@ -115,7 +120,7 @@
 				})
 			},
 			openOrderList: function(tab) {
-				uni.navigateTo({
+				this.navigateTo({
 					url: "/pages/order/order?tab=" + tab
 				})
 			}

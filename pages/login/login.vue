@@ -79,7 +79,7 @@
 			
 		},
 		methods: {
-			...mapMutations(['login']),
+			...mapMutations(['login', 'initCartData', 'initOrderData']),
 			
 			clickLeft: function() {
 				uni.navigateBack({delta: 1})
@@ -122,8 +122,10 @@
 					password: this.password
 				}).then(res => {
 					console.log(res);
-					
 					this.login(res)
+					// 登录成功之后初始化购物车数据和订单数据
+					this.initCartData()
+					this.initOrderData()
 					
 					uni.hideLoading()
 					uni.showToast({

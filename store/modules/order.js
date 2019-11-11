@@ -1,34 +1,3 @@
-/*
-[
-	{
-		typeNo: 0, 
-		data: []
-	},
-	{
-		typeNo: 1, 
-		data: []
-	},
-	{
-		typeNo: 2, 
-		data: []
-	},
-	{
-		typeNo: 3, 
-		data: []
-	},
-	{
-		typeNo: 4, 
-		data: []
-	}
-]
-*/
-
-// 所有订单数据 
-let defaultData = []
-
-let orderList = uni.getStorageSync('orderList')
-let initData = orderList? JSON.parse(orderList) : defaultData
-
 export default {
 	state: {
 		tempOrder: {
@@ -81,7 +50,7 @@ export default {
 			}
 		],
 		
-		list: initData
+		list: []
 	},
 	getters: {
 		// 通过订单id获取对应的订单数据 返回值是对象
@@ -98,6 +67,16 @@ export default {
 		}
 	},
 	mutations: {
+		// 初始化订单数据
+		initOrderData(state) {
+			let orderList = uni.getStorageSync('orderList')
+			state.list = orderList? JSON.parse(orderList) : []
+		},
+		// 用户退出登录之后隐藏当前用户的订单数据
+		hideOrderData(state) {
+			state.list = []
+		},
+		
 		// 添加临时订单
 		addTempOrder(state, data) {
 			state.tempOrder = data

@@ -84,14 +84,12 @@ let defaultData = [
 	}
 ]
 
-let cartList = uni.getStorageSync('cartList')
-let initData = cartList? JSON.parse(cartList) : defaultData
 
 export default {
 	state: {
 		isedit: false,
 		
-		list: initData,
+		list: [],
 		// 选中列表 (存放选中的商品的id)
 		selectedList: [],
 		// popup弹出框是否显示
@@ -138,6 +136,16 @@ export default {
 		}
 	},
 	mutations: {
+		// 初始化购物车数据
+		initCartData(state) {
+			let cartList = uni.getStorageSync('cartList')
+			state.list = cartList? JSON.parse(cartList) : defaultData
+		},
+		// 用户退出登录之后隐藏购物车数据
+		hideCartData(state) {
+			state.list = []
+		},
+		
 		// 商品属性弹出框中修改了任意数据
 		attrsChange(state, obj) {
 			state.list[obj.index].pprice = obj.pprice

@@ -74,9 +74,11 @@
 		<!-- 商品信息列表弹出框 -->
 		<common-popup :popupClass="isShowPopup" :popupHeight="popupHeight" @hide="changePopup('none')">
 			<card headTitle="订单商品列表">
-				<block v-for="(item,index) in order.order_items" :key="index">
-					<order-list-item :goods="item" :index="index"></order-list-item>
-				</block>
+				<scroll-view scroll-y class="w-100" :style="'height:'+(popupHeight - 120)+'upx;'">
+					<block v-for="(item,index) in order.order_items" :key="index">
+						<order-list-item :goods="item" :index="index"></order-list-item>
+					</block>
+				</scroll-view>
 			</card>
 		</common-popup>
 	</view>

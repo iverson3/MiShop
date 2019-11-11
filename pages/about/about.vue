@@ -33,7 +33,10 @@
 		},
 		methods: {
 			clearCache: function() {
-				uni.removeStorageSync('orderList')
+				// uni.removeStorageSync('orderList')
+				uni.removeStorageSync('loginStatus')
+				uni.removeStorageSync('token')
+				uni.removeStorageSync('userInfo')
 				uni.showToast({
 					title: '缓存清除成功',
 					icon: 'none'
