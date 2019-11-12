@@ -102,7 +102,7 @@
 			</template>
 			<!-- 编辑状态下显示 -->
 			<template v-else>
-				<view class="flex-1 d-flex a-center j-center font-md main-bg-color text-white">
+				<view @tap="moveToCollection" class="flex-1 d-flex a-center j-center font-md main-bg-color text-white">
 					移入收藏
 				</view>
 				<view @tap="doDelGoods(true)"
@@ -325,8 +325,7 @@
 			}
 		},
 		onLoad: function() {
-			// 未登录时 不显示购物车列表
-			// if (!this.loginStatus) this.list = []
+			
 		},
 		onShow: function() {
 			
@@ -383,6 +382,43 @@
 				uni.navigateTo({
 					url: "/pages/detail/detail?goods_id=" + id
 				})
+			},
+			// 将购物车中选中的商品移入收藏夹
+			moveToCollection: function() {
+				// 判断是否有选中商品
+				if (!this.someChecked) {
+					return uni.showToast({title: '请先选择商品', icon: 'none'});
+				}
+				
+				let collectList = uni.getStorageSync('collectList')
+				collectList = collectList? JSON.parse(collectList) : []				
+				let collectDetailList = uni.getStorageSync('collectDetailList')
+				collectDetailList = collectDetailList? JSON.parse(collectDetailList) : []
+				
+				this.selectedInfoList.forEach(goods => {
+					// 该商品已经在收藏夹里面的情况下 则更新到收藏夹列表的最前面
+					if (this.isCollected(collectList, goods.id)) {
+						// 先找到该商品并删除
+						let index = collectList.indexOf(goods.id)
+						collectList.splice(index, 1)
+						collectDetailList.splice(index, 1)
+					}
+					// 不管是否已经在收藏夹中 都要加入收藏夹最前面
+					collectList.unshift(goods.id)
+					collectDetailList.unshift(goods)
+				})
+				uni.setStorageSync('collectList', JSON.stringify(collectList))
+				uni.setStorageSync('collectDetailList', JSON.stringify(collectDetailList))
+				// 最后再从购物车中删除这些商品
+				this.doDelGoods(false)
+				uni.showToast({title: '成功移入收藏夹', icon: 'none'});
+			},
+			// 判断当前商品id是否在收藏记录里面
+			isCollected: function(collectList, goods_id) {
+				if (!collectList || collectList.length === 0) return false
+				let index = collectList.indexOf(goods_id)
+				if (index === -1) return false
+				return true
 			},
 			
 			orderConfirm: function() {

@@ -163,13 +163,10 @@
 							firstLoad: i === 0 ? 'after' : 'before'
 						}
 						// 获取首屏数据
-						if (i === 0) {
-							obj.list = data.data
-						}
+						if (i === 0) obj.list = data.data
 						arr.push(obj)
 					}
 					this.newsitems = arr
-					console.log(this.newsitems)
 				}
 			},
 			async addData(callback = false) {
@@ -245,7 +242,9 @@
 				})
 			},
 			openMessage: function() {
-				uni.navigateTo({
+				// 需要验证用户权限的跳转使用 this.navigateTo()
+				// 不需要验证用户权限的跳转使用 uni.navigateTo()
+				this.navigateTo({
 					url: "/pages/msg-list/msg-list"
 				})
 			}

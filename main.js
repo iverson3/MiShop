@@ -31,6 +31,12 @@ Vue.prototype.navigateTo = (options) => {
 	uni.navigateTo(options);
 }
 
+// 判断用户是否处于登录状态
+Vue.prototype.isLogin = () => {
+	if (store.state.user.loginStatus && store.state.user.loginStatus === true) return true
+	return false
+}
+
 
 
 App.mpType = 'app'

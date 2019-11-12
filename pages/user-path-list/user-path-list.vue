@@ -4,13 +4,13 @@
 			<uni-swipe-action :options="options" @click="bindClick($event, index)">
 				<uni-list-item @click="choose(item)">
 					<view class="text-secondary">
-						<view class="d-flex a-center">
+						<view class="d-flex a-center line-h-md font-md">
 							<text class="main-text-color mr-2">{{ item.name }}</text>
 							{{ item.phone }}
 							<text class="main-text-color ml-2" v-if="item.isdefault">[默认]</text>
 						</view>
-						<view class="">{{ item.path }}</view>
-						<view class="">{{ item.detailPath }}</view>
+						<view class="line-h-sm font">{{ item.path }}</view>
+						<view class="line-h-sm font">{{ item.detailPath }}</view>
 					</view>
 				</uni-list-item>
 			</uni-swipe-action>

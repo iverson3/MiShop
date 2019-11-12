@@ -7,7 +7,7 @@
 			</view>
 		</template>
 		<template v-if="!initing && tabBars.length === 0">
-			<view class="w-100 j-center a-center" style="padding-top: 150px;">
+			<view class="w-100 j-center a-center" style="padding-top: 300px;">
 				<text class="font-md text-light-muted">首页初始化失败，请检查网络</text>
 			</view>
 		</template>
@@ -140,6 +140,7 @@
 	// 获取当前页面
 	const currentWebview = plus.webview.currentWebview()
 	
+	// nvue中无法使用vue全局定义或挂载的一些东西 所以这里需要单独的引入
 	import $api from '@/common/lib/request.js';
 	
 	export default {
@@ -183,7 +184,9 @@
 			uni.onNavigationBarButtonTap(e => {
 				console.log(e)
 				if (e.index === 0) {
-					uni.navigateTo({
+					// 需要验证用户权限的跳转使用 this.navigateTo()  
+					// 不需要验证用户权限的跳转使用 uni.navigateTo()
+					this.navigateTo({
 						url: "/pages/msg-list/msg-list"
 					})
 				} else {
@@ -199,7 +202,7 @@
 		},
 		
 		methods: {
-			async __init() {
+			__init() {
 				// 封装之后的调用方式一
 				// $api.get('/index_category/data').then((data) => {
 				// 	// 初始化tabbar数据
@@ -211,14 +214,15 @@
 				// })
 				
 				// 封装之后的调用方式二
-				let data = await $api.get('/index_category/data')
-				this.initing = false
-				if (data) {
+				$api.get('/index_category/data').then(data => {
+					this.initing = false
 					// 初始化tabbar数据
 					this.tabBars = data.category
 					// 初始化页面数据
 					this.newsitems = this.setNewsItems(data)
-				}
+				}).catch(err => {
+					this.initing = false
+				})
 			},
 			
 			// 演示request请求的三种方式
@@ -387,10 +391,7 @@
 						aryItem.data = []
 					}
 					ary.push(aryItem);
-					
 				}
-				// json字符串化输出
-				// console.log(JSON.stringify(ary))
 				return ary;
 			}
 			

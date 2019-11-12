@@ -47,9 +47,9 @@
 					let index = collectList.indexOf(this.goods_id)
 					collectList.splice(index, 1)
 					collectDetailList.splice(index, 1)
-				} else { // 反之 则加入收藏
-					collectList.push(this.goods_id)
-					collectDetailList.push(this.goodsInfo)
+				} else { // 反之 则加入到收藏夹的最前面
+					collectList.unshift(this.goods_id)
+					collectDetailList.unshift(this.goodsInfo)
 					hasCollect = true
 				}
 				uni.setStorageSync('collectList', JSON.stringify(collectList))

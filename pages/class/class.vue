@@ -4,6 +4,12 @@
 		<loading-plus v-if="beforeReady"></loading-plus>
 		<!-- <loading :show="showLoading"></loading> -->
 		
+		<template v-if="!beforeReady && (cate.length === 0)">
+			<view class="w-100 j-center a-center text-center" style="padding-top: 300upx;" @tap="reloadData">
+				<text class="font-md text-light-muted">获取数据失败，请检查网络</text>
+			</view>
+		</template>
+		
 		<!-- 左边 分类列表 -->
 		<scroll-view id="leftScroll" scroll-y 
 		:scroll-top="leftScrollTop"
@@ -44,6 +50,7 @@
 				activeIndex: 0,
 				cate: [],
 				list: [],
+				beforeReady: true,
 				
 				leftDomsTop: [],
 				rightDomsTop: [],
@@ -74,6 +81,11 @@
 				if (ST > this.cateItemHeight) {
 					this.leftScrollTop = this.leftDomsTop[newValue]
 				}
+			},
+			beforeReady(a, b) {
+				console.log('beforeReady change');
+				console.log(b);
+				console.log(a); 
 			}
 		},
 		// 监听导航栏searchinput搜索框点击事件
@@ -84,7 +96,9 @@
 		},
 		onNavigationBarButtonTap: function(e) {
 			if (e.index === 0) {
-				uni.navigateTo({
+				// 需要验证用户权限的跳转使用 this.navigateTo()
+				// 不需要验证用户权限的跳转使用 uni.navigateTo()
+				this.navigateTo({
 					url: "/pages/msg-list/msg-list"
 				})
 			}
@@ -111,9 +125,14 @@
 					}).exec();
 				})
 			},
-			async getData() {
-				let res = await this.$api.get('/category/app_category')
-				if (res) {
+			// 分类数据加载失败的情况下 用户点击页面再次尝试请求并加载数据
+			reloadData: function() {
+				this.beforeReady = true
+				this.getData()
+			},
+			
+			getData() {
+				this.$api.get('/category/app_category').then(res => {
 					let cate = []
 					let list = []
 					res.forEach(v => {
@@ -127,14 +146,18 @@
 					})
 					this.cate = cate
 					this.list = list
-				} else {
 					
-				}
-				
-				// 将回调函数延迟到下次DOM更新循环之后执行
-				this.$nextTick(() => {
-					// this.showLoading = false
-					this.getAllDomInfo()
+					console.log(this.cate.length);
+					this.beforeReady = false
+					
+					// 将回调函数延迟到下次DOM更新循环之后执行
+					this.$nextTick(() => {
+						this.getAllDomInfo()
+						console.log('end');
+					})
+				}).catch(err => {
+					console.log('xxxxxxxxx');
+					this.beforeReady = false
 				})
 			},
 			getAllDomInfo: function() {

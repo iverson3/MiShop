@@ -53,11 +53,11 @@
 			// 设置"未读的红点"
 			setTimeout(() => {
 				uni.setTabBarBadge({
-					index: 3,
+					index: 2,
 					text: '3'
 				});
 				uni.showTabBarRedDot({
-					index: 2
+					index: 3
 				});
 			}, 1000);
 		},
