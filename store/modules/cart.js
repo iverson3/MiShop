@@ -48,6 +48,7 @@ let defaultData = [
 		id: 25,
 		title: "韩国ins柠檬黄边框苹果X手机壳Iphonexsmax/8plus/7p/XR透明6软壳",
 		cover: "/static/images/demo/list/1.jpg",
+		sku_type: 1,
 		// 当前商品的可选属性
 		attrs: [
 			{
@@ -89,7 +90,7 @@ export default {
 	state: {
 		isedit: false,
 		
-		list: [],
+		list: defaultData,
 		// 选中列表 (存放选中的商品的id)
 		selectedList: [],
 		// popup弹出框是否显示
