@@ -22,7 +22,7 @@
 				<uni-list-item @tap="showPopup('express')">
 					<view class="d-flex">
 						<text class="mr-2 text-muted">配送</text>
-						<text class="mr-2">{{ defaultPathCity }}</text>
+						<text class="mr-2">{{ deliveryPath? deliveryPath : defaultPathCity }}</text>
 						<text class="main-text-color">现配</text>
 					</view>
 				</uni-list-item>
@@ -113,7 +113,7 @@
 			 
 			<!-- 地址列表 h660 -->
 			<scroll-view scroll-y class="w-100" style="height: 835upx;">
-			 	<uni-list-item v-for="(item,index) in pathList" :key="index">
+			 	<uni-list-item @tap="changeCurPath(item)" v-for="(item,index) in pathList" :key="index">
 					<view class="iconfont icon-dingwei font-weight font-md">
 						{{ item.name }}
 						<text class="ml-2">{{ item.phone }}</text> 
@@ -216,6 +216,8 @@
 				context: "",
 				baseAttrs: [],
 				selects: [],
+				// 详情页用户选择的配送地址，在用户选择之前使用默认地址 defaultPathCity(用户自己的默认收货地址)
+				deliveryPath: false, 
 				
 				comments: [],
 				hotList: [],
@@ -394,6 +396,11 @@
 				}
 			},
 			addCart: function() {
+				if (!this.isLogin()) {
+					uni.showToast({title: '请先登录', icon: 'none'});
+					uni.navigateTo({url: '/pages/login/login'});
+					return
+				}
 				let goods = JSON.parse(JSON.stringify(this.detail))
 				
 				goods['pprice'] = parseFloat(this.showPrice)
@@ -415,6 +422,9 @@
 				uni.showToast({title: "加入成功"})
 			},
 			openCreatePath: function() {
+				if (!this.isLogin()) {
+					return uni.showToast({title: '请先登录', icon: 'none'});
+				}
 				uni.navigateTo({
 					url: "/pages/user-path-edit/user-path-edit"
 				})
@@ -433,6 +443,8 @@
 			
 			// 判断当前商品id是否在收藏记录里面
 			isCollected: function() {
+				if (!this.isLogin()) return false
+				
 				if (this.detail.id === 0) return false
 				let collectList = uni.getStorageSync('collectList')
 				if (!collectList) return false
@@ -443,6 +455,12 @@
 			},
 			changeCollect: function(collect) {
 				this.hasCollect = collect
+			},
+			
+			// 修改配送的收货地址 
+			changeCurPath: function(item) {
+				this.deliveryPath = item.path
+				this.hidePopup('express')
 			},
 			
 			// 详情信息中的图片预览处理

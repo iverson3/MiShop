@@ -48,6 +48,7 @@
 			if (loginStatus && loginStatus === true) {
 				this.$store.commit('initCartData')
 				this.$store.commit('initOrderData')
+				this.$store.commit('initPathData')
 			}
 			
 			// 设置"未读的红点"

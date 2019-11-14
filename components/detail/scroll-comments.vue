@@ -18,7 +18,9 @@
 						<text class="font-md line-h">{{ item.username }}</text>
 						<text class="d-block font text-light-muted line-h">{{ item.create_time | formatTime }}</text>
 					</view>
-					<view class="iconfont icon-dianzan font text-light-muted pl-1 ml-auto">{{ item.goods_num }}</view>
+					<view class="iconfont icon-dianzan font text-light-muted ml-auto">
+						<text class="pl-1">{{ item.goods_num }}</text>
+					</view>
 				</view>
 				<view class="d-block font-md mb-2 pt line-h-sm" 
 				style="min-height: 90upx;max-height: 104upx;white-space: initial;overflow: hidden;">

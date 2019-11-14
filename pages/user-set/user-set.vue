@@ -43,7 +43,7 @@
 			})
 		},
 		methods: {
-			...mapMutations(['logout', 'hideCartData', 'hideOrderData']),
+			...mapMutations(['logout', 'hideCartData', 'hideOrderData', 'hidePathData']),
 			
 			navigate: function(path) {
 				if (!path) return
@@ -54,8 +54,10 @@
 			doLogout: function() {
 				this.$api.post('/logout', {}, {token: true, checkToken: true}).then(res => {
 					this.logout()
+					// 用户退出登录之后隐藏用户相关数据
 					this.hideCartData()
 					this.hideOrderData()
+					this.hidePathData()
 					
 					uni.showToast({title: '退出登录成功', icon: 'none'});
 					setTimeout(() => {

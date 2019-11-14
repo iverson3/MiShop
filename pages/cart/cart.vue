@@ -51,8 +51,8 @@
 								{{ item.title }}
 							</view>
 							<!-- 商品的属性和规格 -->
-							<view v-if="item.sku_type === 1" @tap.stop="doShowPopup(index)" class="d-flex a-center text-light-muted mb-2 px-1 py-0 bg-light-secondary" style="width: auto;border-radius: 20upx;display: inline-table;">
-								<text class="line-h mr-2 font-sm">
+							<view v-if="item.sku_type === 1" @tap.stop="doShowPopup(index)" class="d-flex a-center text-light-muted mb-2 mt-2 py-1 bg-light-secondary" style="width:fit-content;height:auto;border-radius: 8upx;padding-left: 15upx;padding-right: 15upx;">
+								<text class="line-h mr-2 font-sm" style="width:auto;height:auto;max-width:50%px;">
 									{{ item.attrs | getAttrsStr }}
 								</text>
 								<text class="iconfont icon-bottom line-h font-sm"></text>

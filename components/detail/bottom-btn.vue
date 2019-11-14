@@ -36,6 +36,10 @@
 		},
 		methods: {
 			addCollect: function() {
+				if (!this.isLogin()) {
+					return uni.showToast({title: '请先登录', icon: 'none'});
+				}
+				
 				let collectList = uni.getStorageSync('collectList')
 				collectList = collectList? JSON.parse(collectList) : []				
 				let collectDetailList = uni.getStorageSync('collectDetailList')

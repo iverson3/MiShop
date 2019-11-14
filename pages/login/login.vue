@@ -79,7 +79,7 @@
 			
 		},
 		methods: {
-			...mapMutations(['login', 'initCartData', 'initOrderData']),
+			...mapMutations(['login', 'initCartData', 'initOrderData', 'initPathData']),
 			
 			clickLeft: function() {
 				uni.navigateBack({delta: 1})
@@ -123,9 +123,10 @@
 				}).then(res => {
 					console.log(res);
 					this.login(res)
-					// 登录成功之后初始化购物车数据和订单数据
+					// 登录成功之后初始化购物车数据、订单数据、收货地址数据
 					this.initCartData()
 					this.initOrderData()
+					this.initPathData()
 					
 					uni.hideLoading()
 					uni.showToast({
