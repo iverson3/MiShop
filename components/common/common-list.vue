@@ -25,9 +25,21 @@
 		},
 		methods: {
 			openDetail: function() {
-				uni.redirectTo({
-					url: "/pages/detail/detail?goods_id=" + this.item.id
-				})
+				// 获取应用页面栈
+				let pages = getCurrentPages()
+				// 应用中包含当前公共商品列表组件的tab页面
+				let tabs = [
+					"pages/index/index",
+					"pages/cart/cart"
+				]
+				
+				let url = "/pages/detail/detail?goods_id=" + this.item.id
+				// 如果当前页面是tab页或者页面栈中只有当前一个页面 则不允许使用uni.redirectTo()进行页面跳转
+				if (pages.length === 1 || tabs.indexOf(pages[pages.length - 1].route) > -1) {
+					uni.navigateTo({url: url})
+				} else {
+					uni.redirectTo({url: url})
+				}
 			}
 		}
 	}

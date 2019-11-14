@@ -85,9 +85,10 @@
 		</view>
 		
 		<!-- 占位 -->
-		<view style="height: 100upx;background: white;"></view>
+		<view :style="'height: '+ (bottomHeight + 100) +'upx;background: white;'"></view>
 		<!-- 价格合计组件 -->
-		<view class="d-flex a-center a-stretch position-fixed left-0 right-0 bottom-0 border-top border-light-secondary bg-white" style="height: 100upx;z-index: 1000;">
+		<view class="d-flex a-center a-stretch position-fixed left-0 right-0 border-top border-light-secondary bg-white" 
+		:style="'height: 100upx;z-index: 1000;bottom: '+ bottomHeight +'upx;'">
 			<label @click="doSelectAll" class="radio d-flex a-center j-center flex-shrink" style="width: 120upx;">
 				<radio color="#FD6801" :checked="checkedAll" :disabled="disableSelectAll"/>
 			</label>
@@ -187,6 +188,9 @@
 				attrsDataList: [],
 				popupData_local: {},
 				updateNum: true,
+				// 底部tabBar的高度 (H5平台下底部tabBar因为不是原生控件 是div模拟的，所以会占用页面高度50px)
+				// 价格合计栏距底部的距离 (fixed定位 bottom: 0upx;)
+				bottomHeight: 0,
 				
 				hotList: [
 					{
@@ -325,7 +329,11 @@
 			}
 		},
 		onLoad: function() {
-			
+			// 在H5(浏览器)平台下 因为没有原生控件这个概念，所以H5平台上的底部tabBar是uni-app用div构建模拟出来的
+			// 所以在使用fixed绝对定位时，要考虑底部tabBar所占的50px的高度 (App和小程序平台下没有这个问题)
+			// #ifdef H5
+			this.bottomHeight = 100
+			// #endif
 		},
 		onShow: function() {
 			

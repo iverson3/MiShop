@@ -54,6 +54,8 @@
 		<uni-list-item title="浏览历史" :showExtraIcon="true" leftIcon="icon-history" leftIconStyle="color:#808C98;"></uni-list-item>
 		<uni-list-item title="更多设置" @click="navigate('user-set', false)" :showExtraIcon="true" leftIcon="icon-icon_set_up" leftIconStyle="color:#808C98;"></uni-list-item>
 		
+		<!-- 占位 -->
+		<view :style="'height: '+ bottomHeight +'upx;background: white;'"></view>
 	</view>
 </template>
 
@@ -90,7 +92,9 @@
 						icon: "icon-daipingjia",
 						tabIndex: 4
 					}
-				]
+				],
+				// 底部tabBar的高度 (H5平台下底部tabBar因为不是原生控件 是div模拟的，所以会占用页面高度50px)
+				bottomHeight: 0,
 			}
 		},
 		computed: {
@@ -98,6 +102,13 @@
 				loginStatus: state => state.user.loginStatus,
 				userInfo: state => state.user.userInfo
 			})
+		},
+		onLoad: function() {
+			// 在H5(浏览器)平台下 因为没有原生控件这个概念，所以H5平台上的底部tabBar是uni-app用div构建模拟出来的
+			// 所以在使用fixed绝对定位时，要考虑底部tabBar所占的50px的高度 (App和小程序平台下没有这个问题)
+			// #ifdef H5
+			this.bottomHeight = 100
+			// #endif
 		},
 		methods: {
 			navigate: function(path, check = true) {
