@@ -334,6 +334,9 @@
 			// #ifdef H5
 			this.bottomHeight = 100
 			// #endif
+			// #ifdef MP-WEIXIN
+			this.bottomHeight = 100
+			// #endif
 		},
 		onShow: function() {
 			
@@ -474,11 +477,7 @@
 				data.total_num = sum
 				data.total_price = this.totalPrice
 				// 判断是否有默认收货地址
-				if (this.defaultPath.length > 0) {
-					data.path_id = this.defaultPath[0].id
-				} else {
-					data.path_id = 0
-				}
+				data.path_id = this.defaultPath.length > 0 ? this.defaultPath[0].id : 0
 				// 添加临时订单
 				this.addTempOrder(data)
 				

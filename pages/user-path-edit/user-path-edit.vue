@@ -134,21 +134,34 @@
 			submit() {
 				// 验证表单数据
 				
+				// 处理post数据
+				let data = JSON.parse(JSON.stringify(this.form))
+				data.default = data.isdefault ? 1 : 0
+				delete data.isdefault
+				
 				// 判断当前是新增还是修改
 				if (this.isedit) {
-					this.updatePathAction({
-						index: this.index,
-						item: this.form
+					let id = this.form.id
+					this.$api.post('/useraddresses/' + id, data, {token: true, toast: false}).then(res => {
+						this.updatePathAction({
+							index: this.index,
+							item: this.form
+						})
+						uni.showToast({title: "修改成功"})
+						setTimeout(() => {
+							uni.navigateBack({delta: 1})
+						}, 600)
+					}).catch(err => {
+						uni.showToast({title: '修改失败', icon: 'none'});
 					})
-					uni.showToast({title: "修改成功"})
 				} else {
-					let data = JSON.parse(JSON.stringify(this.form))
-					data.default = data.isdefault ? 1 : 0
-					delete data.isdefault
 					this.$api.post('/useraddresses', data, {token: true, toast: false}).then(res => {
+						this.form.id = parseInt(res.id)
 						this.createPathAction(this.form)
 						uni.showToast({title: "创建成功"})
-						uni.navigateBack({delta: 1})
+						setTimeout(() => {
+							uni.navigateBack({delta: 1})
+						}, 600)
 					}).catch(err => {
 						uni.showToast({title: '创建收货地址失败', icon: 'none'});
 					})

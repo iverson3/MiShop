@@ -120,11 +120,11 @@
 						<text v-if="item.isdefault" class="ml-3" style="color: red;">[默认]</text>
 					</view>
 					<view class="font text-light-muted">
-						{{ item.path }} {{ item.detailPath }}
+						{{ item.province }} {{ item.city }} {{ item.district }} {{ item.address }}
 					</view>
 				</uni-list-item>
 			</scroll-view>
-			 
+			
 			<!-- 按钮 h100 -->
 			<view class="main-bg-color text-white font-md d-flex j-center a-center"
 			hover-class="main-bg-hover-color"
@@ -459,7 +459,7 @@
 			
 			// 修改配送的收货地址 
 			changeCurPath: function(item) {
-				this.deliveryPath = item.path
+				this.deliveryPath = item.province +' '+ item.city +' '+ item.district
 				this.hidePopup('express')
 			},
 			

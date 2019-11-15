@@ -25,9 +25,10 @@ export default {
 		},
 		// 获取默认地址中的城市部分
 		defaultPathCity: (state, getters) => {
-			let city = "北京 东城区"
+			let city = "北京市 东城区"
 			if (getters.defaultPath.length > 0) {
-				city = getters.defaultPath[0].path
+				let item = getters.defaultPath[0]
+				city = item.province +' '+ item.city +' '+ item.district
 			}
 			return city
 		},

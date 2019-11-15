@@ -102,6 +102,7 @@
 				
 				hotList: [
 					{
+						id: 25,
 						cover:"/static/images/demo/list/1.jpg",
 						title:"米家空调",
 						desc:"1.5匹变频",
@@ -109,6 +110,7 @@
 						pprice:1399
 					},
 					{
+						id: 25,
 						cover:"/static/images/demo/list/1.jpg",
 						title:"米家空调",
 						desc:"1.5匹变频",
@@ -116,6 +118,7 @@
 						pprice:1399
 					},
 					{
+						id: 25,
 						cover:"/static/images/demo/list/1.jpg",
 						title:"米家空调",
 						desc:"1.5匹变频",
@@ -123,6 +126,7 @@
 						pprice:1399
 					},
 					{
+						id: 25,
 						cover:"/static/images/demo/list/1.jpg",
 						title:"米家空调",
 						desc:"1.5匹变频",
@@ -130,6 +134,7 @@
 						pprice:1399
 					},
 					{
+						id: 25,
 						cover:"/static/images/demo/list/1.jpg",
 						title:"米家空调",
 						desc:"1.5匹变频",
@@ -137,6 +142,7 @@
 						pprice:1399
 					},
 					{
+						id: 25,
 						cover:"/static/images/demo/list/1.jpg",
 						title:"米家空调",
 						desc:"1.5匹变频",

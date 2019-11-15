@@ -9,8 +9,8 @@
 							{{ item.phone }}
 							<text class="main-text-color ml-2" v-if="item.isdefault">[默认]</text>
 						</view>
-						<view class="line-h-sm font">{{ item.path }}</view>
-						<view class="line-h-sm font">{{ item.detailPath }}</view>
+						<view class="line-h-sm font">{{ item.province +' '+ item.city +' '+ item.district }}</view>
+						<view class="line-h-sm font">{{ item.address }}</view>
 					</view>
 				</uni-list-item>
 			</uni-swipe-action>
@@ -105,6 +105,9 @@
 							success: (res) => {
 								if (res.confirm) {
 									let id = this.list[index].id
+									
+									console.log(id);
+									// return
 									this.$api.del("/useraddresses/" + id, {}, {token: true, toast: false}).then(res => {
 										this.delPath(index)
 										uni.showToast({title: "删除成功"})

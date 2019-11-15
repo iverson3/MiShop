@@ -35,7 +35,7 @@
 				
 				let url = "/pages/detail/detail?goods_id=" + this.item.id
 				// 如果当前页面是tab页或者页面栈中只有当前一个页面 则不允许使用uni.redirectTo()进行页面跳转
-				if (pages.length === 1 || tabs.indexOf(pages[pages.length - 1].route) > -1) {
+				if (pages.length === 1 || pages[pages.length - 1].route !== "pages/detail/detail" || tabs.indexOf(pages[pages.length - 1].route) > -1) {
 					uni.navigateTo({url: url})
 				} else {
 					uni.redirectTo({url: url})

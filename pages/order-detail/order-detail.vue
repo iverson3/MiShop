@@ -14,7 +14,7 @@
 				{{ pathInfo.phone }}
 			</view>
 			<view class="text-light-muted font-md">
-				{{ pathInfo.path }} {{ pathInfo.detailPath }}
+				{{ pathInfo.province }} {{ pathInfo.city }} {{ pathInfo.district }} {{ pathInfo.address }}
 			</view>
 		</view>
 		<divider></divider>
@@ -46,7 +46,7 @@
 		<divider></divider>
 		
 		<card headTitle="订单信息">
-			<uni-list-item title="订单编号" extraWidth="40%">
+			<uni-list-item title="订单编号" extraWidth="50%">
 				<view slot="right" class="font-md text-light-muted">{{ orderInfo.orderNo }}</view>
 			</uni-list-item>
 			<uni-list-item title="支付时间" extraWidth="60%">

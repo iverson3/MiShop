@@ -7,7 +7,7 @@
 					<view class="font-weight font-lg">
 						{{ path.name }} {{ path.phone }} <text v-if="path.isdefault" class="border border-white px-1 rounded font ml-2">默认</text>
 					</view>
-					<view class="font">{{ path.path }} {{ path.detailPath }}</view>
+					<view class="font">{{ path.province }} {{ path.city }} {{ path.district }} {{ path.address }}</view>
 				</view>
 			</template>
 			<template v-else>
@@ -120,7 +120,7 @@
 			this.order = JSON.parse(JSON.stringify(this.tempOrder))
 			// 给个初始值 后面再根据页面的选择进行修改
 			this.order.pay_price = this.order.total_price
-			this.order.freight = 0
+			this.order.freight   = 0
 			this.order.coupon_id = 0
 			
 			if (this.order.path_id !== 0) {
