@@ -38,7 +38,7 @@
 <script>
 	import uniNavBar from '@/components/uni-ui/uni-nav-bar/uni-nav-bar.vue'
 	
-	import {mapState, mapMutations} from 'vuex';
+	import {mapState, mapMutations, mapActions} from 'vuex';
 	export default {
 		components: {
 			uniNavBar
@@ -79,7 +79,8 @@
 			
 		},
 		methods: {
-			...mapMutations(['login', 'initCartData', 'initOrderData', 'initPathData']),
+			...mapMutations(['login', 'initCartData', 'initOrderData']),
+			...mapActions(['fetchPathData']),
 			
 			clickLeft: function() {
 				uni.navigateBack({delta: 1})
@@ -126,7 +127,7 @@
 					// 登录成功之后初始化购物车数据、订单数据、收货地址数据
 					this.initCartData()
 					this.initOrderData()
-					this.initPathData()
+					this.fetchPathData()
 					
 					uni.hideLoading()
 					uni.showToast({

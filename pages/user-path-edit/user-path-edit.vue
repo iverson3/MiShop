@@ -15,7 +15,7 @@
 		<view class="p-2 border-bottom d-flex a-center bg-white">
 			<view class="font-md text-secondary mr-1 flex-shrink">所在地区: </view>
 			<input class="px-1 font-md flex-1" type="text" disabled 
-			:value="form.path"
+			:value="path"
 			placeholder="请选择所在地区"
 			@click="showMulLinkageThreePicker" />
 			
@@ -27,7 +27,11 @@
 		</view>
 		<view class="p-2 d-flex a-center bg-white">
 			<view class="font-md text-secondary mr-1 flex-shrink">详细地址: </view>
-			<input class="px-1 font-md flex-1" type="text" v-model="form.detailPath" />
+			<input class="px-1 font-md flex-1" type="text" v-model="form.address" />
+		</view>
+		<view class="p-2 d-flex a-center bg-white">
+			<view class="font-md text-secondary mr-1 flex-shrink">邮编: </view>
+			<input class="px-1 font-md flex-1" type="text" v-model="form.zip" />
 		</view>
 		
 		<divider></divider>
@@ -65,9 +69,19 @@
 				form: {
 					name: "",
 					phone: "",
-					path: "",
-					detailPath: "",
+					province: "",
+					city: "",
+					district: "",
+					zip: "",
+					address: "",
 					isdefault: false
+				}
+			}
+		},
+		computed: {
+			path() {
+				if (this.form.province) {
+					return this.form.province + '-' + this.form.city + '-' + this.form.district
 				}
 			}
 		},
@@ -128,10 +142,17 @@
 					})
 					uni.showToast({title: "修改成功"})
 				} else {
-					this.createPathAction(this.form)
-					uni.showToast({title: "创建成功"})
+					let data = JSON.parse(JSON.stringify(this.form))
+					data.default = data.isdefault ? 1 : 0
+					delete data.isdefault
+					this.$api.post('/useraddresses', data, {token: true, toast: false}).then(res => {
+						this.createPathAction(this.form)
+						uni.showToast({title: "创建成功"})
+						uni.navigateBack({delta: 1})
+					}).catch(err => {
+						uni.showToast({title: '创建收货地址失败', icon: 'none'});
+					})
 				}
-				uni.navigateBack({delta: 1})
 			},
 			// 显示三级联动选择
 			showMulLinkageThreePicker() {
@@ -139,7 +160,11 @@
 			},
 			onConfirm(e) {
 				this.pickerValue = e.value
-				this.form.path  = e.label
+				// this.form.path  = e.label
+				let arr = e.label.split('-')
+				this.form.province = arr[0]
+				this.form.city = arr[1]
+				this.form.district = arr[2]
 			}
 		}
 	}

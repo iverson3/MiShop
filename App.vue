@@ -48,7 +48,9 @@
 			if (loginStatus && loginStatus === true) {
 				this.$store.commit('initCartData')
 				this.$store.commit('initOrderData')
-				this.$store.commit('initPathData')
+				// dispatch action 从服务端获取收货地址数据
+				this.$store.dispatch('fetchPathData')
+				// this.$store.commit('initPathData')
 			}
 			
 			// 设置"未读的红点"

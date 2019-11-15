@@ -15,6 +15,14 @@
 				</uni-list-item>
 			</uni-swipe-action>
 		</block>
+		
+		<template v-if="list.length === 0">
+			<view class="w-100 j-center a-center text-center" style="padding-top: 300upx;">
+				<view class="font-md text-light-muted">
+					暂无收货地址,<text class="main-text-color" @tap="reloadPath">点击刷新</text>
+				</view>
+			</view>
+		</template>
 	</view>
 </template>
 
@@ -22,7 +30,7 @@
 	import uniListItem from '@/components/uni-ui/uni-list-item/uni-list-item.vue'
 	import uniSwipeAction from '@/components/uni-ui/uni-swipe-action/uni-swipe-action.vue'
 	
-	import {mapState, mapMutations} from 'vuex'
+	import {mapState, mapMutations, mapActions} from 'vuex'
 	export default {
 		components: {
 			uniListItem,
@@ -62,9 +70,22 @@
 				})
 			}
 		},
+		onPullDownRefresh: function() {
+			this.reloadPath()
+		},
 		methods: {
 			...mapMutations(['delPath']),
+			...mapActions(['fetchPathData']),
 			
+			reloadPath: function() {
+				this.fetchPathData((res) => {
+					if (res) {
+						uni.showToast({title: '刷新成功', icon: 'none'});
+					} else {
+						uni.showToast({title: '刷新失败', icon: 'none'});
+					}
+				})
+			},
 			bindClick(e, index) {
 				switch (e.index){
 					case 0:  // 修改
@@ -83,8 +104,13 @@
 							content: "确定要删除吗？",
 							success: (res) => {
 								if (res.confirm) {
-									this.delPath(index)
-									uni.showToast({title: "删除成功"})
+									let id = this.list[index].id
+									this.$api.del("/useraddresses/" + id, {}, {token: true, toast: false}).then(res => {
+										this.delPath(index)
+										uni.showToast({title: "删除成功"})
+									}).catch(err => {
+										uni.showToast({title: '删除失败，请重试', icon: 'none'});
+									})
 								}
 							}
 						})

@@ -229,6 +229,7 @@
             "path" : "pages/user-path-list/user-path-list",
             "style" : {
             	"navigationBarTitleText":"收货地址",
+				"enablePullDownRefresh": true,
             	"app-plus": {
             		"scrollIndicator":"none",
             		"bounce":"none",

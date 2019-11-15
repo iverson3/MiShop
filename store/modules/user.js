@@ -40,12 +40,7 @@ export default {
 	},
 	actions: {
 		refreshToken({commit, state}, obj) {
-			setInterval(() => {
-				// 请求服务器接口 重新获取token
-				let token = "new-token"
-				commit('resetToken', token)
-				console.log(state.token)
-			}, 2000)
+			
 		}
 	}
 }

@@ -111,4 +111,12 @@ export default {
 		options.method = 'POST'
 		return this.request(options, errCallback)
 	},
+	
+	// DELETE请求
+	del(url, data = {}, options = {}, errCallback = false) {
+		options.url = url
+		options.data = data
+		options.method = 'DELETE'
+		return this.request(options, errCallback)
+	},
 }

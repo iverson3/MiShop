@@ -8,10 +8,13 @@
 	isdefault: true
 }
 */
+import $api from '@/common/lib/request.js';
 
 export default {
 	state: {
 		list: [],
+		// 因为用户的收货地址基本上都不会有太多条,一次性就可以全部获取到,所以暂时不考虑下一页的问题
+		page: 1
 	},
 	getters: {
 		// 获取默认收货地址
@@ -36,8 +39,8 @@ export default {
 	mutations: {
 		// 初始化收货地址数据
 		initPathData(state) {
-			let pathList = uni.getStorageSync('pathList')
-			state.list = pathList? JSON.parse(pathList) : []
+			// let pathList = uni.getStorageSync('pathList')
+			// state.list = pathList? JSON.parse(pathList) : []
 		},
 		// 用户退出登录之后隐藏收货地址数据
 		hidePathData(state) {
@@ -52,7 +55,7 @@ export default {
 		delPath(state, index) {
 			state.list.splice(index, 1)
 			// 收货地址有改动 持久化数据
-			uni.setStorageSync('pathList', JSON.stringify(state.list))
+			// uni.setStorageSync('pathList', JSON.stringify(state.list))
 		},
 		// 修改收货地址
 		updatePath(state, {index, item}) {
@@ -72,6 +75,25 @@ export default {
 		}
 	},
 	actions: {
+		// 从服务端获取收货地址数据
+		fetchPathData({commit, state}, callback = false) {
+			$api.get('/useraddresses/' + state.page, {}, {token: true}).then(res => {
+				console.log(res);
+				if (typeof callback === 'function') callback(true)
+				if (res.length === 0) {
+					state.list = state.page === 1 ? [] : state.list
+					return
+				}
+				// 处理服务端返回的数据
+				res.forEach((v, i) => {
+					v.isdefault = (i === 0 && v.last_used_time !== null) ? true : false
+				})
+				state.list = state.page === 1 ? res : [...state.list, ...res]
+				
+			}).catch(err => {
+				if (typeof callback === 'function') callback(false)
+			})
+		},
 		// 新增收货地址
 		createPathAction({commit, state}, item) {
 			if (item.isdefault) {
@@ -79,7 +101,7 @@ export default {
 			}
 			commit('createPath', item)
 			// 收货地址有改动 持久化数据
-			uni.setStorageSync('pathList', JSON.stringify(state.list))
+			// uni.setStorageSync('pathList', JSON.stringify(state.list))
 		},
 		// 修改收货地址
 		updatePathAction({commit}, obj) {
@@ -88,7 +110,7 @@ export default {
 			}
 			commit('updatePath', obj)
 			// 收货地址有改动 持久化数据
-			uni.setStorageSync('pathList', JSON.stringify(state.list))
+			// uni.setStorageSync('pathList', JSON.stringify(state.list))
 		}
 	}
 }
