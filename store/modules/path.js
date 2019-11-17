@@ -1,10 +1,17 @@
 /*
 {
-	id: 2,
-	name: "Stefan",
-	phone: "13396095889",
-	path: "广东省 深圳市 南山区",
-	detailPath: "xxxx公司 2栋 122",
+	"id": 11,
+	"user_id": 3,
+	"province": "辽宁省",
+	"city": "沈阳市",
+	"district": "皇姑区",
+	"address": "Dddhhhh ",
+	"zip": 0,
+	"name": "Zzzs",
+	"phone": "13396097889",
+	"last_used_time": 1573831386,
+	"create_time": "1970-01-01 08:33:39",
+	"update_time": "1970-01-01 08:33:39",
 	isdefault: true
 }
 */
