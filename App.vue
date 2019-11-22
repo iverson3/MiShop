@@ -46,7 +46,7 @@
 			let loginStatus = uni.getStorageSync('loginStatus')
 			// let token = uni.getStorageSync('token')
 			if (loginStatus && loginStatus === true) {
-				this.$store.commit('initCartData')
+				// this.$store.commit('initCartData')
 				this.$store.commit('initOrderData')
 				// dispatch action 从服务端获取收货地址数据
 				this.$store.dispatch('fetchPathData')

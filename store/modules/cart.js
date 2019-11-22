@@ -151,11 +151,10 @@ export default {
 		// 商品属性弹出框中修改了任意数据
 		attrsChange(state, obj) {
 			state.list[obj.index].pprice = obj.pprice
+			state.list[obj.index].num = obj.num
 			state.list[obj.index].maxnum = obj.maxnum
 			state.list[obj.index].skusText = obj.skusText
 			// popupData.selects
-			
-			// state.list[obj.index].attrs = obj.attrs
 			// 购物车数据有改动 持久化数据
 			// uni.setStorageSync('cartList', JSON.stringify(state.list))
 		},

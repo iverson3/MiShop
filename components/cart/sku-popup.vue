@@ -63,7 +63,8 @@
 		},
 		data() {
 			return {
-				updateNum: true
+				updateNum: true,
+				num: 1
 			}
 		},
 		computed: {
@@ -82,6 +83,7 @@
 			
 			// 拿到选中的skus组成的多规格字符串
 			checkedSkus() {
+				if (!this.popupData.selects) return "";
 				let checkedSkus = this.popupData.selects.map(v => {
 					return v.list[v.selected].name
 				})
@@ -104,29 +106,44 @@
 				return this.popupData.goods_skus[this.checkedSkusIndex].pprice
 			},
 		},
+		watch: {
+			popupData(newVal, oldVal) {
+				if (newVal.item) {
+					this.num = newVal.item.num
+				}
+			}
+		},
 		methods: {
 			...mapMutations([
 				'attrsChange',
-				'numChange'
+				// 'numChange'
 			]),
 			...mapActions(['doHidePopup']),
 			
 			changeAttr: function() {
+				uni.showLoading({
+					mask: true,
+					title: "属性修改中..."
+				})
 				this.$api.post('/cart/' + this.popupData.item.id, {
 					shop_id: this.popupData.goods_skus[this.checkedSkusIndex].id, // 规格id
-					num: 1
+					num: this.num
 				}, {token: true, toast: false}).then(res => {
+					uni.hideLoading()
 					this.attrsChange({
 						index: this.popupIndex,
 						// attrs: this.attrsDataList,
 						skusText: this.checkedSkus,
 						pprice: this.showPrice,
-						maxnum: this.maxStock
+						maxnum: this.maxStock,
+						num: this.num
 					})
 					this.doHidePopup()
 				})
 			},
 			changeNum: function(num, item, index) {
+				this.num = num
+				
 				// if (this.popupIndex === -1 && index === -1) return
 				
 				// v-if="updateNum" @forceUpdate="forceRefreshNumber()"

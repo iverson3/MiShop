@@ -115,7 +115,6 @@
 			</template>
 		</view>
 		
-		
 		<!-- 属性筛选弹出框 -->
 		<sku-popup></sku-popup>
 		
@@ -152,7 +151,6 @@
 		computed: {
 			...mapState({
 				isedit: state => state.cart.isedit,
-				// popupIndex: state => state.cart.popupIndex,
 				list: state => state.cart.list,
 				
 				loginStatus: state => state.user.loginStatus,
@@ -204,7 +202,7 @@
 				'addTempOrder',
 				'initCartList',
 				
-				// 'numChange'
+				'numChange'
 			]),
 			...mapActions([
 				'doSelectAll',
@@ -236,20 +234,28 @@
 			},
 			
 			ShowPopup: function(index, item) {
-				this.$api.get('/cart/'+ item.id +'/sku', {}, {token: true, toast: false}).then(res => {
-		
+				this.$api.get('/cart/'+ item.id +'/sku', {}, 
+					{token: true, toast: false}).then(res => {
+					
+					let arr = item.skusText.split(',')
+					let i = 0
+					let selected = 0
+				
 					// 商品多规格弹出框数据
 					res.selects = res.goods_skus_card.map(v => {
-						var list = v.goods_skus_card_value.map(v2 => {
+						var list = v.goods_skus_card_value.map((v2, index2) => {
+							if (v2.value === arr[i]) selected = index2
 							return {
 								id: v2.id,
 								name: v2.value
 							}
 						})
+						
+						i++;
 						return {
 							id: v.id,
 							title: v.name,
-							selected: 0,
+							selected: selected,
 							list: list
 						}
 					})
@@ -270,7 +276,7 @@
 			},
 		
 			changeNum: function(num, item, index) {
-				if (this.popupIndex === -1 && index === -1) return
+				if (index === -1) return
 				
 				if (item.num === num) return
 				uni.showLoading({
@@ -281,7 +287,7 @@
 					uni.hideLoading()
 					item.num = num
 					this.numChange({
-						index: (this.popupIndex === -1)? index : this.popupIndex,
+						index: index,
 						num: num
 					})
 				})

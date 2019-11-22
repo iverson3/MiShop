@@ -38,6 +38,9 @@ export default {
 			options.toast = true
 		}
 		
+		console.log('options.data');
+		console.log(options.data);
+		
 		return new Promise((res, rej) => {
 			// 请求之前 拦截器 todo
 			
