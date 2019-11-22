@@ -51,9 +51,10 @@
 								{{ item.title }}
 							</view>
 							<!-- 商品的属性和规格 -->
-							<view v-if="item.sku_type === 1" @tap.stop="doShowPopup(index)" class="d-flex a-center text-light-muted mb-2 mt-2 py-1 bg-light-secondary" style="width:fit-content;height:auto;border-radius: 8upx;padding-left: 15upx;padding-right: 15upx;">
+							<view v-if="item.skus_type === 1" @tap.stop="ShowPopup(index, item)" class="d-flex a-center text-light-muted mb-2 mt-2 py-1 bg-light-secondary" style="width:fit-content;height:auto;border-radius: 8upx;padding-left: 15upx;padding-right: 15upx;">
 								<text class="line-h mr-2 font-sm" style="width:auto;height:auto;max-width:50%px;">
-									{{ item.attrs | getAttrsStr }}
+									<!-- {{ item.attrs | getAttrsStr }} -->
+									{{ item.skusText}}
 								</text>
 								<text class="iconfont icon-bottom line-h font-sm"></text>
 							</view>
@@ -62,7 +63,7 @@
 						<view class="mt-auto d-flex j-sb pl-2">
 							<price>{{ item.pprice }}</price>
 							<view class="a-self-end">
-								<uni-number-box v-if="updateNum" @forceUpdate="forceRefreshNumber()" @change="changeNum($event, item, index)" :value="item.num" :min="item.minnum" :max="item.maxnum"></uni-number-box>
+								<uni-number-box @change="changeNum($event, item, index)" :value="item.num" :min="item.minnum" :max="item.maxnum"></uni-number-box>
 							</view>
 						</view>
 					</view>
@@ -116,47 +117,7 @@
 		
 		
 		<!-- 属性筛选弹出框 -->
-		<common-popup :popupClass="popupShow" @hide="doHidePopup">
-			<!-- 
-			商品信息 h275
-			图片 180*180
-			 -->
-			<view class="d-flex a-center" style="height: 275upx;">
-				<image src="../../static/images/demo/list/1.jpg" 
-				style="width: 180upx;height: 180upx;"
-				class="border rounded"
-				mode="widthFix"></image>
-				<view class="pl-2">
-				 	<price priceSize="font-lg" unitSize="font">{{ showPrice }}</price>
-					<view class="d-block">
-						<text class="mr-1">{{ checkedSkus }}</text>
-					</view>
-				</view>
-			</view>
-			 
-			<!-- 表单部分 h660 -->
-			<scroll-view scroll-y class="w-100" style="height: 660upx;">
-			 	<card :headTitle="item.title" 
-				v-for="(item,index) in attrsDataList"
-				:key="index"
-				:headTitleWeight="false" 
-				:headBorderBottom="false">
-					<mi-radio-group :label="item" :selected.sync="item.selected"></mi-radio-group>
-				</card>
-				<view class="d-flex j-sb a-center px-2 py-3 mt-2 border-top border-light-secondary">
-					<text>购买数量</text>
-					<uni-number-box v-if="updateNum" @forceUpdate="forceRefreshNumber()" @change="changeNum($event, popupData_local, popupIndex)" :value="popupData_local.num" :min="popupData_local.minnum" :max="maxStock"></uni-number-box>
-				</view>
-			</scroll-view>
-			 
-			<!-- 按钮 h100 -->
-			<view class="main-bg-color text-white font-md d-flex j-center a-center"
-			hover-class="main-bg-hover-color"
-			@tap.stop="changeAttr"
-			style="height: 100upx;margin-left: -30upx;margin-right: -30upx;">
-				确定
-			</view>
-		</common-popup>
+		<sku-popup></sku-popup>
 		
 	</view>
 </template>
@@ -166,10 +127,8 @@
 	import uniNavBar from '@/components/uni-ui/uni-nav-bar/uni-nav-bar.vue'
 	import price from '@/components/common/price.vue'
 	import uniNumberBox from '@/components/uni-ui/uni-number-box/uni-number-box.vue'
-	import card from '@/components/common/card.vue'
-	import commonPopup from '@/components/common/common-popup.vue'
-	import miRadioGroup from '@/components/common/mi-radio-group.vue'
 	import commonList from '@/components/common/common-list.vue'
+	import skuPopup from '@/components/cart/sku-popup.vue'
 	
 	import {mapState, mapGetters, mapMutations, mapActions} from 'vuex'
 	export default {
@@ -178,79 +137,23 @@
 			uniNavBar,
 			price,
 			uniNumberBox,
-			card,
-			commonPopup,
-			miRadioGroup,
-			commonList
+			commonList,
+			skuPopup
 		},
 		data() {
 			return {
-				attrsDataList: [],
-				popupData_local: {},
-				updateNum: true,
 				// 底部tabBar的高度 (H5平台下底部tabBar因为不是原生控件 是div模拟的，所以会占用页面高度50px)
 				// 价格合计栏距底部的距离 (fixed定位 bottom: 0upx;)
 				bottomHeight: 0,
 				
-				hotList: [
-					{
-						id: 25,
-						cover:"/static/images/demo/list/1.jpg",
-						title:"米家空调",
-						desc:"1.5匹变频",
-						oprice:2699,
-						pprice:1399
-					},
-					{
-						id: 25,
-						cover:"/static/images/demo/list/1.jpg",
-						title:"米家空调",
-						desc:"1.5匹变频",
-						oprice:2699,
-						pprice:1399
-					},
-					{
-						id: 25,
-						cover:"/static/images/demo/list/1.jpg",
-						title:"米家空调",
-						desc:"1.5匹变频",
-						oprice:2699,
-						pprice:1399
-					},
-					{
-						id: 25,
-						cover:"/static/images/demo/list/1.jpg",
-						title:"米家空调",
-						desc:"1.5匹变频",
-						oprice:2699,
-						pprice:1399
-					},
-					{
-						id: 25,
-						cover:"/static/images/demo/list/1.jpg",
-						title:"米家空调",
-						desc:"1.5匹变频",
-						oprice:2699,
-						pprice:1399
-					},
-					{
-						id: 25,
-						cover:"/static/images/demo/list/1.jpg",
-						title:"米家空调",
-						desc:"1.5匹变频",
-						oprice:2699,
-						pprice:1399
-					}
-				]
+				hotList: []
 			}
 		},
 		computed: {
 			...mapState({
 				isedit: state => state.cart.isedit,
-				popupIndex: state => state.cart.popupIndex,
+				// popupIndex: state => state.cart.popupIndex,
 				list: state => state.cart.list,
-				attrsData: state => state.cart.attrsData,
-				popupShow: state => state.cart.popupShow,
 				
 				loginStatus: state => state.user.loginStatus,
 			}),
@@ -259,56 +162,9 @@
 				'someChecked',
 				'totalPrice',
 				'disableSelectAll',
-				'popupData',
 				'selectedInfoList',
-				
 				'defaultPath',
 			]),
-			
-			// 最大库存根据多规格属性的改变进行动态的改变
-			maxStock() {
-				if (!this.popupData_local.goodsSkus) return 0
-				if (this.checkedSkusIndex < 0) return this.popupData_local.min_stock
-				return this.popupData_local.goodsSkus[this.checkedSkusIndex].stock || 100
-			},
-			
-			// 拿到选中的skus组成的多规格字符串
-			checkedSkus() {
-				let checkedSkus = this.attrsDataList.map(v => {
-					return v.list[v.selected].name
-				})
-				return checkedSkus.join(",")
-			},
-			// 选中的多规格属性组 对应在价格对照表中的索引
-			checkedSkusIndex() {
-				let index = 0
-				if (this.popupData_local.goodsSkus) {
-					index = this.popupData_local.goodsSkus.findIndex((item) => {
-						return item.skusText === this.checkedSkus
-					})
-				}
-				return index
-			},
-			// 根据多规格属性的选择而动态计算的价格
-			showPrice() {
-				if (this.checkedSkusIndex < 0) return this.popupData_local.min_price || 0.00
-				if (!this.popupData_local.goodsSkus) return 0.00
-				return this.popupData_local.goodsSkus[this.checkedSkusIndex].pprice
-			}
-		},
-		watch: {
-			popupData(a, b) {
-				if (typeof a.attrs === 'undefined') {
-					this.popupData_local = {}
-					this.attrsDataList = []
-					return 
-				}
-				// 判断商品是否是多规格
-				if (a.sku_type === 1) {
-					this.attrsDataList = JSON.parse(JSON.stringify(a.attrs))
-				}
-				this.popupData_local = JSON.parse(JSON.stringify(a))
-			}
 		},
 		filters: {
 			// 拼接属性字段
@@ -339,51 +195,98 @@
 			// #endif
 		},
 		onShow: function() {
-			
+			this.getData()
 		},
 		methods: {
 			...mapMutations([
 				'selectItem',
 				'changeEditStatus',
 				'addTempOrder',
+				'initCartList',
 				
-				'attrsChange',
-				'numChange'
+				// 'numChange'
 			]),
 			...mapActions([
 				'doSelectAll',
 				'doDelGoods',
-				'doShowPopup',
-				'doHidePopup'
+				'doShowPopup'
 			]),
 			
-			// 强制更新numberBox子组件  一种hack的强制更新子组件的方式 (组件依赖的state字段没有变化的情况下 需要强制的方式组件才会更新)
-			forceRefreshNumber() {
-				// 移除组件
-				this.updateNum = false
-				// 在组件移除后，重新渲染组件
-				// this.$nextTick可实现在DOM 状态更新后，执行传入的方法。
-				this.$nextTick(() => {
-					this.updateNum = true
+			// 获取数据
+			getData: function() {
+				// 获取购物车数据
+				this.$api.get('/cart', {}, {token: true, toast: false}).then(res => {
+					console.log(res);
+					this.initCartList(res)
+				})
+				
+				// 获取热门商品列表数据
+				this.$api.get('/goods/hotlist').then(res => {
+					this.hotList = res.map(v => {
+						return {
+							id: v.id,
+							cover: v.cover,
+							title: v.title,
+							desc: v.desc,
+							oprice: v.min_oprice,
+							pprice: v.min_price
+						}
+					})
 				})
 			},
+			
+			ShowPopup: function(index, item) {
+				this.$api.get('/cart/'+ item.id +'/sku', {}, {token: true, toast: false}).then(res => {
+		
+					// 商品多规格弹出框数据
+					res.selects = res.goods_skus_card.map(v => {
+						var list = v.goods_skus_card_value.map(v2 => {
+							return {
+								id: v2.id,
+								name: v2.value
+							}
+						})
+						return {
+							id: v.id,
+							title: v.name,
+							selected: 0,
+							list: list
+						}
+					})
+					// 商品多规格 匹配价格
+					res.goods_skus.forEach(item => {
+						let arr = []
+						for (let key in item.skus) {
+							arr.push(item.skus[key].value)
+						}
+						item.skusText = arr.join(",")
+					})
+					
+					this.doShowPopup({
+						index: index,
+						data: res
+					})
+				})
+			},
+		
 			changeNum: function(num, item, index) {
 				if (this.popupIndex === -1 && index === -1) return
-				item.num = num
-				this.numChange({
-					index: (this.popupIndex === -1)? index : this.popupIndex,
-					num: num
+				
+				if (item.num === num) return
+				uni.showLoading({
+					mask: true,
+					title: "修改中..."
+				})
+				this.$api.post('/cart/updatenumber/'+item.id, {num: num}, {token: true, toast: false}).then(res => {
+					uni.hideLoading()
+					item.num = num
+					this.numChange({
+						index: (this.popupIndex === -1)? index : this.popupIndex,
+						num: num
+					})
 				})
 			},
-			changeAttr: function() {
-				this.attrsChange({
-					index: this.popupIndex,
-					attrs: this.attrsDataList,
-					pprice: this.showPrice,
-					maxnum: this.maxStock
-				})
-				this.doHidePopup()
-			},
+			
 			gotoIndex: function() {
 				uni.switchTab({
 					url: "/pages/index/index"

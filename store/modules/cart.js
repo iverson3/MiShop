@@ -90,13 +90,15 @@ export default {
 	state: {
 		isedit: false,
 		
-		list: defaultData,
+		list: [],
 		// 选中列表 (存放选中的商品的id)
 		selectedList: [],
 		// popup弹出框是否显示
 		popupShow: "none",
 		// 当前弹出框所修改的商品的索引
 		popupIndex: -1,
+		// 当前弹出框中对应商品的属性
+		popupData: {}
 	},
 	getters: {
 		// 判断是否有商品被选中
@@ -121,10 +123,6 @@ export default {
 		disableSelectAll: (state) => {
 			return state.list.length === 0
 		},
-		// 获取当前需要修改属性的商品
-		popupData: (state) => {
-			return state.popupIndex > -1 ? state.list[state.popupIndex] : {}
-		},
 		// 获取购物车中选中的商品的详细信息列表
 		selectedInfoList: (state) => {
 			let infoList = []
@@ -137,10 +135,13 @@ export default {
 		}
 	},
 	mutations: {
+		initCartList(state, data) {
+			state.list = data
+		},
 		// 初始化购物车数据
 		initCartData(state) {
-			let cartList = uni.getStorageSync('cartList')
-			state.list = cartList? JSON.parse(cartList) : defaultData
+			// let cartList = uni.getStorageSync('cartList')
+			// state.list = cartList? JSON.parse(cartList) : defaultData
 		},
 		// 用户退出登录之后隐藏购物车数据
 		hideCartData(state) {
@@ -151,14 +152,17 @@ export default {
 		attrsChange(state, obj) {
 			state.list[obj.index].pprice = obj.pprice
 			state.list[obj.index].maxnum = obj.maxnum
-			state.list[obj.index].attrs = obj.attrs
+			state.list[obj.index].skusText = obj.skusText
+			// popupData.selects
+			
+			// state.list[obj.index].attrs = obj.attrs
 			// 购物车数据有改动 持久化数据
-			uni.setStorageSync('cartList', JSON.stringify(state.list))
+			// uni.setStorageSync('cartList', JSON.stringify(state.list))
 		},
 		numChange(state, obj) {
 			state.list[obj.index].num = obj.num
 			// 购物车数据有改动 持久化数据
-			uni.setStorageSync('cartList', JSON.stringify(state.list))
+			// uni.setStorageSync('cartList', JSON.stringify(state.list))
 		},
 		
 		changeEditStatus(state) {
@@ -180,7 +184,7 @@ export default {
 				state.selectedList.push(id)
 			}
 			// 购物车数据有改动 持久化数据
-			uni.setStorageSync('cartList', JSON.stringify(state.list))
+			// uni.setStorageSync('cartList', JSON.stringify(state.list))
 		},
 		// 全选
 		selectAll(state) {
@@ -190,7 +194,7 @@ export default {
 				return v.id
 			})
 			// 购物车数据有改动 持久化数据
-			uni.setStorageSync('cartList', JSON.stringify(state.list))
+			// uni.setStorageSync('cartList', JSON.stringify(state.list))
 		},
 		// 取消全选
 		unSelectAll(state) {
@@ -200,7 +204,7 @@ export default {
 			})
 			state.selectedList = []
 			// 购物车数据有改动 持久化数据
-			uni.setStorageSync('cartList', JSON.stringify(state.list))
+			// uni.setStorageSync('cartList', JSON.stringify(state.list))
 		},
 		// 删除购物车中选中的商品
 		delGoods(state) {
@@ -210,7 +214,7 @@ export default {
 			// 清空选中列表
 			state.selectedList = []
 			// 购物车数据有改动 持久化数据
-			uni.setStorageSync('cartList', JSON.stringify(state.list))
+			// uni.setStorageSync('cartList', JSON.stringify(state.list))
 		},
 		// 初始化popupIndex
 		initPopupIndex(state, index) {
@@ -243,7 +247,7 @@ export default {
 				state.list.unshift(goods)
 			}
 			// 购物车数据有改动 持久化数据
-			uni.setStorageSync('cartList', JSON.stringify(state.list))
+			// uni.setStorageSync('cartList', JSON.stringify(state.list))
 		},
 		// 加入购物车 (允许购物车中商品id相同 选择的属性不同)
 		// 目前弃用这种策略
@@ -300,10 +304,12 @@ export default {
 	},
 	actions: {
 		// 显示弹出框
-		doShowPopup({state, commit, getters}, index) {
+		doShowPopup({state, commit, getters}, obj) {
 			// 只有在编辑状态下才能显示弹出框
 			// if (state.isedit) {
-				commit('initPopupIndex', index)
+				commit('initPopupIndex', obj.index)
+				state.popupData = obj.data
+				state.popupData.item = state.list[obj.index]
 				state.popupShow = 'show'
 			// }
 		},
