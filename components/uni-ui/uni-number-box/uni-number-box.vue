@@ -36,24 +36,19 @@
 		},
 		data() {
 			return {
+				// 用来保存上一个正常且有效的input值
+				// 以便恢复input value时使用
+				oldValue: 0,
 				inputValue: 0
 			}
 		},
 		watch: {
 			value(val) {
 				this.inputValue = +val
+				this.oldValue = +val
 			},
-			inputValue(newVal, oldVal) {
-				let temp = parseInt(newVal)
-				// input的值不能为空 也不能为0
-				if (!newVal || temp === 0) {
-					this.inputValue = this.value
-					this.$emit('change', this.inputValue)
-					return
-				}
-				if (+newVal !== +oldVal) {
-					this.$emit('change', newVal)
-				}
+			inputValue(newVal, oldVal) { 
+				
 			},
 			// 最大库存
 			max(newVal, oldVal) {
@@ -65,6 +60,7 @@
 		},
 		created() {
 			this.inputValue = +this.value
+			this.oldValue = +this.value
 		},
 		methods: {
 			_calcValue(type) {
@@ -83,6 +79,13 @@
 					return
 				}
 				this.inputValue = value / scale
+				
+				// input value有改变 才触发父组件进行更新
+				if (this.inputValue !== this.oldValue) {
+					// 更新oldValue值
+					this.oldValue = this.inputValue
+					this.$emit('change', parseInt(this.inputValue))
+				}
 			},
 			_getDecimalScale() {
 				let scale = 1
@@ -96,17 +99,16 @@
 				let value = event.detail.value
 				// 校验正整数
 				let reg = /^[1-9]+[0-9]*]*$/
-				if (!value || !reg.test(value)) {
-					// 如果输入为空或者非正整数 则还原input的值 并且使用$emit通知父组件强制更新当前组件
-					this.inputValue = this.value
-					this.$emit('forceUpdate')
-					return
+				if (!value || !reg.test(value) || value > this.max) {
+					// 如果输入为空或者非正整数或者大于库存数 则还原input的值为上一个正常值
+					value = this.oldValue
 				}
-				value = +value
-				if (value > this.max) {
-					value = this.max
-				} else if (value < this.min) {
-					value = this.min
+				value = parseInt(value)
+				// input value有改变 才触发父组件进行更新
+				if (value !== this.oldValue) {
+					// 更新oldValue值
+					this.oldValue = value
+					this.$emit('change', parseInt(value))
 				}
 				this.inputValue = value
 			}

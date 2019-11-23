@@ -107,7 +107,7 @@
 				<view @tap="moveToCollection" class="flex-1 d-flex a-center j-center font-md main-bg-color text-white">
 					移入收藏
 				</view>
-				<view @tap="doDelGoods(true)"
+				<view @tap="deleteGoods"
 				class="flex-1 d-flex a-center j-center bg-danger text-white font-md" 
 				hover-class="main-bg-hover-color">
 					删除
@@ -152,6 +152,7 @@
 			...mapState({
 				isedit: state => state.cart.isedit,
 				list: state => state.cart.list,
+				selectedList: state => state.cart.selectedList,
 				
 				loginStatus: state => state.user.loginStatus,
 			}),
@@ -236,7 +237,7 @@
 			ShowPopup: function(index, item) {
 				this.$api.get('/cart/'+ item.id +'/sku', {}, 
 					{token: true, toast: false}).then(res => {
-					
+					// 切割属性字段
 					let arr = item.skusText.split(',')
 					let i = 0
 					let selected = 0
@@ -274,15 +275,10 @@
 					})
 				})
 			},
-		
+			
 			changeNum: function(num, item, index) {
-				if (index === -1) return
-				
-				if (item.num === num) return
-				uni.showLoading({
-					mask: true,
-					title: "修改中..."
-				})
+				if (index === -1 || item.num === num || num > item.maxnum) return
+				uni.showLoading({mask: true, title: "修改中..."})
 				this.$api.post('/cart/updatenumber/'+item.id, {num: num}, {token: true, toast: false}).then(res => {
 					uni.hideLoading()
 					item.num = num
@@ -309,7 +305,6 @@
 				if (!this.someChecked) {
 					return uni.showToast({title: '请先选择商品', icon: 'none'});
 				}
-				
 				let collectList = uni.getStorageSync('collectList')
 				collectList = collectList? JSON.parse(collectList) : []				
 				let collectDetailList = uni.getStorageSync('collectDetailList')
@@ -339,6 +334,28 @@
 				let index = collectList.indexOf(goods_id)
 				if (index === -1) return false
 				return true
+			},
+			
+			// 从购物车中删除商品
+			deleteGoods: function() {
+				// 判断是否有选中商品
+				if (!this.someChecked) {
+					return uni.showToast({title: '请先选择商品', icon: 'none'});
+				}
+				uni.showModal({
+					content: "是否删除选中的商品",
+					success: (res) => {
+						if (res.confirm) {
+							uni.showLoading({title: "商品删除中...", mask: true})
+							let ids = this.selectedList.join(',')
+							this.$api.post('/cart/delete', {shop_ids: ids}, {token: true, toast: false}).then(res => {
+								this.doDelGoods(false)
+								uni.hideLoading()
+								uni.showToast({title: "删除成功"})
+							})
+						}
+					}
+				})
 			},
 			
 			orderConfirm: function() {

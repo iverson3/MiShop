@@ -28,7 +28,7 @@
 			</card>
 			<view class="d-flex j-sb a-center px-2 py-3 mt-2 border-top border-light-secondary">
 				<text>购买数量</text>
-				<uni-number-box @change="changeNum($event, popupData, popupIndex)" :value="popupData.item.num" :min="popupData.item.minnum" :max="maxStock"></uni-number-box>
+				<uni-number-box @change="changeNum($event)" :value="popupData.item.num" :min="popupData.item.minnum" :max="maxStock"></uni-number-box>
 			</view>
 		</scroll-view>
 		 
@@ -63,7 +63,6 @@
 		},
 		data() {
 			return {
-				updateNum: true,
 				num: 1
 			}
 		},
@@ -111,20 +110,20 @@
 				if (newVal.item) {
 					this.num = newVal.item.num
 				}
+			},
+			popupShow(a, b) {
+				
 			}
 		},
 		methods: {
 			...mapMutations([
 				'attrsChange',
-				// 'numChange'
+				'numChange'
 			]),
 			...mapActions(['doHidePopup']),
 			
 			changeAttr: function() {
-				uni.showLoading({
-					mask: true,
-					title: "属性修改中..."
-				})
+				uni.showLoading({mask: true, title: "属性修改中..."})
 				this.$api.post('/cart/' + this.popupData.item.id, {
 					shop_id: this.popupData.goods_skus[this.checkedSkusIndex].id, // 规格id
 					num: this.num
@@ -132,41 +131,28 @@
 					uni.hideLoading()
 					this.attrsChange({
 						index: this.popupIndex,
-						// attrs: this.attrsDataList,
 						skusText: this.checkedSkus,
 						pprice: this.showPrice,
 						maxnum: this.maxStock,
+					})
+					this.numChange({
+						index: this.popupIndex,
 						num: this.num
 					})
 					this.doHidePopup()
 				})
 			},
-			changeNum: function(num, item, index) {
+			changeNum: function(num) {
+				if (num > this.maxStock) return
 				this.num = num
-				
-				// if (this.popupIndex === -1 && index === -1) return
-				
-				// v-if="updateNum" @forceUpdate="forceRefreshNumber()"
-				
-				// if (item.num === num) return
-				
-				// console.log(item);
-				// return
-				// uni.showLoading({
-				// 	mask: true,
-				// 	title: "修改中..."
-				// })
-				// this.$api.post('/cart/updatenumber/'+ this.popupData.item.id, {num: num}, {token: true, toast: false}).then(res => {
-				// 	uni.hideLoading()
-				// 	item.num = num
-				// 	this.numChange({
-				// 		index: (this.popupIndex === -1)? index : this.popupIndex,
-				// 		num: num
-				// 	})
-				// })
 			},
 			
-			// 强制更新numberBox子组件  一种hack的强制更新子组件的方式 (组件依赖的state字段没有变化的情况下 需要强制的方式组件才会更新)
+			
+			// 目前已被弃用，因为不再需要强制刷新
+			// 强制更新numberBox子组件  
+			// 父组件中的用法 v-if="updateNum" @forceUpdate="forceRefreshNumber"
+			// 子组件中的用法 this.$emit('forceUpdate')
+			// 一种hack的强制更新子组件的方式 (组件依赖的state字段没有变化的情况下 需要强制的方式组件才会更新)
 			forceRefreshNumber() {
 				// 移除组件
 				this.updateNum = false
@@ -175,7 +161,7 @@
 				this.$nextTick(() => {
 					this.updateNum = true
 				})
-			},
+			}
 		}
 	}
 </script>
