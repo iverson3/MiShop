@@ -97,11 +97,12 @@
 			</scroll-view>
 			 
 			<!-- 按钮 h100 -->
-			<view class="main-bg-color text-white font-md d-flex j-center a-center"
-			hover-class="main-bg-hover-color"
+			<view class="text-white font-md d-flex j-center a-center"
+			:hover-class="maxStock === 0? '' : 'main-bg-hover-color'"
+			:class="maxStock === 0? 'bg-secondary' : 'main-bg-color'"
 			@tap.stop="addCart"
 			style="height: 100upx;margin-left: -30upx;margin-right: -30upx;">
-				加入购物车
+				{{ maxStock === 0? '暂无库存' : '加入购物车' }}
 			</view>
 		</common-popup>
 		
@@ -242,7 +243,7 @@
 				}
 				if (!this.detail.goodsSkus) return 0
 				if (this.checkedSkusIndex < 0) return this.detail.min_stock
-				return this.detail.goodsSkus[this.checkedSkusIndex].stock || 100
+				return this.detail.goodsSkus[this.checkedSkusIndex].stock
 			},
 			
 			// 拿到选中的skus组成的多规格字符串
@@ -292,9 +293,8 @@
 			}
 		},
 		methods: {
-			...mapMutations([
-				'addGoodsToCart'
-			]),
+			...mapMutations(['addGoodsToCart']),
+			
 			async __init(goods_id) {
 				uni.showLoading({
 					title: "商品详情加载中...",
@@ -396,30 +396,64 @@
 				}
 			},
 			addCart: function() {
+				if (this.maxStock === 0) return;
 				if (!this.isLogin()) {
 					uni.showToast({title: '请先登录', icon: 'none'});
 					uni.navigateTo({url: '/pages/login/login'});
 					return
 				}
-				let goods = JSON.parse(JSON.stringify(this.detail))
-				
-				goods['pprice'] = parseFloat(this.showPrice)
-				goods['minnum'] = 1
-				goods['maxnum'] = parseInt(this.maxStock)
-				goods['checked'] = false
-				goods['attrs'] = this.selects
-				delete goods.goodsAttrs
-				delete goods.content
-				delete goods.hotComments
-				delete goods.hotList
-				delete goods.goodsBanner
-				
-				// 加入购物车
-				this.addGoodsToCart(goods)
-				// 隐藏属性选择弹出框
-				this.hidePopup('attr')
-				// 加入成功提示
-				uni.showToast({title: "加入成功"})
+				// 组装post数据
+				let data = {
+					// 单规格用商品id,多规格则用规格id
+					shop_id: this.detail.sku_type === 0? this.detail.id : this.detail.goodsSkus[this.checkedSkusIndex].id,
+					skus_type: this.detail.sku_type,
+					num: this.detail.num
+				}
+				uni.showLoading({
+					title: "加入中...",
+					mask: true
+				})
+				this.$api.post('/cart', data, {token: true, toast: false}).then(res => {
+					uni.hideLoading()
+					// 通知购物车进行更新
+					// 没有效果 但好像也不需要这个触发更新了
+					// this.$emit('updateCart')
+					
+					let skusTextList = []
+					if (res.skus_type === 1) {
+						// 获取当前商品选中的多规格和属性
+						Object.keys(res.goodsSkus.skus).forEach(function(k){
+							skusTextList.push(res.goodsSkus.skus[k].value)
+						});
+					}
+					
+					// store中加入购物车列表
+					let goods = {}
+					goods.title = this.detail.title
+					goods.cover = this.detail.cover
+					goods.num = this.detail.num
+					goods.id = parseInt(res.id)
+					goods.skus_type = res.skus_type
+					// 多规格商品才有下面两个字段
+					if (res.skus_type === 1) {
+						goods.shop_id = res.shop_id
+						goods.skusText = skusTextList.join(',')
+					}
+					goods.pprice = parseFloat(this.showPrice)
+					goods.minnum = 1
+					goods.maxnum = parseInt(this.maxStock)
+					goods.checked = false
+					// 加入购物车
+					this.addGoodsToCart(goods)
+					// 隐藏属性选择弹出框
+					this.hidePopup('attr')
+					// 加入成功提示
+					uni.showToast({title: "加入成功"})
+				}).catch(err => {
+					console.log(err);
+					uni.hideLoading()
+					uni.showToast({title: "加入购物车失败"})
+				})
 			},
 			openCreatePath: function() {
 				if (!this.isLogin()) {

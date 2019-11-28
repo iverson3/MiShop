@@ -39,6 +39,7 @@ export default {
 		}
 		
 		console.log('options.data');
+		console.log(options.url);
 		console.log(options.data);
 		
 		return new Promise((res, rej) => {

@@ -47,7 +47,7 @@
 					
 					<view class="d-flex flex-column flex-1">
 						<view class="flex-1 d-flex flex-column pl-2">
-							<view @tap="openGoodsDetail(item.id)" class="text-dark" :class="item.sku_type === 1?'mb-1':'mb-5 mt-2'" style="font-size: 32upx;line-height: 1.3;">
+							<view @tap="openGoodsDetail(item.id)" class="text-dark" :class="item.skus_type === 1?'mb-1':'mb-5 mt-2'" style="font-size: 32upx;line-height: 1.3;">
 								{{ item.title }}
 							</view>
 							<!-- 商品的属性和规格 -->
@@ -192,8 +192,17 @@
 			// #ifdef MP-WEIXIN
 			this.bottomHeight = 100
 			// #endif
+			
+			this.getData()
+			// 监听购物车更新
+			this.$on('updateCart', () => {
+				this.getData()
+			})
 		},
-		onShow: function() {
+		onUnload: function() {
+			this.$off('updateCart')
+		},
+		onPullDownRefresh: function() {
 			this.getData()
 		},
 		methods: {
@@ -202,6 +211,7 @@
 				'changeEditStatus',
 				'addTempOrder',
 				'initCartList',
+				'unSelectAll',
 				
 				'numChange'
 			]),
@@ -215,8 +225,14 @@
 			getData: function() {
 				// 获取购物车数据
 				this.$api.get('/cart', {}, {token: true, toast: false}).then(res => {
-					console.log(res);
+					console.log(res)
+					// 取消全选状态
+					this.unSelectAll()
+					// 初始化购物车列表数据
 					this.initCartList(res)
+					uni.stopPullDownRefresh()
+				}).catch(err => {
+					uni.stopPullDownRefresh()
 				})
 				
 				// 获取热门商品列表数据
@@ -239,20 +255,18 @@
 					{token: true, toast: false}).then(res => {
 					// 切割属性字段
 					let arr = item.skusText.split(',')
-					let i = 0
 					let selected = 0
 				
 					// 商品多规格弹出框数据
-					res.selects = res.goods_skus_card.map(v => {
+					res.selects = res.goods_skus_card.map((v, index) => {
 						var list = v.goods_skus_card_value.map((v2, index2) => {
-							if (v2.value === arr[i]) selected = index2
+							if (v2.value === arr[index]) selected = index2
 							return {
 								id: v2.id,
 								name: v2.value
 							}
 						})
 						
-						i++;
 						return {
 							id: v.id,
 							title: v.name,

@@ -8,10 +8,13 @@
 				<view class="iconfont text-muted line-h-md" :class="hasCollect? 'icon-shoucang-done':'icon-shoucang'"></view>
 				收藏
 			</view>
-			<view class="flex-1 flex-column a-center line-h-md text-center" 
+			<view class="flex-1 flex-column a-center line-h-md text-center position-relative" 
 			@tap="toCart" style="padding-right: 50upx;"
 			hover-class="bg-light-secondary">
 				<view class="iconfont icon-gouwuche text-muted line-h-md"></view>
+				<view v-if="cartCount > 0 || cartCount === '99+'" class="position-absolute" style="left: 100upx;top: 0;">
+					<uni-badge :text="cartCount" type="error" size="small"></uni-badge>
+				</view>
 				购物车
 			</view>
 			<view @tap="$emit('showAttrPopup')" class="d-flex j-center a-center font-md main-bg-color text-white" hover-class="main-bg-hover-color" style="flex: 2.5;">
@@ -22,7 +25,13 @@
 </template>
 
 <script>
+	import uniBadge from '@/components/uni-ui/uni-badge/uni-badge.vue';
+	
+	import { mapGetters } from 'vuex'
 	export default {
+		components: {
+			uniBadge
+		},
 		props: {
 			goods_id: {
 				type: Number,
@@ -33,6 +42,9 @@
 				default: false
 			},
 			goodsInfo: Object
+		},
+		computed: {
+			...mapGetters(['cartCount'])
 		},
 		methods: {
 			addCollect: function() {

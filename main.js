@@ -2,9 +2,11 @@ import Vue from 'vue'
 import App from './App'
 import store from './store/index.js'
 import request from './common/lib/request.js';
+import helper from './common/lib/helper.js';
 
 Vue.prototype.$store = store
 Vue.prototype.$api = request
+Vue.prototype.$help = helper
 
 Vue.config.productionTip = false
 
@@ -36,8 +38,6 @@ Vue.prototype.isLogin = () => {
 	if (store.state.user.loginStatus && store.state.user.loginStatus === true) return true
 	return false
 }
-
-
 
 App.mpType = 'app'
 
