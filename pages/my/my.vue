@@ -48,7 +48,7 @@
 		<uni-list-item title="会员中心" :showExtraIcon="true" leftIcon="icon-huangguan" leftIconStyle="color:#FCBE2D;"></uni-list-item>
 		<uni-list-item title="服务中心" :showExtraIcon="true" leftIcon="icon-service" leftIconStyle="color:#FA6C5E;"></uni-list-item>
 		<uni-list-item title="小米之家" :showExtraIcon="true" leftIcon="icon-home" leftIconStyle="color:#FE8B42;"></uni-list-item>
-		<uni-list-item title="更多功能" :showExtraIcon="true" leftIcon="icon-gengduo" leftIconStyle="color:#9ED45A;"></uni-list-item>
+		<uni-list-item title="更多功能" @click="navigate('comment')" :showExtraIcon="true" leftIcon="icon-gengduo" leftIconStyle="color:#9ED45A;"></uni-list-item>
 		<divider></divider>
 		<uni-list-item title="我的收藏" @click="navigate('collection')" :showExtraIcon="true" leftIcon="icon-shoucang" leftIconStyle="color:#808C98;"></uni-list-item>
 		<uni-list-item title="浏览历史" :showExtraIcon="true" leftIcon="icon-history" leftIconStyle="color:#808C98;"></uni-list-item>

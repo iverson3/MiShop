@@ -195,12 +195,18 @@
 			
 			this.getData()
 			// 监听购物车更新
-			this.$on('updateCart', () => {
+			uni.$on('updateCart', () => {
+				console.log('emit updateCart');
 				this.getData()
 			})
 		},
+		// beforeDestroy: function() {
+		// 	console.log('cart will Destroy');
+		// 	uni.$off('updateCart')
+		// },
 		onUnload: function() {
-			this.$off('updateCart')
+			console.log('cart will Unload');
+			uni.$off('updateCart')
 		},
 		onPullDownRefresh: function() {
 			this.getData()

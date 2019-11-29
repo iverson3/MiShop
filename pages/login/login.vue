@@ -129,8 +129,7 @@
 					this.initOrderData()
 					this.fetchPathData()
 					// 通知购物车进行更新
-					// 没效果
-					// this.$emit('updateCart')
+					uni.$emit('updateCart')
 					
 					uni.hideLoading()
 					uni.showToast({

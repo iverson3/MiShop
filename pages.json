@@ -408,7 +408,23 @@
         ,{
             "path" : "pages/comment/comment",
             "style" : {
-				"navigationBarTitleText":"对订单进行评价"
+				"navigationBarTitleText":"对订单进行评价",
+				"app-plus": {
+					"subNVues": [{
+						"id": "mapsearchbar",
+						"path": "pages/comment/subnvue/map-search-bar",
+						// "type":"popup",
+						"style": {
+							"position": "absolute",  
+							"dock": "top",  
+							"width": "700upx",  
+							"height": "200upx",  
+							"background": "transparent",
+							"top":"140px",
+							"left":"10px"
+						}
+					}]
+				}
 			}
         }
     ],

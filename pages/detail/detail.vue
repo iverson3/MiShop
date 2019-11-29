@@ -416,8 +416,8 @@
 				this.$api.post('/cart', data, {token: true, toast: false}).then(res => {
 					uni.hideLoading()
 					// 通知购物车进行更新
-					// 没有效果 但好像也不需要这个触发更新了
-					// this.$emit('updateCart')
+					// 好像不需要这个触发更新了
+					// uni.$emit('updateCart')
 					
 					let skusTextList = []
 					if (res.skus_type === 1) {

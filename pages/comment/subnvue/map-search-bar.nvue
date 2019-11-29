@@ -1,0 +1,67 @@
+<template>
+	<div class="p-2 map-search-bar">
+		<text class="searchbar-location-name">{{ city }}</text>
+		<div class="searchbar-input-div" @click="openLocation">
+			<text class="searchbar-input-cont">{{ location }}</text>
+		</div>
+		<image class="" src="/static/images/demo/cate_01.png" mode="widthFix" @click="openLocation" style="width: 80px;height: 80px;margin: 10px;"></image>                  
+	</div>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				city: "",
+				location: ""
+			}
+		},
+		created: function() {
+			uni.$on('setSearchBarInfo', (data) => {
+				console.log(data);
+				this.city = data.city
+				this.location = data.location
+			})
+		},
+		beforeDestroy: function() {
+			uni.$off('setSearchBarInfo')
+		},
+		methods: {
+			openLocation: function() {
+				uni.showToast({
+					title: '打开地图',
+					icon: 'none'
+				});
+				uni.$emit('openLocationFromNvue')
+			}
+		}
+	}
+</script>
+
+<style>
+	.map-search-bar {
+		background-color: rgba(0, 0, 0, 0.7); 
+		height: 100px;
+		flex-direction: row;
+		justify-content: center;
+	}
+	.searchbar-location-name {
+		padding: 8px; 
+		color: white; 
+		margin-top: 28px;
+	}
+	.searchbar-input-div {
+		background-color: #F2F2F2;
+		width: 420px;
+		height: 65px;
+		border-radius: 30px;
+		margin: 10px;
+		margin-top: 18px;
+		padding: 15px;
+		padding-left: 25px;
+	}
+	.searchbar-input-cont {
+		lines: 1;
+		text-overflow: ellipsis;
+	}
+</style>
