@@ -4,7 +4,7 @@
 		<div class="searchbar-input-div" @click="openLocation">
 			<text class="searchbar-input-cont">{{ location }}</text>
 		</div>
-		<image class="" src="/static/images/demo/cate_01.png" mode="widthFix" @click="openLocation" style="width: 80px;height: 80px;margin: 10px;"></image>                  
+		<image class="searchbar-icon" src="/static/images/demo/cate_01.png" mode="widthFix" @click="openLocation"></image>                  
 	</div>
 </template>
 
@@ -63,5 +63,10 @@
 	.searchbar-input-cont {
 		lines: 1;
 		text-overflow: ellipsis;
+	}
+	.searchbar-icon {
+		width: 80px;
+		height: 80px;
+		margin: 10px 0 0 10px;
 	}
 </style>

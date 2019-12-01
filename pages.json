@@ -427,6 +427,15 @@
 				}
 			}
         }
+        ,{
+            "path" : "pages/video-demo/video-demo",
+            "style" : {
+				"navigationBarTitleText": "视频",
+				"app-plus": {
+					"scrollIndicator": "none"
+				}
+			}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
