@@ -112,7 +112,8 @@
 		},
 		computed: {
 			...mapState({
-				tempOrder: state => state.order.tempOrder
+				tempOrder: state => state.order.tempOrder,
+				selectedList: state => state.cart.selectedList
 			}),
 			...mapGetters(['defaultPath', 'getPathById'])
 		},
@@ -198,8 +199,11 @@
 				this.order.pay_price = this.order.total_price + this.order.freight - this.order.coupon_id
 				
 				this.doCreateOrder(this.order)
-				// 下订单后 删除进入订单的商品(即选中的商品)
-				this.doDelGoods(false)
+				// 正式生成订单后 删除进入订单的商品(即选中的商品)
+				let ids = this.selectedList.join(',')
+				this.$api.post('/cart/delete', {shop_ids: ids}, {token: true, toast: false}).then(res => {
+					this.doDelGoods(false)
+				})
 				
 				uni.redirectTo({
 					url: "/pages/pay-methods/pay-methods?orderid=" + this.order.id

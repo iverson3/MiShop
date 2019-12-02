@@ -24,9 +24,10 @@
 								"color":"#989898",
 								"colorPressed":"#FD6801",
 								"float":"left",
-								"fontSize":"22px",
-								"fontSrc":"/static/font/iconfont.ttf",
-								"text": "\ue67a"  // 图标的Unicode (消息图标)
+								"fontSize":"14px",
+								// "fontSrc":"/static/font/iconfont.ttf",
+								// "text": "\ue67a"  // 图标的Unicode (消息图标)
+								"text":"北京"
 							},
 							{
 								"color":"#989898",
@@ -433,6 +434,30 @@
 				"navigationBarTitleText": "视频",
 				"app-plus": {
 					"scrollIndicator": "none"
+				}
+			}
+        }
+        ,{
+            "path" : "pages/choose-city/choose-city",
+            "style" : {
+				// 配置编译到 App 平台时的特定样式
+				"app-plus": {
+				    // 不显示滚动条
+					// "scrollIndicator":"none",
+					// 关闭回弹效果
+					"bounce":"none",
+					// app顶部导航栏自定义设置
+					"titleNView": {
+						// 搜索框
+						"searchInput": {
+							"align":"left",
+							"backgroundColor":"#F7F7F7",
+							"borderRadius":"4px",
+							"disabled":"true",
+							"placeholder":"输入城市名进行搜索",
+							"placeholderColor":"#CCCCCC"
+						}
+					}
 				}
 			}
         }

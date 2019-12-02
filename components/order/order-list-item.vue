@@ -9,7 +9,7 @@
 				<text class="font-md text-light-muted ml-auto">￥{{ goods.pprice }}</text>
 			</view>
 			<view class="d-flex a-center">
-				<text class="font text-light-muted">{{ goods.attrs }}</text>
+				<text class="font text-light-muted">{{ goods.skus_type === 1 ? goods.skusText : "" }}</text>
 				<text class="font text-light-muted ml-auto">x {{ goods.num }}</text>
 			</view>
 		</view>

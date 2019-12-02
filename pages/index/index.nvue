@@ -173,6 +173,40 @@
 				console.log('index show')
 			})
 			
+			
+			uni.getLocation({
+				geocode: true,
+				success: res => {
+					let city = res.address.city
+					let i = city.indexOf('市')
+					if (i !== -1) {
+						city = city.replace("市", "")
+					}
+					let len = city.length
+					// 修改buttons
+					// index: 按钮索引, style {WebviewTitleNViewButtonStyles }  
+					currentWebview.setTitleNViewButtonStyle(0, {
+					    text: city,
+						select: true,  // 是否显示选择指示图标
+						width: 16 * len + "px", // 按钮的宽度 默认44px
+						// badgeText: '测试信' // 文字角标
+						// redDot: true   // 按钮上是否显示红点
+					})
+				},
+				fail: () => {
+					uni.showToast({title: '获取定位失败', icon: 'none'});
+				}
+			})
+			
+			uni.$on('updateIndexCity', (data) => {
+				let len = data.length
+				currentWebview.setTitleNViewButtonStyle(0, {
+				    text: data,
+					select: true,
+					width: 16 * len + "px",
+				})
+			})
+			
 			// 监听导航栏searchinput搜索框点击事件
 			uni.onNavigationBarSearchInputClicked(e => {
 				uni.navigateTo({
@@ -184,11 +218,22 @@
 			uni.onNavigationBarButtonTap(e => {
 				console.log(e)
 				if (e.index === 0) {
+					uni.navigateTo({
+						url: '/pages/choose-city/choose-city'
+					})
+					// uni.chooseLocation({
+					// 	success: (res) => {
+					// 		// 获取不到城市信息
+					// 		console.log(res);
+					// 	}
+					// })
+					
 					// 需要验证用户权限的跳转使用 this.navigateTo()  
 					// 不需要验证用户权限的跳转使用 uni.navigateTo()
-					this.navigateTo({
-						url: "/pages/msg-list/msg-list"
-					})
+					// nvue页面中使用不了这个 this.navigateTo()  
+					// uni.navigateTo({
+					// 	url: "/pages/msg-list/msg-list"
+					// })
 				} else {
 					// 扫一扫
 				}

@@ -325,28 +325,38 @@
 				if (!this.someChecked) {
 					return uni.showToast({title: '请先选择商品', icon: 'none'});
 				}
-				let collectList = uni.getStorageSync('collectList')
-				collectList = collectList? JSON.parse(collectList) : []				
-				let collectDetailList = uni.getStorageSync('collectDetailList')
-				collectDetailList = collectDetailList? JSON.parse(collectDetailList) : []
-				
-				this.selectedInfoList.forEach(goods => {
-					// 该商品已经在收藏夹里面的情况下 则更新到收藏夹列表的最前面
-					if (this.isCollected(collectList, goods.id)) {
-						// 先找到该商品并删除
-						let index = collectList.indexOf(goods.id)
-						collectList.splice(index, 1)
-						collectDetailList.splice(index, 1)
-					}
-					// 不管是否已经在收藏夹中 都要加入收藏夹最前面
-					collectList.unshift(goods.id)
-					collectDetailList.unshift(goods)
+				// 先请求服务端删除对应的商品
+				let ids = this.selectedList.join(',')
+				this.$api.post('/cart/delete', {shop_ids: ids}, {token: true, toast: false}).then(res => {
+					// 将商品加入到收藏夹中
+					let collectList = uni.getStorageSync('collectList')
+					collectList = collectList? JSON.parse(collectList) : []				
+					let collectDetailList = uni.getStorageSync('collectDetailList')
+					collectDetailList = collectDetailList? JSON.parse(collectDetailList) : []
+					
+					this.selectedInfoList.forEach(goods => {
+						// 该商品已经在收藏夹里面的情况下 则更新到收藏夹列表的最前面
+						if (this.isCollected(collectList, goods.id)) {
+							// 先找到该商品并删除
+							let index = collectList.indexOf(goods.id)
+							collectList.splice(index, 1)
+							collectDetailList.splice(index, 1)
+						}
+						// 购物车商品数据中没有商品描述信息，暂时这样写
+						goods.desc = "酒店格调，简约品味/双雕方空，繁艺简呈/新疆纯棉，百支醇密";
+						// 不管是否已经在收藏夹中 都要加入收藏夹最前面
+						collectList.unshift(goods.id)
+						collectDetailList.unshift(goods)
+					})
+					uni.setStorageSync('collectList', JSON.stringify(collectList))
+					uni.setStorageSync('collectDetailList', JSON.stringify(collectDetailList))
+					
+					// 最后再从购物车中删除这些商品
+					this.doDelGoods(false)
+					uni.showToast({title: '成功移入收藏夹', icon: 'none'});
+				}).catch(err => {
+					uni.showToast({title: '操作失败，请重试', icon: 'none'});
 				})
-				uni.setStorageSync('collectList', JSON.stringify(collectList))
-				uni.setStorageSync('collectDetailList', JSON.stringify(collectDetailList))
-				// 最后再从购物车中删除这些商品
-				this.doDelGoods(false)
-				uni.showToast({title: '成功移入收藏夹', icon: 'none'});
 			},
 			// 判断当前商品id是否在收藏记录里面
 			isCollected: function(collectList, goods_id) {
@@ -400,26 +410,17 @@
 				}
 				// 不可以直接修改getter字段
 				let selectedList = JSON.parse(JSON.stringify(this.selectedInfoList))
+				let sum = 0
 				// 处理商品信息中的字段
 				selectedList.forEach(goods => {
 					// 删除订单中不需要的商品字段
 					delete goods.checked
 					delete goods.minnum
 					delete goods.maxnum
-					// 处理商品属性字段
-					let attrs = ""
-					goods.attrs.forEach(v => {
-						attrs = (attrs === "")? v.list[v.selected].name : (attrs + " " + v.list[v.selected].name)
-					})
-					goods.attrs = attrs
+					// 计算总的商品数
+					sum = sum + goods.num
 				})
 				data.order_items = selectedList
-				
-				// 计算总的商品数
-				let sum = 0
-				data.order_items.forEach(v => {
-					sum = sum + v.num
-				})
 				data.total_num = sum
 				data.total_price = this.totalPrice
 				// 判断是否有默认收货地址
