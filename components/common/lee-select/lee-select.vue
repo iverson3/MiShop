@@ -1,17 +1,18 @@
 <template>
 	<view class="select-page">
-		<scroll-view class="scroll-list-panel" scroll-y :scroll-top="scrollTop" :scroll-with-animation="true" @scroll="myScroll">
-			<base-classes v-for="(item, index) in quickPanelData" :classesAttr="item" :key="index" @chooseItem="chooseItem"></base-classes>
+		<scroll-view class="scroll-list-panel" scroll-y :scroll-top="1" :scroll-into-view="scrollViewId" :scroll-with-animation="true" @scroll="myScroll">
+			<slot></slot>
+			<!-- <base-classes v-for="(item, index) in quickPanelData" :classesAttr="item" :key="index" @chooseItem="chooseItem"></base-classes> -->
 			<view class="main-wrap">
-					<view class="sort-wrap" v-for="(sort,index1) in listData" :key="index1" :id="'view'+ index" :style="{backgroundColor:getListAttrListBackgroundColor}">
-						<view class="title" :style="{fontSize:getListAttrTitleFontSize,color:getListAttrTitleColor,height:getListAttrTitleHeight,background:getListAttrTitleBackground,paddingLeft:getListAttrTitlePadding}">{{sort.initial}}</view>
-						<view class="list">
-							<text v-for="(city, index2) in sort.list" :key="index2" :style="{height:getListAttrItemHeight, lineHeight:getListAttrItemHeight,  fontSize:getListAttrItemFontSize,borderBottom:getListAttrItemBorderBottom,margin:getListAttrItemMargin,color:getListAttrItemColor,background:getListAttrItemBackgroundColor}" @click="chooseItem(city.name)">{{city.name}}</text>
-						</view>
+				<view class="sort-wrap" v-for="(sort,index1) in listData" :key="index1" :id="'view' + index1" :style="{backgroundColor:getListAttrListBackgroundColor}">
+					<view class="title" :style="{fontSize:getListAttrTitleFontSize,color:getListAttrTitleColor,height:getListAttrTitleHeight,background:getListAttrTitleBackground,paddingLeft:getListAttrTitlePadding}">{{sort.initial}}</view>
+					<view class="list">
+						<text v-for="(city, index2) in sort.list" :key="index2" :style="{height:getListAttrItemHeight, lineHeight:getListAttrItemHeight,  fontSize:getListAttrItemFontSize,borderBottom:getListAttrItemBorderBottom,margin:getListAttrItemMargin,color:getListAttrItemColor,background:getListAttrItemBackgroundColor}" @click="chooseItem(city.name)">{{city.name}}</text>
 					</view>
+				</view>
 			</view>
 		</scroll-view>
-		<view v-if="getNavData.length > 0" class="now-sort" :style="{fontSize:getListAttrTitleFontSize,color:getListAttrTitleColor,height:getListAttrTitleHeight,background:getListAttrTitleBackground,paddingLeft:getListAttrTitlePadding}">{{getNavData[activeIndex]}}</view>
+		<!-- <view v-if="getNavData.length > 0" class="now-sort" :style="{fontSize:getListAttrTitleFontSize,color:getListAttrTitleColor,height:getListAttrTitleHeight,background:getListAttrTitleBackground,paddingLeft:getListAttrTitlePadding}">{{getNavData[activeIndex]}}</view> -->
 		<view :class="['now-letter', fadeFlag?'fadeIn':'']">{{getNavData[activeIndex]}}</view>
 		<view class="letter-nav" v-if="getNavAttrEnable" :style="{backgroundColor:getNavAttrbackgroundColor,padding:getNavAttrPadding,borderRadius:getNavAttrBorderRadius}">
 			<text :class="['item',index === activeIndex ? 'active': '']" v-for="(item,index) in getNavData" :key="index"
@@ -31,6 +32,8 @@
 				index:"",
 				scrollTop: 0,
 				oldScrollTop: 0,
+				
+				scrollViewId: 'view0',
 				
 				disArray: [0],
 				activeIndex: 0,
@@ -67,10 +70,10 @@
 		computed:{
 			getNavData() {
 				let navData = [];
-				this.quickPanelData.forEach((item,index) => {
-					const navItem = item.navName || item.title || '标题'
-					navData.push(navItem)
-				})
+				// this.quickPanelData.forEach((item,index) => {
+				// 	const navItem = item.navName || item.title || '标题'
+				// 	navData.push(navItem)
+				// })
 				this.listData.forEach((item,index) => {
 					navData.push(item.initial)
 				})
@@ -143,15 +146,15 @@
 				 return uni.upx2px(this.navAttr.borderRadius || 100) + 'px'
 			 },
 			 getNavAttrPadding() {
-				  if (this.navAttr.itemPadding) {
-				 					let temp = ''
-				 					 const arr = this.navAttr.padding.split(' ')
-				 					 arr.forEach((item,index)=> {
-				 						 temp += uni.upx2px(item) + 'px' + ' '
-				 					 })
-				 					 return temp
+				if (this.navAttr.itemPadding) {
+					let temp = ''
+					 const arr = this.navAttr.padding.split(' ')
+					 arr.forEach((item,index)=> {
+						 temp += uni.upx2px(item) + 'px' + ' '
+					 })
+					 return temp
 				 } else {
-				 					 return uni.upx2px(0) + 'px' + ' ' + uni.upx2px(0) + 'px'
+				 	return uni.upx2px(0) + 'px' + ' ' + uni.upx2px(0) + 'px'
 				 }
 			 }
 		},
@@ -161,14 +164,15 @@
 		methods: {
 			scrollSelect(index) {
 				clearTimeout(this.Timer)
+				this.scrollViewId = 'view' + index
 				
-				this.scrollTop = this.oldScrollTop
-				this.$nextTick(function(){
-					this.scrollTop = this.disArray[index]
-					console.log(this.scrollTop)
-				})
-				// this.scrollTop = this.disArray[index]
-				console.log(this.scrollTop)
+				// this.scrollTop = this.oldScrollTop
+				// this.$nextTick(function(){
+				// 	this.scrollTop = this.disArray[index]
+				// 	console.log(this.scrollTop)
+				// })
+				// // this.scrollTop = this.disArray[index]
+				// console.log(this.scrollTop)
 				
 				this.activeIndex = index
 				this.fadeFlag = true
@@ -177,8 +181,8 @@
 				}, 1000)
 			},
 			myScroll(e) {
-				this.oldScrollTop = e.detail.scrollTop
-				console.log(e)
+				// this.oldScrollTop = e.detail.scrollTop
+				// console.log(e)
 				const length = this.disArray.length
 				for (let i = 0; i < length; i++) {
 					if (this.disArray[i] < e.detail.scrollTop && this.disArray[i + 1] > e.detail.scrollTop) {
@@ -213,7 +217,7 @@
 		width: 100%;
 		box-sizing: border-box;
 		position: relative;
-		height:100%;
+		height: 100%;
 			.scroll-list-panel {
 				height:inherit;
 				.title {

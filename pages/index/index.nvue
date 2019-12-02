@@ -244,6 +244,7 @@
 		beforeDestroy: function() {
 			// 移除监听的事件
 			currentWebview.removeEventListener('show', e=>{})
+			uni.$off('updateIndexCity')
 		},
 		
 		methods: {

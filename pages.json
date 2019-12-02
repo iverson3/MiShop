@@ -443,7 +443,7 @@
 				// 配置编译到 App 平台时的特定样式
 				"app-plus": {
 				    // 不显示滚动条
-					// "scrollIndicator":"none",
+					"scrollIndicator":"none",
 					// 关闭回弹效果
 					"bounce":"none",
 					// app顶部导航栏自定义设置
