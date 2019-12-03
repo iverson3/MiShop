@@ -3,8 +3,8 @@
 		<!-- #ifdef MP -->
 		<!-- 顶部的自定义导航栏 -->
 		<view class="w-100 d-flex a-center" style="height: 90upx;">
-			<view style="width: 85upx;" class="d-flex a-center j-center" @click="openMessage">
-				<text class="iconfont icon-xiaoxi"></text>
+			<view :style="'width:'+cityWidth+';'" class="d-flex a-center j-center px-1" @click="openMessage">
+				{{ curCity }}<text class="iconfont icon-bottom"></text>
 			</view>
 			<view class="flex-1 bg-light rounded d-flex a-center text-light-muted" 
 			@click="openSearch"
@@ -119,11 +119,20 @@
 		},
 		data() {
 			return {
+				curCity: "北京",
+				
 				scrollinto: "",
 				scrollH: 500,
 				tabIndex: 0,
 				tabBars: [],
 				newsitems: []
+			}
+		},
+		computed: {
+			cityWidth() {
+				let len = this.curCity.length
+				len = len * 30 + 10
+				return len + 'upx'
 			}
 		},
 		onLoad() {
@@ -143,6 +152,33 @@
 			})
 			// 初始化事件
 			this.__init()
+			
+			// 页面创建后 获取用户定位信息
+			uni.getLocation({
+				geocode: true,
+				success: res => {
+					if (res.address && res.address.city) {
+						let city = res.address.city
+						// 去除城市名中的最后一个"市"字
+						let i = city.indexOf('市')
+						if (i !== -1 && i === city.length - 1) city = city.replace("市", "")
+						this.curCity = city
+					} else {
+						uni.showToast({title: '获取定位失败', icon: 'none'});
+					}
+				},
+				fail: () => {
+					uni.showToast({title: '获取定位失败', icon: 'none'});
+				}
+			})
+			
+			//  监听City的改变事件
+			uni.$on('updateIndexCity', (data) => {
+				this.curCity = data
+			})
+		},
+		onUnload: function() {
+			uni.$off('updateIndexCity')
 		},
 		methods: {
 			async __init() {
@@ -242,11 +278,15 @@
 				})
 			},
 			openMessage: function() {
+				uni.navigateTo({
+					url: "/pages/choose-city/choose-city"
+				})
+				
 				// 需要验证用户权限的跳转使用 this.navigateTo()
 				// 不需要验证用户权限的跳转使用 uni.navigateTo()
-				this.navigateTo({
-					url: "/pages/msg-list/msg-list"
-				})
+				// this.navigateTo({
+				// 	url: "/pages/msg-list/msg-list"
+				// })
 			}
 		}
 	}

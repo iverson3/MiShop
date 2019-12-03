@@ -1,6 +1,6 @@
 <template>
 	<view class="select-page">
-		<scroll-view class="scroll-list-panel" scroll-y :scroll-top="1" :scroll-into-view="scrollViewId" :scroll-with-animation="true" @scroll="myScroll">
+		<scroll-view class="scroll-list-panel" scroll-y :scroll-top="1" :scroll-into-view="scrollViewId" :scroll-with-animation="true" :enable-back-to-top="true" @scroll="myScroll">
 			<slot></slot>
 			<!-- <base-classes v-for="(item, index) in quickPanelData" :classesAttr="item" :key="index" @chooseItem="chooseItem"></base-classes> -->
 			<view class="main-wrap">

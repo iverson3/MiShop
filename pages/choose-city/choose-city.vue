@@ -6,7 +6,7 @@
 			<view class="w-100 d-flex a-center border-bottom border-secondary py-2">
 				<view class="iconfont icon-dingwei font-md pl-2"></view>
 				<view class="font-md text-light-muted mr-2">当前定位城市</view>
-				<view class="font-md main-text-color font-weight">{{ curCity }}</view>
+				<view class="font-md main-text-color font-weight" @tap="chooseItem(curCity)">{{ curCity }}</view>
 				<view class="ml-auto text-primary pr-3" @tap="fetchLocation">重新定位</view>
 			</view>
 			
@@ -69,10 +69,10 @@
 				
 				listData: city,
 				navAttr: {
-					activeColor: "#FF0000",
-					backgroundColor: "rgba(0, 0, 0, 0)",
+					activeColor: "#FD6801",
+					backgroundColor: "rgba(0, 0, 0, 0.2)",
 					itemPadding: "3 0",
-					padding: "0 15 0 0"
+					padding: "0 10 0 10"
 				}
 			}
 		},
@@ -86,21 +86,29 @@
 				uni.getLocation({
 					geocode: true,
 					success: (res) => {
-						this.curCity = res.address.city
 						uni.hideLoading()
+						if (res.address && res.address.city) {
+							this.curCity = res.address.city
+						} else {
+							this.curCity = "定位失败"
+							uni.showToast({title: '获取定位失败', icon: 'none'});
+						}
 					},
 					fail: () => {
-						this.curCity = "定位失败"
 						uni.hideLoading()
+						this.curCity = "定位失败"
 						uni.showToast({title: '获取定位失败', icon: 'none'});
 					}
 				})
 			},
 			itemClickedHandler: function(item) {
-				uni.$emit('updateIndexCity', item.name)
-				uni.navigateBack({delta: 1})
+				this.chooseItem(item.name)
 			},
 			chooseItem: function(name) {
+				// 去除城市名中的最后一个"市"字
+				let i = name.indexOf('市')
+				if (i !== -1 && i === name.length - 1) name = name.replace("市", "")
+				// 通知首页更新city信息
 				uni.$emit('updateIndexCity', name)
 				uni.navigateBack({delta: 1})
 			}

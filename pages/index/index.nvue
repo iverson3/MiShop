@@ -173,31 +173,35 @@
 				console.log('index show')
 			})
 			
-			
+			// 页面创建后 获取用户定位信息
 			uni.getLocation({
 				geocode: true,
 				success: res => {
-					let city = res.address.city
-					let i = city.indexOf('市')
-					if (i !== -1) {
-						city = city.replace("市", "")
+					if (res.address && res.address.city) {
+						let city = res.address.city
+						// 去除城市名中的最后一个"市"字
+						let i = city.indexOf('市')
+						if (i !== -1 && i === city.length - 1) city = city.replace("市", "")
+						let len = city.length
+						// 修改buttons
+						// index: 按钮索引, style {WebviewTitleNViewButtonStyles }  
+						currentWebview.setTitleNViewButtonStyle(0, {
+						    text: city,
+							select: true,  // 是否显示选择指示图标
+							width: 16 * len + "px", // 按钮的宽度 默认44px
+							// badgeText: '测试信' // 文字角标
+							// redDot: true   // 按钮上是否显示红点
+						})
+					} else {
+						uni.showToast({title: '获取定位失败', icon: 'none'});
 					}
-					let len = city.length
-					// 修改buttons
-					// index: 按钮索引, style {WebviewTitleNViewButtonStyles }  
-					currentWebview.setTitleNViewButtonStyle(0, {
-					    text: city,
-						select: true,  // 是否显示选择指示图标
-						width: 16 * len + "px", // 按钮的宽度 默认44px
-						// badgeText: '测试信' // 文字角标
-						// redDot: true   // 按钮上是否显示红点
-					})
 				},
 				fail: () => {
 					uni.showToast({title: '获取定位失败', icon: 'none'});
 				}
 			})
 			
+			//  监听City的改变事件
 			uni.$on('updateIndexCity', (data) => {
 				let len = data.length
 				currentWebview.setTitleNViewButtonStyle(0, {
