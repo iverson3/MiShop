@@ -103,11 +103,47 @@
 				userInfo: state => state.user.userInfo
 			})
 		},
-		onLoad: function() {
+		// 分享
+		onShareAppMessage: function(e) {
+			console.log(e);
+			return {
+				title: "miShop用户个人页面",
+				content: "miShop xxx用户个人中心页面",
+				path: "/pages/my/my?screen=" + 333,
+				imageUrl: "/static/images/demo/demo6.jpg",
+				success: () => {
+					console.log('Share success');
+				},
+				fail: () => {
+					console.log('Share fail');
+				}
+			}
+		},
+		onLoad: function(e) {
 			// 在H5(浏览器)平台下 因为没有原生控件这个概念，所以H5平台上的底部tabBar是uni-app用div构建模拟出来的
 			// 所以在使用fixed绝对定位时，要考虑底部tabBar所占的50px的高度 (App和小程序平台下没有这个问题)
 			// #ifdef H5
 			this.bottomHeight = 100
+			// #endif
+			
+			// 如果有自定义的screen参数 则表示是来自于分享
+			if (e.screen) {
+				uni.showToast({
+					title: "分享场景值：" + e.screen,
+					icon: 'none'
+				});
+			}
+			
+			// 如果是微信小程序平台 则提供分享按钮让用户进行分享操作
+			// #ifdef MP-WEIXIN
+			uni.showShareMenu({
+				title: "share-title333",
+				content: "share-content333",
+				path: "/pages/my/my",
+				success: () => {
+					console.log('showShareMenu success');
+				}
+			})
 			// #endif
 		},
 		methods: {

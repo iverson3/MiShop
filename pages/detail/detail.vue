@@ -287,10 +287,36 @@
 			}
 			return false  // 让页面正常返回
 		},
+		// 分享
+		onShareAppMessage: function(e) {
+			console.log(e);
+			return {
+				title: "share-title22",
+				content: "share-content22",
+				path: "/pages/detail/detail?goods_id=" + this.detail.id,
+				imageUrl: this.banners[0].src,
+				success: () => {
+					console.log('Share success');
+				},
+				fail: () => {
+					console.log('Share fail');
+				}
+			}
+		},
 		onLoad: function(e) {
 			if (e.goods_id) {
 				this.__init(e.goods_id)
 			}
+			// #ifdef MP-WEIXIN
+			uni.showShareMenu({
+				title: "share-title",
+				content: "share-content",
+				path: "/pages/detail/detail",
+				success: () => {
+					console.log('showShareMenu success');
+				}
+			})
+			// #endif
 		},
 		methods: {
 			...mapMutations(['addGoodsToCart']),

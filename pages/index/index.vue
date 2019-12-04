@@ -109,6 +109,9 @@
 	import card from '@/components/common/card.vue'
 	import commonList from '@/components/common/common-list.vue'
 	
+	// 引入高德小程序 SDK
+	import amap from '@/common/sdk/amap-wx.js';  
+	
 	export default {
 		components: {
 			swiperImage,
@@ -120,6 +123,8 @@
 		data() {
 			return {
 				curCity: "北京",
+				amapPlugin: null,
+				key: '491c191af4077a2a85ab24b56444a194',
 				
 				scrollinto: "",
 				scrollH: 500,
@@ -153,24 +158,38 @@
 			// 初始化事件
 			this.__init()
 			
-			// 页面创建后 获取用户定位信息
-			uni.getLocation({
-				geocode: true,
-				success: res => {
-					if (res.address && res.address.city) {
-						let city = res.address.city
-						// 去除城市名中的最后一个"市"字
-						let i = city.indexOf('市')
-						if (i !== -1 && i === city.length - 1) city = city.replace("市", "")
-						this.curCity = city
-					} else {
-						uni.showToast({title: '获取定位失败', icon: 'none'});
-					}
+			// 初始化一个高德小程序SDK的实例对象
+			this.amapPlugin = new amap.AMapWX({
+				key: this.key
+			});
+			
+			// #ifdef MP-WEIXIN
+			uni.authorize({
+			    scope: 'scope.userLocation',
+			    success: (e) => {
+					// 调用高德地图SDK提供的api 获取用户当前定位信息
+					this.amapPlugin.getRegeo({
+						success: (data) => {
+							if (data[0].regeocodeData && data[0].regeocodeData.addressComponent && data[0].regeocodeData.addressComponent.city) {
+								let city = data[0].regeocodeData.addressComponent.city
+								// 去除城市名中的最后一个"市"字
+								let i = city.indexOf('市')
+								if (i !== -1 && i === city.length - 1) city = city.replace("市", "")
+								this.curCity = city
+							} else {
+								uni.showToast({title: '获取定位失败', icon: 'none'});
+							}
+						},
+						fail: () => {
+							uni.showToast({title: '获取定位失败', icon: 'none'});
+						}
+					});  
 				},
-				fail: () => {
-					uni.showToast({title: '获取定位失败', icon: 'none'});
+				fail: (e1) => {
+					console.log(e1);
 				}
 			})
+			// #endif
 			
 			//  监听City的改变事件
 			uni.$on('updateIndexCity', (data) => {
