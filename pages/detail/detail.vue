@@ -287,12 +287,42 @@
 			}
 			return false  // 让页面正常返回
 		},
+		onNavigationBarButtonTap: function(e) {
+			if (e.index === 0) {
+				// #ifdef APP-PLUS
+				// 分享为小程序类型
+				let shareInfo = {
+					type: 'miniProgram',
+					title: this.detail.title,
+					content: this.detail.desc,
+					thumbs: this.banners[0].src,  // 图片小于128K，宽高比为5:4
+					miniProgram: {  // 小程序参数
+						id: 'gh_ee9e6cbf2fb9', // 微信小程序的原始ID
+						path: "/pages/detail/detail?goods_id=" + this.detail.id, // 微信小程序打开的页面路径
+						type: 2, // 微信小程序版本类型 0-正式版； 1-测试版； 2-体验版
+						webUrl: "/pages/detail/detail?goods_id=" + this.detail.id
+					}
+				}
+				// 分享为网页类型
+				shareInfo = {
+					type: 'web',
+					content: this.detail.title,
+					href: "http://ukuhub.com"
+				}
+				plus.share.sendWithSystem(shareInfo, function(){
+					uni.showToast({title: '分享成功', icon: "success"});
+				}, function(e){
+					uni.showToast({title: '分享失败', icon: 'none'});
+				});
+				// #endif
+			}
+		},
 		// 分享
 		onShareAppMessage: function(e) {
 			console.log(e);
 			return {
-				title: "share-title22",
-				content: "share-content22",
+				title: this.detail.title,
+				content: this.detail.desc,
 				path: "/pages/detail/detail?goods_id=" + this.detail.id,
 				imageUrl: this.banners[0].src,
 				success: () => {

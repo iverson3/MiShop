@@ -134,13 +134,14 @@
 							this.curCity = res.address.city
 						} else {
 							this.curCity = "定位失败"
-							uni.showToast({title: '获取定位失败', icon: 'none'});
+							uni.showToast({title: res.latitude, icon: 'none'});
 						}
 					},
 					fail: (err) => {
 						console.log(err)
 						uni.hideLoading()
-						this.curCity = "定位失败"
+						// this.curCity = "定位失败"
+						this.curCity = JSON.stringify(err)
 						uni.showToast({title: '获取定位失败', icon: 'none'});
 					}
 				})
