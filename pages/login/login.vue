@@ -79,7 +79,7 @@
 			
 		},
 		methods: {
-			...mapMutations(['login', 'initCartData', 'initOrderData']),
+			...mapMutations(['login', 'initOrderData']),
 			...mapActions(['fetchPathData']),
 			
 			clickLeft: function() {
@@ -125,7 +125,6 @@
 					console.log(res);
 					this.login(res)
 					// 登录成功之后初始化购物车数据、订单数据、收货地址数据
-					// this.initCartData()
 					this.initOrderData()
 					this.fetchPathData()
 					// 通知购物车进行更新

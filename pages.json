@@ -461,6 +461,12 @@
 				}
 			}
         }
+        ,{
+            "path" : "pages/coupon/coupon",
+            "style" : {
+				"navigationBarTitleText":"领取优惠券"
+			}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

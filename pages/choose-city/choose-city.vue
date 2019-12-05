@@ -26,7 +26,7 @@
 		</lee-select>
 	</view>
 </template>
-
+		
 <script>
 	import card from '@/components/common/card.vue';
 	import miRadioGroup from '@/components/common/mi-radio-group.vue'
@@ -85,7 +85,7 @@
 			// 初始化一个高德小程序SDK的实例对象
 			this.amapPlugin = new amap.AMapWX({  
 				key: this.key  
-			});  
+			});
 		},
 		created: function() {
 			this.fetchLocation()
@@ -124,7 +124,61 @@
 				})
 				// #endif
 				
-				// #ifdef APP-PLUS || H5
+				// #ifdef H5
+				// h5端的获取定位信息 还有待研究实现方法
+				uni.showLoading({title: "获取定位中...", mask: true})
+				this.curCity = "定位中..."
+				uni.getLocation({
+					type: 'gcj02',
+					success: (res) => {
+						let key = '34a0ab9ac57a9933090da49650e0b35f'
+						let location = res.longitude + ',' + res.latitude
+						let url = 'https://restapi.amap.com/v3/geocode/regeo?key='+ key +'&location=' + location
+						uni.request({
+							url: url,  
+							method: "get",  
+							dataType:"json",      
+							header: {  
+								'content-type': 'application/x-www-form-urlencoded'
+							},  
+							success: (res) => {  
+								uni.hideLoading()
+								let data = res.data;  
+								console.log(data);  
+								if (data.status && data.status == 1) {  
+									// 获取地址信息中的city字段                 
+									this.curCity = data.regeocodes.addressComponent.city
+								} else {
+									this.curCity = "定位失败"
+									uni.showToast({title: '获取地址失败', icon: 'none'});
+								}
+							},
+							fail: (res) => {
+								console.log(res);
+								uni.hideLoading()
+								this.curCity = "定位失败"
+								uni.showToast({title: '获取地址失败', icon: 'none'});
+							}  
+						})  
+					},
+					fail: (err) => {
+						console.log(err);
+						uni.hideLoading()
+						this.curCity = "定位失败"
+						uni.showToast({title: '获取定位失败', icon: 'none'});
+					}
+				})
+
+						
+				// uni.showToast({
+				// 	title: 'h5端暂不支持获取城市',
+				// 	icon: 'none'
+				// });
+				// #endif
+				
+				// #ifdef APP-PLUS
+				uni.showLoading({title: "获取定位中...", mask: true})
+				this.curCity = "定位中..."
 				uni.getLocation({
 					geocode: true,
 					success: (res) => {
@@ -134,14 +188,13 @@
 							this.curCity = res.address.city
 						} else {
 							this.curCity = "定位失败"
-							uni.showToast({title: res.latitude, icon: 'none'});
+							uni.showToast({title: '获取定位失败', icon: 'none'});
 						}
 					},
 					fail: (err) => {
 						console.log(err)
 						uni.hideLoading()
-						// this.curCity = "定位失败"
-						this.curCity = JSON.stringify(err)
+						this.curCity = "定位失败"
 						uni.showToast({title: '获取定位失败', icon: 'none'});
 					}
 				})

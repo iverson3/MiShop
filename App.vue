@@ -46,12 +46,18 @@
 			let loginStatus = uni.getStorageSync('loginStatus')
 			// let token = uni.getStorageSync('token')
 			if (loginStatus && loginStatus === true) {
-				// this.$store.commit('initCartData')
+				this.$store.dispatch('updateCartList')
 				this.$store.commit('initOrderData')
 				// dispatch action 从服务端获取收货地址数据
 				this.$store.dispatch('fetchPathData')
-				// this.$store.commit('initPathData')
 			}
+			
+			// 监听购物车更新
+			uni.$on('updateCart', () => {
+				console.log('emit updateCart');
+				this.$store.dispatch('updateCartList')
+			})
+			// uni.$off('updateCart')
 			
 			// 设置"未读的红点"
 			setTimeout(() => {

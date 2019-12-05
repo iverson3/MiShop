@@ -194,19 +194,12 @@
 			// #endif
 			
 			this.getData()
-			// 监听购物车更新
-			uni.$on('updateCart', () => {
-				console.log('emit updateCart');
-				this.getData()
-			})
 		},
 		// beforeDestroy: function() {
 		// 	console.log('cart will Destroy');
-		// 	uni.$off('updateCart')
 		// },
 		onUnload: function() {
 			console.log('cart will Unload');
-			uni.$off('updateCart')
 		},
 		onPullDownRefresh: function() {
 			this.getData()
@@ -216,26 +209,20 @@
 				'selectItem',
 				'changeEditStatus',
 				'addTempOrder',
-				'initCartList',
-				'unSelectAll',
 				
 				'numChange'
 			]),
 			...mapActions([
 				'doSelectAll',
 				'doDelGoods',
-				'doShowPopup'
+				'doShowPopup',
+				'updateCartList'
 			]),
 			
 			// 获取数据
 			getData: function() {
 				// 获取购物车数据
-				this.$api.get('/cart', {}, {token: true, toast: false}).then(res => {
-					console.log(res)
-					// 取消全选状态
-					this.unSelectAll()
-					// 初始化购物车列表数据
-					this.initCartList(res)
+				this.updateCartList().then(res => {
 					uni.stopPullDownRefresh()
 				}).catch(err => {
 					uni.stopPullDownRefresh()

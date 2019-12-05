@@ -19,6 +19,12 @@
 						<text>{{ checkedSkus }}</text>
 					</view>
 				</uni-list-item>
+				<uni-list-item @tap="gotoCoupon">
+					<view class="d-flex">
+						<text class="mr-2 text-muted">优惠券</text>
+						<text class="main-text-color">立刻领取</text>
+					</view>
+				</uni-list-item>
 				<uni-list-item @tap="showPopup('express')">
 					<view class="d-flex">
 						<text class="mr-2 text-muted">配送</text>
@@ -551,6 +557,13 @@
 			changeCurPath: function(item) {
 				this.deliveryPath = item.province +' '+ item.city +' '+ item.district
 				this.hidePopup('express')
+			},
+			
+			// 前往优惠券页面
+			gotoCoupon: function() {
+				this.navigateTo({
+					url: '/pages/coupon/coupon'
+				});
 			},
 			
 			// 详情信息中的图片预览处理

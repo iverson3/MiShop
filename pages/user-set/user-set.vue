@@ -58,9 +58,6 @@
 					this.hideCartData()
 					this.hideOrderData()
 					this.hidePathData()
-					uni.removeTabBarBadge({
-						index: 2
-					})
 					
 					uni.showToast({title: '退出登录成功', icon: 'none'});
 					setTimeout(() => {

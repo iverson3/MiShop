@@ -1,4 +1,5 @@
 import $help from '@/common/lib/helper.js'
+import $api from '@/common/lib/request.js'
 
 export default {
 	state: {
@@ -59,7 +60,7 @@ export default {
 			// 更新购物车tabbar的角标数字
 			$help.updateCartBadge(state.list.length)
 		},
-		// 初始化购物车数据
+		// 初始化购物车数据 (已弃用)
 		initCartData(state) {
 			// let cartList = uni.getStorageSync('cartList')
 			// state.list = cartList? JSON.parse(cartList) : []
@@ -67,6 +68,8 @@ export default {
 		// 用户退出登录之后隐藏购物车数据
 		hideCartData(state) {
 			state.list = []
+			state.selectedList = []
+			$help.updateCartBadge(0)
 		},
 		
 		// 商品属性弹出框中修改了任意数据
@@ -200,6 +203,21 @@ export default {
 		}
 	},
 	actions: {
+		// 获取购物车数据
+		updateCartList({state, commit}) {
+			return new Promise((res, rej) => {
+				$api.get('/cart', {}, {token: true, toast: false}).then(data => {
+					console.log(data)
+					// 取消全选状态
+					commit('unSelectAll')
+					// 初始化购物车列表数据
+					commit('initCartList', data)
+					res(data)
+				}).catch(err => {
+					rej(err)
+				})
+			})
+		},
 		// 显示弹出框
 		doShowPopup({state, commit, getters}, obj) {
 			// 只有在编辑状态下才能显示弹出框

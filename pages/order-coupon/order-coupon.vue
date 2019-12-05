@@ -49,79 +49,65 @@
 				tabBars: [
 					{
 						name:"可用",
+						page: 1,
+						key: 'valid',
+						firstLoaded: false,
 						no_thing: "no_receiving",
 						msg: "没有可用的优惠券",
-						list: [
-							{
-								title: "第三季仿微信立减100元",
-								start_time: "2019-08-12",
-								end_time: "2019-10-01",
-								price: 100,
-								desc: "满300元使用",
-								status: true,
-								disabled: false
-							},
-							{
-								title: "第三季仿微信立减100元",
-								start_time: "2019-08-12",
-								end_time: "2019-10-01",
-								price: 100,
-								desc: "满300元使用",
-								status: true,
-								disabled: true
-							},
-							{
-								title: "第三季仿微信立减100元",
-								start_time: "2019-08-12",
-								end_time: "2019-10-01",
-								price: 100,
-								desc: "满300元使用",
-								status: true,
-								disabled: true
-							}
-						]
+						list: []
 					},
 					{
 						name:"已失效",
+						page: 1,
+						key: 'invalid',
+						firstLoaded: false,
 						no_thing: "no_comment",
 						msg: "没有已失效的优惠券",
-						list: [
-							{
-								title: "第三季仿微信立减100元",
-								start_time: "2019-08-12",
-								end_time: "2019-10-01",
-								price: 100,
-								desc: "满300元使用",
-								status: false,
-								disabled: true
-							},
-							{
-								title: "第三季仿微信立减100元",
-								start_time: "2019-08-12",
-								end_time: "2019-10-01",
-								price: 100,
-								desc: "满300元使用",
-								status: false,
-								disabled: true
-							},
-							{
-								title: "第三季仿微信立减100元",
-								start_time: "2019-08-12",
-								end_time: "2019-10-01",
-								price: 100,
-								desc: "满300元使用",
-								status: false,
-								disabled: true
-							}
-						]
+						list: []
 					}
 				],
 				
 			}
 		},
+		computed: {
+			page() {
+				return this.tabBars[this.tabIndex].page
+			},
+			isValid() {
+				return this.tabBars[this.tabIndex].key
+			}
+		},
+		onLoad: function() {
+			this.getData()
+		},
 		methods: {
+			getData: function() {
+				let index = this.tabIndex
+				this.$api.get('/usercoupon/' + this.page + '/' + this.isValid, {}, {token: true, toast: false}).then(res => {
+					
+					this.tabBars[index].list = res.map(item => {
+						return {
+							id: item.id,
+							title: item.coupon.name,
+							start_time: item.coupon.start_time,
+							end_time: item.coupon.end_time,
+							price: item.coupon.value,
+							desc: item.coupon.desc,
+							status: index === 0,
+							disabled: false
+						}
+					})
+					this.tabBars[index].firstLoaded = true
+				}).catch(err => {
+					uni.showToast({title: '优惠券加载失败', icon: 'none'});
+				})
+			},
 			changeTab: function(index) {
 				this.tabIndex = index
+				// 判断是否已经首次加载过数据了
+				if (!this.tabBars[index].firstLoaded) {
+					this.getData()
+				}
 			}
 		}
 	}
