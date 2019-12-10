@@ -1,73 +1,101 @@
 <template>
 	<view>
 		
-		<!-- 商品详情大图 -->
-		<swiper-image :resdata="banners" :height="750" :preview="true"></swiper-image>
-		
-		<!-- 商品基础信息 -->
-		<base-info :detail="detail" :show-price="showPrice"></base-info>
-		
-		<!-- 滚动商品特性 -->
-		<scroll-attrs :baseAttrs="baseAttrs"></scroll-attrs>
-		
-		<!-- 属性选择 -->
-		<view class="p-2">
-			<view class="rounded border bg-light-secondary">
-				<uni-list-item v-if="detail.sku_type === 1" @tap="showPopup('attr')">
-					<view class="d-flex">
-						<text class="mr-2 text-muted">已选</text>
-						<text>{{ checkedSkus }}</text>
-					</view>
-				</uni-list-item>
-				<uni-list-item @tap="gotoCoupon">
-					<view class="d-flex">
-						<text class="mr-2 text-muted">优惠券</text>
-						<text class="main-text-color">立刻领取</text>
-					</view>
-				</uni-list-item>
-				<uni-list-item @tap="showPopup('express')">
-					<view class="d-flex">
-						<text class="mr-2 text-muted">配送</text>
-						<text class="mr-2">{{ deliveryPath? deliveryPath : defaultPathCity }}</text>
-						<text class="main-text-color">现配</text>
-					</view>
-				</uni-list-item>
-				<uni-list-item extraWidth="15%" @tap="showPopup('service')">
-					<view class="d-flex a-center">
-						<view class="text-muted font d-flex a-center mr-2">
-							<view class="iconfont icon-finish main-text-color"></view>
-							小米自营
-						</view>
-						<view class="text-muted font d-flex a-center mr-2">
-							<view class="iconfont icon-finish main-text-color"></view>
-							小米发货
-						</view>
-						<view class="text-muted font d-flex a-center mr-2">
-							<view class="iconfont icon-finish main-text-color"></view>
-							七天无理由退货
-						</view>
-					</view>
-				</uni-list-item>
-			</view>
+		<view v-if="beforeReady" class="w-100 d-flex flex-column" style="margin-top: 100upx;">
+			<mi-skeleton
+				:loading="beforeReady"
+				:showTitle="true">
+			</mi-skeleton>
+			<mi-skeleton
+				:loading="beforeReady"
+				:showTitle="true">
+			</mi-skeleton>
+			<mi-skeleton
+				:loading="beforeReady"
+				:showTitle="true">
+			</mi-skeleton>
+			<mi-skeleton
+				:loading="beforeReady"
+				:showTitle="true">
+			</mi-skeleton>
 		</view>
 		
-		<!-- 横向滚动评论 -->
-		<scroll-comments :goods_id="detail.id" :comments="comments"></scroll-comments>
-		
-		<!-- 商品详情 -->
-		<view class="py-4">
-			<u-parse className="uparse" :content="context" @preview="preview" @navigate="navigate"></u-parse>
-		</view>
-		
-		<!-- 热门推荐 -->
-		<card headTitle="热门推荐" :headTitleWeight="false" :headBorderBottom="false">
-			<view class="row j-sb">
-				<common-list v-for="(item,index) in hotList" :key="index" :item="item" :index="index"></common-list>
+		<template v-if="!beforeReady && !(detail.id)">
+			<view class="w-100 d-flex j-center a-center" style="padding-top: 300px;" @tap="reloadData">
+				<text class="font-md text-light-muted">商品信息加载失败，点击重试</text>
 			</view>
-		</card>
+		</template>
 		
-		<!-- 底部操作条 -->
-		<bottom-btn :goods_id="detail.id" :goodsInfo="goodsInfo" :hasCollect="hasCollect" @changeCollect="changeCollect" @showAttrPopup="showPopup('attr')"></bottom-btn>
+		
+		<template v-if="!beforeReady && detail.id">
+			<!-- 商品详情大图 -->
+			<swiper-image :resdata="banners" :height="750" :preview="true"></swiper-image>
+			
+			<!-- 商品基础信息 -->
+			<base-info :detail="detail" :show-price="showPrice"></base-info>
+			
+			<!-- 滚动商品特性 -->
+			<scroll-attrs :baseAttrs="baseAttrs"></scroll-attrs>
+			
+			<!-- 属性选择 -->
+			<view class="p-2">
+				<view class="rounded border bg-light-secondary">
+					<uni-list-item v-if="detail.sku_type === 1" @tap="showPopup('attr')">
+						<view class="d-flex">
+							<text class="mr-2 text-muted">已选</text>
+							<text>{{ checkedSkus }}</text>
+						</view>
+					</uni-list-item>
+					<uni-list-item @tap="gotoCoupon">
+						<view class="d-flex">
+							<text class="mr-2 text-muted">优惠券</text>
+							<text class="main-text-color">立刻领取</text>
+						</view>
+					</uni-list-item>
+					<uni-list-item @tap="showPopup('express')">
+						<view class="d-flex">
+							<text class="mr-2 text-muted">配送</text>
+							<text class="mr-2">{{ deliveryPath? deliveryPath : defaultPathCity }}</text>
+							<text class="main-text-color">现配</text>
+						</view>
+					</uni-list-item>
+					<uni-list-item extraWidth="15%" @tap="showPopup('service')">
+						<view class="d-flex a-center">
+							<view class="text-muted font d-flex a-center mr-2">
+								<view class="iconfont icon-finish main-text-color"></view>
+								小米自营
+							</view>
+							<view class="text-muted font d-flex a-center mr-2">
+								<view class="iconfont icon-finish main-text-color"></view>
+								小米发货
+							</view>
+							<view class="text-muted font d-flex a-center mr-2">
+								<view class="iconfont icon-finish main-text-color"></view>
+								七天无理由退货
+							</view>
+						</view>
+					</uni-list-item>
+				</view>
+			</view>
+			
+			<!-- 横向滚动评论 -->
+			<scroll-comments :goods_id="detail.id" :comments="comments"></scroll-comments>
+			
+			<!-- 商品详情 -->
+			<view class="py-4">
+				<u-parse className="uparse" :content="context" @preview="preview" @navigate="navigate"></u-parse>
+			</view>
+			
+			<!-- 热门推荐 -->
+			<card headTitle="热门推荐" :headTitleWeight="false" :headBorderBottom="false">
+				<view class="row j-sb">
+					<common-list v-for="(item,index) in hotList" :key="index" :item="item" :index="index"></common-list>
+				</view>
+			</card>
+			
+			<!-- 底部操作条 -->
+			<bottom-btn :goods_id="detail.id" :goodsInfo="goodsInfo" :hasCollect="hasCollect" @changeCollect="changeCollect" @showAttrPopup="showPopup('attr')"></bottom-btn>
+		</template>
 		
 		
 		<!-- 属性筛选弹出框 -->
@@ -191,6 +219,7 @@
 	import price from '@/components/common/price.vue'
 	import miRadioGroup from '@/components/common/mi-radio-group.vue'
 	import uniNumberBox from '@/components/uni-ui/uni-number-box/uni-number-box.vue'
+	import miSkeleton from '@/components/common/skeleton/mi-skeleton.vue'
 
 	import {mapState, mapMutations, mapGetters} from 'vuex'
 	export default {
@@ -207,7 +236,8 @@
 			commonPopup,
 			price,
 			miRadioGroup,
-			uniNumberBox
+			uniNumberBox,
+			miSkeleton
 		},
 		data() {
 			return {
@@ -219,6 +249,8 @@
 				// 轮播图数据
 				banners: [],
 				
+				beforeReady: true,
+				goods_id: 0,
 				detail: {},
 				context: "",
 				baseAttrs: [],
@@ -341,6 +373,8 @@
 		},
 		onLoad: function(e) {
 			if (e.goods_id) {
+				// 保存goods_id 
+				this.goods_id = e.goods_id
 				this.__init(e.goods_id)
 			}
 			// #ifdef MP-WEIXIN
@@ -357,14 +391,14 @@
 		methods: {
 			...mapMutations(['addGoodsToCart']),
 			
-			async __init(goods_id) {
-				uni.showLoading({
-					title: "商品详情加载中...",
-					mask: true
-				})
-				let res = await this.$api.get('/goods/' + goods_id)
-				uni.hideLoading()
-				if (res) {
+			reloadData: function() {
+				this.beforeReady = true
+				this.__init(this.goods_id)
+			},
+			__init(goods_id) {
+				this.$api.get('/goods/' + goods_id).then(res => {
+					this.beforeReady = false
+	
 					// 轮播图
 					this.banners = res.goodsBanner.map(v => {
 						return {
@@ -455,7 +489,9 @@
 						})
 					}
 					
-				}
+				}).catch(err => {
+					this.beforeReady = false
+				})
 			},
 			addCart: function() {
 				if (this.maxStock === 0) return;

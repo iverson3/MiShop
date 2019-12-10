@@ -1,7 +1,7 @@
 <template>
 	<view class="d-flex border-top border-light-secondary animated fadeIn faster" style="height: 100%; box-sizing: border-box;">
 		
-		<loading-plus v-if="beforeReady"></loading-plus>
+		<!-- <loading-plus v-if="beforeReady"></loading-plus> -->
 		<!-- <loading :show="showLoading"></loading> -->
 		
 		<template v-if="!beforeReady && (cate.length === 0)">
@@ -10,42 +10,67 @@
 			</view>
 		</template>
 		
-		<!-- 左边 分类列表 -->
-		<scroll-view id="leftScroll" scroll-y 
-		:scroll-top="leftScrollTop"
-		style="flex: 1;height: 100%;" 
-		class="border-right border-light-secondary">
-			<view v-for="(item,index) in cate" :key="index" 
-			@tap="changeCate(index)"
-			hover-class="bg-light-secondary"
-			class="border-bottom border-light-secondary py-1 left-scroll-item">
-				<view :class="activeIndex===index?'class-active':''" class="py-1 font-md text-muted text-center">{{ item.name }}</view>
-			</view>
-		</scroll-view>
-		
-		<!-- 右边 对应分类下的商品列表 -->
-		<scroll-view scroll-y style="flex: 3.5;height: 100%;" 
-		@scroll="onRightScroll"
-		:scroll-top="rightScrollTop" 
-		:scroll-with-animation="true">
-			<view v-for="(item,index) in list" :key="index" class="row right-scroll-item">
-				<view v-for="(item2,index2) in item.list" :key="index2" 
-				@tap="openDetail(item2.goods_id)"
-				class="span24-8 text-center py-2">
-					<image :src="item2.cover" style="width: 120upx;height: 120upx;"></image>
-					<text class="d-block">{{ item2.name }}</text>
+		<template v-if="!beforeReady">
+			<!-- 左边 分类列表 -->
+			<scroll-view id="leftScroll" scroll-y 
+			:scroll-top="leftScrollTop"
+			style="flex: 1;height: 100%;" 
+			class="border-right border-light-secondary">
+				<view v-for="(item,index) in cate" :key="index" 
+				@tap="changeCate(index)"
+				hover-class="bg-light-secondary"
+				class="border-bottom border-light-secondary py-1 left-scroll-item">
+					<view :class="activeIndex===index?'class-active':''" class="py-1 font-md text-muted text-center">{{ item.name }}</view>
 				</view>
-			</view>
-		</scroll-view>
+			</scroll-view>
+			
+			<!-- 右边 对应分类下的商品列表 -->
+			<scroll-view scroll-y style="flex: 3.5;height: 100%;" 
+			@scroll="onRightScroll"
+			:scroll-top="rightScrollTop" 
+			:scroll-with-animation="true">
+				<view v-for="(item,index) in list" :key="index" class="row right-scroll-item">
+					<view v-for="(item2,index2) in item.list" :key="index2" 
+					@tap="openDetail(item2.goods_id)"
+					class="span24-8 text-center py-2">
+						<image :src="item2.cover" style="width: 120upx;height: 120upx;"></image>
+						<text class="d-block">{{ item2.name }}</text>
+					</view>
+				</view>
+			</scroll-view>
+		</template>
+		
+		<view v-if="beforeReady" class="w-100 d-flex flex-column">
+			<mi-skeleton
+				:loading="beforeReady"
+				:showTitle="true">
+			</mi-skeleton>
+			<mi-skeleton
+				:loading="beforeReady"
+				:showTitle="true">
+			</mi-skeleton>
+			<mi-skeleton
+				:loading="beforeReady"
+				:showTitle="true">
+			</mi-skeleton>
+			<mi-skeleton
+				:loading="beforeReady"
+				:showTitle="true">
+			</mi-skeleton>
+		</view>
 		
 	</view>
 </template>
 
 <script>
 	import loading from '@/common/mixin/loading.js';
+	import miSkeleton from '@/components/common/skeleton/mi-skeleton.vue'
 	
 	export default {
 		mixins: [loading],
+		components: {
+			miSkeleton
+		},
 		data() {
 			return {
 				activeIndex: 0,

@@ -1,29 +1,52 @@
 <template>
 	<view style="height: 100%;">
-		<!-- 城市列表 -->
-		<lee-select :listData="listData" :navAttr="navAttr" @chooseItem="chooseItem">
-			
-			<view class="w-100 d-flex a-center border-bottom border-secondary py-2">
-				<view class="iconfont icon-dingwei font-md pl-2"></view>
-				<view class="font-md text-light-muted mr-2">当前定位城市</view>
-				<view class="font-md main-text-color font-weight" @tap="chooseItem(curCity)">{{ curCity }}</view>
-				<view class="ml-auto text-primary pr-3" @tap="fetchLocation">重新定位</view>
-			</view>
-			
-			<card headTitle="常用城市" :headBorderBottom="false" :headTitleWeight="false">
-				<!-- 单选按钮组 -->
-				<mi-radio-group :label="labelHistoryCity" @itemClicked="itemClickedHandler"></mi-radio-group>
-			</card>
+		
+		<view v-if="beforeReady" class="w-100 d-flex flex-column">
+			<mi-skeleton
+				:loading="beforeReady"
+				:showTitle="true">
+			</mi-skeleton>
+			<mi-skeleton
+				:loading="beforeReady"
+				:showTitle="true">
+			</mi-skeleton>
+			<mi-skeleton
+				:loading="beforeReady"
+				:showTitle="true">
+			</mi-skeleton>
+			<mi-skeleton
+				:loading="beforeReady"
+				:showTitle="true">
+			</mi-skeleton>
+		</view>
+		
+		
+		<template v-if="!beforeReady">
+			<!-- 城市列表 -->
+			<lee-select :listData="listData" :navAttr="navAttr" @chooseItem="chooseItem">
 				
-			<card headTitle="热门城市" :headBorderBottom="false" :headTitleWeight="false">
-				<!-- 单选按钮组 -->
-				<mi-radio-group :label="labelHotCity" @itemClicked="itemClickedHandler"></mi-radio-group>
-			</card>
+				<view class="w-100 d-flex a-center border-bottom border-secondary py-2">
+					<view class="iconfont icon-dingwei font-md pl-2"></view>
+					<view class="font-md text-light-muted mr-2">当前定位城市</view>
+					<view class="font-md main-text-color font-weight" @tap="chooseItem(curCity)">{{ curCity }}</view>
+					<view class="ml-auto text-primary pr-3" @tap="fetchLocation">重新定位</view>
+				</view>
 				
-			<!-- 占位 -->
-			<view class="w-100" style="height: 30upx;"></view>
-			
-		</lee-select>
+				<card headTitle="常用城市" :headBorderBottom="false" :headTitleWeight="false">
+					<!-- 单选按钮组 -->
+					<mi-radio-group :label="labelHistoryCity" @itemClicked="itemClickedHandler"></mi-radio-group>
+				</card>
+					
+				<card headTitle="热门城市" :headBorderBottom="false" :headTitleWeight="false">
+					<!-- 单选按钮组 -->
+					<mi-radio-group :label="labelHotCity" @itemClicked="itemClickedHandler"></mi-radio-group>
+				</card>
+					
+				<!-- 占位 -->
+				<view class="w-100" style="height: 30upx;"></view>
+				
+			</lee-select>
+		</template>
 	</view>
 </template>
 		
@@ -31,6 +54,8 @@
 	import card from '@/components/common/card.vue';
 	import miRadioGroup from '@/components/common/mi-radio-group.vue'
 	import leeSelect from '@/components/common/lee-select/lee-select.vue'
+	import miSkeleton from '@/components/common/skeleton/mi-skeleton.vue'
+	
 	// 城市数据
 	import city from '@/common/data/city.js'
 	// 引入高德小程序 SDK
@@ -40,10 +65,12 @@
 		components: {
 			card,
 			miRadioGroup,
-			leeSelect
+			leeSelect,
+			miSkeleton
 		},
 		data() {
 			return {
+				beforeReady: true,
 				curCity: "北京",
 				
 				labelHistoryCity: {
@@ -89,6 +116,9 @@
 		},
 		created: function() {
 			this.fetchLocation()
+			setTimeout(() => {
+				this.beforeReady = false
+			}, 2000)
 		},
 		methods: {
 			fetchLocation: function() {

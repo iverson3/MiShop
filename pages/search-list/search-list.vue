@@ -67,16 +67,35 @@
 			</view>
 		</uni-drawer>
 		
-		
 		<!-- 搜索结果列表 -->
-		<block v-for="(item,index) in list" :key="index">
+		<block v-if="list.length > 0" v-for="(item,index) in list" :key="index">
 			<search-list :item="item" :index="index"></search-list>
 		</block>
+		
+		<view v-if="searching" class="w-100 d-flex flex-column">
+			<mi-skeleton
+				:loading="searching"
+				:showTitle="true">
+			</mi-skeleton>
+			<mi-skeleton
+				:loading="searching"
+				:showTitle="true">
+			</mi-skeleton>
+			<mi-skeleton
+				:loading="searching"
+				:showTitle="true">
+			</mi-skeleton>
+			<mi-skeleton
+				:loading="searching"
+				:showTitle="true">
+			</mi-skeleton>
+		</view>
+	
 		
 		<!-- 搜索中提示 -->
 		<template v-if="searching">
 			<view class="w-100 d-flex j-center a-center" style="padding-top: 150upx;">
-				<text class="font-md text-light-muted">搜索中...</text>
+				<!-- <text class="font-md text-light-muted">搜索中...</text> -->
 			</view>
 		</template>
 		
@@ -101,6 +120,7 @@
 	import searchList from '@/components/search-list/search-list.vue'
 	import noThing from '@/components/common/no-thing.vue'
 	import uniStatusBar from '@/components/uni-ui/uni-status-bar/uni-status-bar.vue'
+	import miSkeleton from '@/components/common/skeleton/mi-skeleton.vue'
 	
 	// 三种状态显示的文字
 	const PULLLOADMORE = '上拉加载更多'
@@ -114,7 +134,8 @@
 			miRadioGroup,
 			searchList,
 			noThing,
-			uniStatusBar
+			uniStatusBar,
+			miSkeleton
 		},
 		data() {
 			return {
@@ -212,7 +233,7 @@
 			},
 			
 			// 请求接口 获取搜索结果数据
-			async getData(refresh = true, callback = false) {
+			getData(refresh = true, callback = false) {
 				if (refresh) {
 					// 如果页面需要刷新 则清空页数和已经加载的数据
 					this.page = 1
@@ -225,23 +246,24 @@
 					...this.options,
 					...this.condition
 				}
-				let res = await this.$api.post("/goods/search", paras)
-				
-				if (refresh) this.searching = false
-				if (res) {
+				this.$api.post("/goods/search", paras).then(res => {
+					if (refresh) this.searching = false
+					
 					let list = this.formatData(res)
 					this.list = [...this.list, ...list]
 					// 恢复加载状态
 					this.loadtext = list.length < 10? NOMORE : PULLLOADMORE
 					
 					if (typeof callback === 'function') callback(true)
-				} else {
+				}).catch(err => {
+					if (refresh) this.searching = false
+					
 					if (typeof callback === 'function') {
 						callback(false)
 					} else {
 						uni.showToast({title: '搜索失败，请重试', icon: 'none'});
 					}
-				}
+				})
 			},
 			formatData: function(res) {
 				return res.map(item => {

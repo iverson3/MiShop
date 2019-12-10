@@ -16,7 +16,7 @@ export default {
 	// 请求 返回Promise
 	request(options = {}, errCallback = false) {
 		// 组织参数
-		options.url = this.common.baseUrl + options.url
+		options.url =  options.url.indexOf("http") === 0 ? options.url : this.common.baseUrl + options.url
 		options.header = options.header || this.common.header
 		options.data = options.data || this.common.data
 		options.method = options.method || this.common.method

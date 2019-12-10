@@ -7,7 +7,7 @@
 			</view>
 		</template>
 		<template v-if="!initing && tabBars.length === 0">
-			<view class="w-100 j-center a-center" style="padding-top: 300px;">
+			<view class="w-100 j-center a-center" style="padding-top: 300px;" @click="reloadData">
 				<text class="font-md text-light-muted">首页初始化失败，请检查网络</text>
 			</view>
 		</template>
@@ -252,7 +252,12 @@
 		},
 		
 		methods: {
-			__init() {
+			// 重新加载首页数据
+			reloadData: function() {
+				this.initing = true
+				this.__init()
+			},
+			__init: function() {
 				// 封装之后的调用方式一
 				// $api.get('/index_category/data').then((data) => {
 				// 	// 初始化tabbar数据
