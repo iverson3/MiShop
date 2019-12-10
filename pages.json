@@ -467,6 +467,12 @@
 				"navigationBarTitleText":"领取优惠券"
 			}
         }
+        ,{
+            "path" : "pages/longlist/longlist",
+            "style" : {
+				"navigationBarTitleText":"长列表"
+			}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

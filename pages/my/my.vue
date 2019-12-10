@@ -46,7 +46,7 @@
 		<!-- 功能列表 -->
 		<uni-list-item title="小米会员" :showExtraIcon="true" leftIcon="icon-VIP" leftIconStyle="color:#FDBF2E;"></uni-list-item>
 		<uni-list-item title="会员中心" :showExtraIcon="true" leftIcon="icon-huangguan" leftIconStyle="color:#FCBE2D;"></uni-list-item>
-		<uni-list-item title="服务中心" :showExtraIcon="true" leftIcon="icon-service" leftIconStyle="color:#FA6C5E;"></uni-list-item>
+		<uni-list-item title="服务中心" @click="navigate('longlist')" :showExtraIcon="true" leftIcon="icon-service" leftIconStyle="color:#FA6C5E;"></uni-list-item>
 		<uni-list-item title="小米之家" @click="navigate('video-demo')" :showExtraIcon="true" leftIcon="icon-home" leftIconStyle="color:#FE8B42;"></uni-list-item>
 		<uni-list-item title="更多功能" @click="navigate('comment')" :showExtraIcon="true" leftIcon="icon-gengduo" leftIconStyle="color:#9ED45A;"></uni-list-item>
 		<divider></divider>
