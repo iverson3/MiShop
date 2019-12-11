@@ -1,0 +1,291 @@
+<template>
+	<view>
+		<list :show-scrollbar="false" class="w-100" style="height: 100%;">
+			<template v-if="list.length > 0">
+				<!-- 下拉刷新 -->
+				<refresh style="height: 80px;" 
+				class="w-100 flex-row j-center a-center"
+				@refresh="refreshList" 
+				@pullingdown="pullingdown" 
+				:display="refreshShow">
+					<text class="font-md text-muted">{{ refreshtext }}</text>
+				</refresh>
+			</template>
+			
+			<cell v-for="(item,index) in list" :key="index">
+				<div class="col-12 common-list mb-1 flex-row px-5 py-2">
+					<image :src="item.titlepic" class="common-list-cover"></image>
+					<div class="flex-column">
+						<text class="font-md text-dark px-2 py-1 common-list-lines">{{ item.title }}</text>
+						<text class="px-2 font text-light-muted common-list-lines">{{ item.desc }}</text>
+						<div class="px-2 pt-1 row a-end">
+							<price>{{ item.pprice }}</price>
+							<text class="line-through text-light-muted ml-1" @click="translate">{{ "指纹识别 " + item.comment_num }}</text>
+						</div>
+					</div>
+				</div>
+			</cell>
+			
+			<template v-if="list.length > 0">
+				<!-- 上拉加载更多 -->
+				<loading style="height: 70px;" 
+				class="w-100 flex-row j-center a-center"
+				@loading="loadmore" 
+				:display="loadingShow">
+					<text class="font-md text-muted">{{ loadtext }}</text>
+				</loading>
+			</template>
+		</list>
+	</view>
+</template>
+
+<script>
+	import price from '@/components/common/price.nvue'
+	
+	export default {
+		components: {
+			price
+		},
+		data() {
+			return {
+				list: [],
+				page: 1,
+				index: 0,
+				
+				refreshShow: false,
+				refreshtext: "下拉刷新",
+				loadingShow: false,
+				loadtext: "加载更多"
+			}
+		},
+		created: function() {
+			this.getData()
+		},
+		methods: {
+			// Native.js for iOS封装一条通过JS语法直接调用Native Objective-C接口通道
+			// 通过plus.ios可调用几乎所有的系统API
+			translate: function() {
+				// plus.bluetooth.startBluetoothDevicesDiscovery()
+				// plus.io.getVideoInfo()
+				// plus.ios.invoke()
+				// plus.globalEvent.addEventListener  添加事件监听器
+				// plus.webview.currentWebview().beginPullToRefresh() // 开始下拉刷新
+				// plus.webview.currentWebview().draw() // 截屏并绘制为图片
+				// 获取当前webview页面 并为其添加事件监听
+				// plus.webview.currentWebview().addEventListener('maskClick') // show maskClick hide
+				
+				/*
+				// Events模块管理客户端事件，包括系统事件，如扩展API加载完毕、程序前后台切换等
+				"plusready": 扩展API加载完成事件
+				"pause": 运行环境从前台切换到后台事件
+				"resume": 运行环境从后台切换到前台事件
+				"netchange": 设备网络状态变化事件
+				"newintent": 新意图事件
+				"plusscrollbottom": 页面滚动到底部事件
+				"error": 页面加载错误事件
+				"background": 应用切换到后台运行事件
+				"foreground": 应用切换到前台运行事件
+				"trimmemory": 应用需要清理内存事件
+				"splashclosed": 应用启动界面已关闭事件
+				*/
+			   
+				// 可监听的系统事件列表 show backbutton netchange volumeChange
+				plus.globalEvent.addEventListener('netchange', () => {
+					// 获取设备当前的网络状态 plus.networkinfo.getCurrentType() 或 plus.networkinfo.CONNECTION_TYPE
+					let netStatus = plus.networkinfo
+					switch(netStatus.CONNECTION_TYPE) {
+						case netStatus.CONNECTION_NONE:
+							plus.nativeUI.toast('没有网络');
+							break;
+						case netStatus.CONNECTION_WIFI:
+							plus.nativeUI.alert('wifi');
+							break;
+						case netStatus.CONNECTION_CELL4G:
+							plus.nativeUI.alert('4G');
+							break;
+						case netStatus.CONNECTION_CELL3G:
+							plus.nativeUI.alert('3G');
+							break;
+						case netStatus.CONNECTION_CELL2G:
+							plus.nativeUI.alert('2G');
+							break;
+						case netStatus.CONNECTION_ETHERNET:
+							plus.nativeUI.alert('有线网络');
+							break;
+						case netStatus.CONNECTION_UNKNOW:
+							plus.nativeUI.alert('网络状态未知');
+							break;
+						default:
+							plus.nativeUI.alert('网络状态未知');
+							break;
+					}
+				})
+				
+				plus.globalEvent.addEventListener('backbutton', () => {
+					plus.nativeUI.confirm('确定退出页面么？', (res) => {
+						console.log(res);
+					})
+				})
+				
+				// 扫码api
+				// plus.barcode.scan()
+				
+				// plus.geolocation.watchPosition()  监听设备位置变化
+				// 获取设备当前定位信息  uni.getLocation()
+				plus.geolocation.getCurrentPosition((res) => {
+					console.log(res);
+					console.log(res.address.city);
+				}, (err) => {
+					console.log(err);
+				})
+				
+				
+				
+				// 获取当前设备的信息   plus.os.name 也可以获取
+				let platform = uni.getSystemInfoSync().platform
+				let info = "我和我的祖国 listen carefully"
+				
+				if (platform == "ios") {
+					// 调用ios的文字转语音
+					let AVSpeechSynthesizer = plus.ios.importClass("AVSpeechSynthesizer")
+					let speech = new AVSpeechSynthesizer()
+					
+					let AVSpeechUtterance = plus.ios.importClass("AVSpeechUtterance")
+					let utterance = AVSpeechUtterance.speechUtteranceWithString(info)
+					
+					// 设置语速
+					utterance.plusSetAttribute("rate", 0.5)
+					speech.speakUtterance(utterance)
+					
+				} else if (platform == "android") {
+					// 通过以下方法获取内存信息
+					let Context = plus.android.importClass("android.content.Context");
+					let ActivityManager = plus.android.importClass("android.app.ActivityManager");
+					let mi = new ActivityManager.MemoryInfo();
+					let activityService = plus.android.runtimeMainActivity().getSystemService(Context.ACTIVITY_SERVICE);
+					activityService.getMemoryInfo(mi);
+					// 获取mi对象的availMem属性值
+					let memoryInfo = plus.android.getAttribute(mi, "availMem");
+					console.log(memoryInfo);
+				}
+				
+				
+				// #ifdef APP-PLUS
+				// 指纹识别相关html5+ api
+				let isSupport = plus.fingerprint.isSupport()  // 当前设备是否支持指纹识别
+				let isKeyguardSecure = plus.fingerprint.isKeyguardSecure() // 当前设备是否设置密码锁屏
+				let isEnrolled = plus.fingerprint.isEnrolledFingerprints() // 当前设备是否已经录入指纹
+				if (isSupport && isKeyguardSecure && isEnrolled) {
+					// uni.showToast({title: '支持指纹识别', icon: 'none'});
+					
+					// Android平台弹出等待提示框  IOS平台不需要
+					if ('Android' == plus.os.name) {
+						plus.nativeUI.showWaiting('指纹识别中...');
+					}
+					// 进行指纹识别
+					plus.fingerprint.authenticate((res) => {
+						plus.nativeUI.closeWaiting();// 兼容Android平台关闭等待框
+						uni.showToast({title: '识别成功', icon: "success"});
+					}, (e) => {
+						switch(e.code) {
+							case e.AUTHENTICATE_MISMATCH:
+								plus.nativeUI.toast('指纹匹配失败，请重新输入');
+								break;
+							case e.AUTHENTICATE_OVERLIMIT:
+								plus.nativeUI.closeWaiting();//兼容Android平台关闭等待框
+								plus.nativeUI.alert('指纹识别失败次数超出限制，请使用其它方式进行认证');
+								break;
+							default:
+								plus.nativeUI.closeWaiting();//兼容Android平台关闭等待框
+								plus.nativeUI.alert('指纹识别失败('+e.code+')，请重试');
+								break;
+						}
+								
+						// plus.nativeUI.closeWaiting();// 兼容Android平台关闭等待框
+						// uni.showToast({title: '抱歉，识别失败', icon: "none"});
+					})
+					
+				} else {
+					uni.showToast({title: '抱歉，无法进行指纹识别', icon: 'none'});
+				}
+				// #endif
+				
+			},
+			
+			
+			getData() {
+				let data = []
+				for (let i = this.index + 1; i <= this.index + 50; i++) {
+					data.push({
+						id: i,
+						title: "title title title  " + i,
+						titlepic: "https://yanxuan-item.nosdn.127.net/4c536c4ea486f8d5c8a172bfaaf5b680.png",
+						desc: "天鹅绒面，丝绒时髦高级感 " + i,
+						pprice: "200.00",
+						comment_num: i,
+						good_num: i + "%"
+					})
+				}
+				this.index = this.index + 50
+				this.list = [...this.list, ...data]
+				this.page = this.page + 1
+				
+				console.log('-------------');
+				console.log(this.list.length);
+			},
+			
+			loadmore: function() {
+				if (this.loadingShow) return
+				this.loadingShow = true
+				this.loadtext = "加载中..."
+				
+				this.getData()
+				
+				this.loadingShow = false
+				this.loadtext = "加载更多"
+			},
+			
+			pullingdown: function(e) {
+				// 当下拉高度超过某个值 则提示可进行刷新
+				if (e.pullingDistance > e.viewHeight) {
+					this.refreshtext = "释放就能刷新"
+				} else {
+					this.refreshtext = "下拉刷新"
+				}
+			},
+			refreshList: function() {
+				if (this.refreshShow === 'show') return
+				this.refreshShow = 'show'
+				this.refreshtext = "正在刷新中..."
+				
+				this.index = 0
+				this.page = 1
+				this.list = []
+				this.getData()
+				
+				this.refreshtext = "下拉刷新"
+				// 这里必须使用$nextTick() 才能隐藏"下拉刷新"这个提示文字
+				this.$nextTick(() => {
+					this.refreshShow = 'hide'
+				})
+			}
+			
+		}
+	}
+</script>
+
+<!-- 引入nvue专用的公共UI基础库 -->
+<style src="@/common/zcm-main-nvue.css"></style>
+<style>
+.common-list {
+	padding-left: 2.5px;
+	padding-right: 2.5px;
+}
+.common-list-cover {
+	width: 200px;
+	height: 200px;
+}
+.common-list-lines {
+	lines: 1;
+}
+</style>

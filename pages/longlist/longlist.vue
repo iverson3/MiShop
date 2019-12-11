@@ -55,6 +55,9 @@
 				console.log('-------------');
 				// console.log(this.list);
 				console.log(this.list.length);
+				
+				// wx.getLocation()
+				// wx.authorize()
 			}
 		}
 	}

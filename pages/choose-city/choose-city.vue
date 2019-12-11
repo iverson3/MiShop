@@ -198,12 +198,6 @@
 						uni.showToast({title: '获取定位失败', icon: 'none'});
 					}
 				})
-
-						
-				// uni.showToast({
-				// 	title: 'h5端暂不支持获取城市',
-				// 	icon: 'none'
-				// });
 				// #endif
 				
 				// #ifdef APP-PLUS

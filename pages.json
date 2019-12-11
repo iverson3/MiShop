@@ -470,7 +470,10 @@
         ,{
             "path" : "pages/longlist/longlist",
             "style" : {
-				"navigationBarTitleText":"长列表"
+				"navigationBarTitleText":"长列表性能测试",
+				"app-plus": {
+					"scrollIndicator":"none"
+				}
 			}
         }
     ],
