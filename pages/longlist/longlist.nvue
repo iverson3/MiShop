@@ -1,5 +1,11 @@
 <template>
 	<view>
+		<div>扫描结果：<text>{{ scanInfo }}</text></div>
+		<div class="w-100 flex-row j-center a-center p-5 bg-light-secondary text-primary">
+			<div class="flex-1" @click="startScan">扫描二维码</div>
+			<div v-if="isScaning" class="flex-1" @click="endScan">取消扫描</div>
+		</div>
+		
 		<list :show-scrollbar="false" class="w-100" style="height: 100%;">
 			<template v-if="list.length > 0">
 				<!-- 下拉刷新 -->
@@ -52,6 +58,10 @@
 				page: 1,
 				index: 0,
 				
+				scan: null,
+				isScaning: false,
+				scanInfo: "",
+				
 				refreshShow: false,
 				refreshtext: "下拉刷新",
 				loadingShow: false,
@@ -60,85 +70,128 @@
 		},
 		created: function() {
 			this.getData()
+			
+			// plus.globalEvent.addEventListener  添加事件监听器
+			// plus.webview.currentWebview().beginPullToRefresh() // 开始下拉刷新
+			// plus.webview.currentWebview().draw() // 截屏并绘制为图片
+			// 获取当前webview页面 并为其添加事件监听
+			// plus.webview.currentWebview().addEventListener('maskClick') // show maskClick hide
+			
+			/*
+			// Events模块管理客户端事件，包括系统事件，如扩展API加载完毕、程序前后台切换等
+			"plusready": 扩展API加载完成事件
+			"pause": 运行环境从前台切换到后台事件
+			"resume": 运行环境从后台切换到前台事件
+			"netchange": 设备网络状态变化事件
+			"newintent": 新意图事件
+			"plusscrollbottom": 页面滚动到底部事件
+			"error": 页面加载错误事件
+			"background": 应用切换到后台运行事件
+			"foreground": 应用切换到前台运行事件
+			"trimmemory": 应用需要清理内存事件
+			"splashclosed": 应用启动界面已关闭事件
+			*/
+						   
+			// 可监听的系统事件列表 show backbutton netchange volumeChange
+			plus.globalEvent.addEventListener('netchange', () => {
+				// 获取设备当前的网络状态 plus.networkinfo.getCurrentType() 或 plus.networkinfo.CONNECTION_TYPE
+				let netStatus = plus.networkinfo
+				switch(netStatus.CONNECTION_TYPE) {
+					case netStatus.CONNECTION_NONE:
+						plus.nativeUI.toast('没有网络');
+						break;
+					case netStatus.CONNECTION_WIFI:
+						plus.nativeUI.alert('wifi');
+						break;
+					case netStatus.CONNECTION_CELL4G:
+						plus.nativeUI.alert('4G');
+						break;
+					case netStatus.CONNECTION_CELL3G:
+						plus.nativeUI.alert('3G');
+						break;
+					case netStatus.CONNECTION_CELL2G:
+						plus.nativeUI.alert('2G');
+						break;
+					case netStatus.CONNECTION_ETHERNET:
+						plus.nativeUI.alert('有线网络');
+						break;
+					case netStatus.CONNECTION_UNKNOW:
+						plus.nativeUI.alert('网络状态未知');
+						break;
+					default:
+						plus.nativeUI.alert('网络状态未知');
+						break;
+				}
+			})
+			
+			
+			plus.key.addEventListener('backbutton', () => {
+				// plus.nativeUI.confirm('确定退出页面么？', (res) => {
+				// 	console.log(res);
+				// })
+				
+				if (this.scan) {
+					this.endScan()
+					// 没效果
+					// plus.key.removeEventListener('backbutton', ()=>{}, false)
+				}
+			}, false)
+			
+			
+			// plus.geolocation.watchPosition()  监听设备位置变化
+			// 获取设备当前定位信息  uni.getLocation()
+			plus.geolocation.getCurrentPosition((res) => {
+				console.log(res);
+				console.log(res.address.city);
+			}, (err) => {
+				console.log(err);
+			})
+			
 		},
 		methods: {
+			startScan: function() {
+				if (!this.scan) {
+					// 扫码api
+					this.scan = plus.barcode.create('aaaa', [plus.barcode.QR], {
+						top:'0px',
+						left:'0px',
+						width: '100%',
+						height: '100%',
+						position: 'static'
+					})
+					plus.webview.currentWebview().append(this.scan)
+					this.scan.onmarked = this.onmarked
+					this.scan.onerror = this.onerror
+					this.scan.start()
+					
+					this.isScaning = true
+				}
+			},
+			endScan: function() {
+				if (!this.scan) return
+				this.scan.close()
+				this.scan = null
+				this.isScaning = false
+			},
+			onmarked: function(type, result, file) {
+				this.endScan()
+				this.scanInfo = result
+				console.log(this.scanInfo);
+				// this.$nextTick(() => {
+				// })
+				console.log(type, result, file);
+			},
+			onerror: function(err) {
+				console.log(err);
+			},
+			
+			
 			// Native.js for iOS封装一条通过JS语法直接调用Native Objective-C接口通道
 			// 通过plus.ios可调用几乎所有的系统API
 			translate: function() {
 				// plus.bluetooth.startBluetoothDevicesDiscovery()
 				// plus.io.getVideoInfo()
 				// plus.ios.invoke()
-				// plus.globalEvent.addEventListener  添加事件监听器
-				// plus.webview.currentWebview().beginPullToRefresh() // 开始下拉刷新
-				// plus.webview.currentWebview().draw() // 截屏并绘制为图片
-				// 获取当前webview页面 并为其添加事件监听
-				// plus.webview.currentWebview().addEventListener('maskClick') // show maskClick hide
-				
-				/*
-				// Events模块管理客户端事件，包括系统事件，如扩展API加载完毕、程序前后台切换等
-				"plusready": 扩展API加载完成事件
-				"pause": 运行环境从前台切换到后台事件
-				"resume": 运行环境从后台切换到前台事件
-				"netchange": 设备网络状态变化事件
-				"newintent": 新意图事件
-				"plusscrollbottom": 页面滚动到底部事件
-				"error": 页面加载错误事件
-				"background": 应用切换到后台运行事件
-				"foreground": 应用切换到前台运行事件
-				"trimmemory": 应用需要清理内存事件
-				"splashclosed": 应用启动界面已关闭事件
-				*/
-			   
-				// 可监听的系统事件列表 show backbutton netchange volumeChange
-				plus.globalEvent.addEventListener('netchange', () => {
-					// 获取设备当前的网络状态 plus.networkinfo.getCurrentType() 或 plus.networkinfo.CONNECTION_TYPE
-					let netStatus = plus.networkinfo
-					switch(netStatus.CONNECTION_TYPE) {
-						case netStatus.CONNECTION_NONE:
-							plus.nativeUI.toast('没有网络');
-							break;
-						case netStatus.CONNECTION_WIFI:
-							plus.nativeUI.alert('wifi');
-							break;
-						case netStatus.CONNECTION_CELL4G:
-							plus.nativeUI.alert('4G');
-							break;
-						case netStatus.CONNECTION_CELL3G:
-							plus.nativeUI.alert('3G');
-							break;
-						case netStatus.CONNECTION_CELL2G:
-							plus.nativeUI.alert('2G');
-							break;
-						case netStatus.CONNECTION_ETHERNET:
-							plus.nativeUI.alert('有线网络');
-							break;
-						case netStatus.CONNECTION_UNKNOW:
-							plus.nativeUI.alert('网络状态未知');
-							break;
-						default:
-							plus.nativeUI.alert('网络状态未知');
-							break;
-					}
-				})
-				
-				plus.globalEvent.addEventListener('backbutton', () => {
-					plus.nativeUI.confirm('确定退出页面么？', (res) => {
-						console.log(res);
-					})
-				})
-				
-				// 扫码api
-				// plus.barcode.scan()
-				
-				// plus.geolocation.watchPosition()  监听设备位置变化
-				// 获取设备当前定位信息  uni.getLocation()
-				plus.geolocation.getCurrentPosition((res) => {
-					console.log(res);
-					console.log(res.address.city);
-				}, (err) => {
-					console.log(err);
-				})
-				
 				
 				
 				// 获取当前设备的信息   plus.os.name 也可以获取
