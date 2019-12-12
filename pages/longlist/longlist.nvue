@@ -188,7 +188,7 @@
 			phoneCall: function() {
 				// 拨打电话
 				uni.makePhoneCall({
-					phoneNumber: "13396095889",
+					phoneNumber: "15220067792",
 					success: (res) => {
 						console.log(res);
 					},
