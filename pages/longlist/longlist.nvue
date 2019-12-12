@@ -1,12 +1,25 @@
 <template>
 	<view>
-		<div>扫描结果：<text>{{ scanInfo }}</text></div>
-		<div class="w-100 flex-row j-center a-center p-5 bg-light-secondary text-primary">
-			<div class="flex-1" @click="startScan">扫描二维码</div>
+		<div class="flex-row pl-3 pt-3"><text @click="phoneCall">扫描结果： </text><text class="text-danger" @click="copyScanInfo">{{ scanInfo }}</text></div>
+		<div class="w-100 flex-row j-center a-center p-5">
+			<div class="flex-1 p-2 bg-secondary rounded j-center a-center" @click="startScan"><text class="text-white pt-1">扫描二维码</text></div>
 			<div v-if="isScaning" class="flex-1" @click="endScan">取消扫描</div>
 		</div>
 		
-		<list :show-scrollbar="false" class="w-100" style="height: 100%;">
+		<div class="w-100 flex-row j-center a-center px-5">
+			<div class="flex-1 p-3 rounded bg-secondary j-center a-center mx-2" @click="startPhoto"><text class="text-danger">开始拍照</text></div>
+			<div class="flex-1 p-3 rounded bg-secondary j-center a-center mx-2" @click="startVideo"><text class="text-danger">开始录像</text></div>
+		</div>
+		<div>
+			<image style="width:200px;height:200px" :src="imageUrl"></image>
+			<!-- <video v-if="videoUrl != ''" :src="videoUrl" auto-play="true" controls style="width: 500px;height: 300px;"></video> -->
+		</div>
+		
+		<cover-view v-if="showPlayer" @click="closeVideo" style="position: fixed; bottom: 440px; right:80px; background-color: white;">关闭</cover-view>
+		
+		
+		
+		<list :show-scrollbar="false" class="w-100 h-100">
 			<template v-if="list.length > 0">
 				<!-- 下拉刷新 -->
 				<refresh style="height: 80px;" 
@@ -19,7 +32,20 @@
 			</template>
 			
 			<cell v-for="(item,index) in list" :key="index">
-				<div class="col-12 common-list mb-1 flex-row px-5 py-2">
+				<header v-if="index === 2">
+					<div class="col-12 common-list mb-1 flex-row px-5 py-2">
+						<image :src="item.titlepic" class="common-list-cover"></image>
+						<div class="flex-column">
+							<text class="font-md text-dark px-2 py-1 common-list-lines">{{ item.title }}</text>
+							<text class="px-2 font text-light-muted common-list-lines">{{ item.desc }}</text>
+							<div class="px-2 pt-1 row a-end">
+								<price>{{ item.pprice }}</price>
+								<text class="line-through text-light-muted ml-1" @click="translate">{{ "指纹识别 head " + item.comment_num }}</text>
+							</div>
+						</div>
+					</div>
+				</header>
+				<div v-else class="col-12 common-list mb-1 flex-row px-5 py-2">
 					<image :src="item.titlepic" class="common-list-cover"></image>
 					<div class="flex-column">
 						<text class="font-md text-dark px-2 py-1 common-list-lines">{{ item.title }}</text>
@@ -62,6 +88,13 @@
 				isScaning: false,
 				scanInfo: "",
 				
+				camera: null,
+				imageUrl: "",
+				videoUrl: "",
+				
+				showPlayer: false,
+				player: null,
+				
 				refreshShow: false,
 				refreshtext: "下拉刷新",
 				loadingShow: false,
@@ -70,6 +103,7 @@
 		},
 		created: function() {
 			this.getData()
+			
 			
 			// plus.globalEvent.addEventListener  添加事件监听器
 			// plus.webview.currentWebview().beginPullToRefresh() // 开始下拉刷新
@@ -125,11 +159,13 @@
 			})
 			
 			
+			// 监听页面的返回键点击
 			plus.key.addEventListener('backbutton', () => {
 				// plus.nativeUI.confirm('确定退出页面么？', (res) => {
 				// 	console.log(res);
 				// })
 				
+				this.camera = null
 				if (this.scan) {
 					this.endScan()
 					// 没效果
@@ -149,40 +185,201 @@
 			
 		},
 		methods: {
-			startScan: function() {
-				if (!this.scan) {
-					// 扫码api
-					this.scan = plus.barcode.create('aaaa', [plus.barcode.QR], {
-						top:'0px',
-						left:'0px',
-						width: '100%',
-						height: '100%',
-						position: 'static'
-					})
-					plus.webview.currentWebview().append(this.scan)
-					this.scan.onmarked = this.onmarked
-					this.scan.onerror = this.onerror
-					this.scan.start()
+			phoneCall: function() {
+				// 拨打电话
+				uni.makePhoneCall({
+					phoneNumber: "13396095889",
+					success: (res) => {
+						console.log(res);
+					},
+					fail: (err) => {
+						console.log(err);
+					}
+				})
+			},
+			copyScanInfo: function() {
+				// 使手机发生振动
+				// iOS上只有长震动，没有短震动
+				// iOS上需要手机设置“打开响铃时震动”或“静音时震动”，否则无法震动
+				uni.vibrateShort({
+					success() {}
+				})
+				
+				// 设置系统剪贴板的内容
+				uni.setClipboardData({
+					data: this.scanInfo,
+					success() {}
+				})
+				// uni.hideToast()
+				
+				// 获取系统剪贴板内容
+				// uni.getClipboardData({
+				// 	success: (res) => {
+				// 		plus.nativeUI.alert(res.data)
+				// 	}
+				// })
+			},
+			
+			
+			startPhoto: function() {
+				this.camera = plus.camera.getCamera(2)
+				
+				this.camera.captureImage((res) => {
+					console.log(res);
+					this.imageUrl = res
+					this.camera = null
+				}, (err) => {
+					console.log(err);
+					if (err.message == 'cancel') {
+						plus.nativeUI.alert('您取消了拍照')
+					}
+					this.camera = null
+				})
+			},
+			startVideo: function() {
+				this.camera = plus.camera.getCamera(1)
+				
+				console.log(this.camera.supportedVideoFormats);     // mp4
+				console.log(this.camera.supportedVideoResolutions); // 640*480,1280*720,960*540
+				
+				this.camera.startVideoCapture((res) => {
+					console.log(res);
+					// 需要转化为平台绝对路径  
+					// plus.io.convertLocalFileSystemURL()
+					// plus.io.convertAbsoluteFileSystem()
+					let path = plus.io.convertLocalFileSystemURL(res)
+					console.log(path);
+					this.player = null
+					this.player = plus.video.createVideoPlayer('videoplayer1', {
+									src: res,
+									bottom: '50px',
+									right: '30px',
+									width: '200px',
+									height: '200px',
+									position: 'static',
+									
+									controls: true,
+									'show-progress': false,
+									'show-play-btn': false,
+									'direction': 0,
+									'enable-danmu': true,
+									'danmu-btn': true,
+									'danmu-list': [
+										{
+											text: "centent1111",
+											color: "#000",
+											time: 1
+										},
+										{
+											text: "centent2222",
+											color: "#000",
+											time: 3
+										}
+									]
+								});
+					plus.webview.currentWebview().append(this.player);
+					this.showPlayer = true
 					
-					this.isScaning = true
-				}
+					// 监听视频播放器的全屏切换
+					this.player.addEventListener("fullscreenchange", (res) => {
+						console.log(res);
+						this.showPlayer = false
+						if (res.detail.fullScreen) {
+							// 全屏
+							this.player.setStyles({
+								'show-progress': true,
+								'show-play-btn': true
+							})
+						} else {
+							// 退出全屏
+							this.player.setStyles({
+								'show-progress': false,
+								'show-play-btn': false
+							})
+						}
+						this.$nextTick(() => {
+							this.showPlayer = true
+						})
+					})
+					
+					// this.videoUrl = path
+					this.camera = null
+				}, (err) => {
+					console.log(err);
+					if (err.message == 'cancel') {
+						plus.nativeUI.alert('您取消了视频录制')
+					}
+					this.camera = null
+				}, {
+					index: "1",       // 1-主摄像头 2-辅摄像头
+					format: "mp4", 
+					videoMaximumDuration: 10,  // 视频拍摄的最大时长限制
+					resolution: "400*800"    // 视频或照片的分辨率
+				})
+			},
+			closeVideo: function() {
+				if (!this.player) return
+				plus.webview.currentWebview().remove(this.player)
+				this.player.close()
+				this.player = null
+				this.showPlayer = false
+			},
+			
+			
+			startScan: function() {
+				
+				// 监听网络状态变化
+				// uni.onNetworkStatusChange(CALLBACK)
+				
+				// uni-app 设备API
+				// 调起客户端扫码界面
+				uni.scanCode({
+					scanType: ["qrCode", "barCode"],
+					onlyFromCamera: false,
+					success: (res) => {
+						console.log(res);
+						this.scanInfo = res.result
+					},
+					fail: (err) => {
+						console.log(err);
+						this.scanInfo = "扫码失败"
+					}
+				})
+				return
+				
+				
+				if (this.scan) return
+				// Barcode模块管理条码（一维码和二维码）扫描识别，支持常见的一维码（如EAN13码）及二维码（如QR码）
+				// 通过调用设备的摄像头对条码进行扫描识别，扫描到条码后进行解码并返回码数据内容及码类型
+				// plus.barcode.getBarcodeById('abcid')
+				this.scan = plus.barcode.create('abcid', [plus.barcode.QR, plus.barcode.EAN13], {
+					top:'0px',
+					left:'0px',
+					width: '100%',
+					height: '100%',
+					position: 'static'
+				})
+				plus.webview.currentWebview().append(this.scan)
+				this.scan.onmarked = this.onmarked
+				this.scan.onerror = this.onerror
+				this.scan.start()
+				this.isScaning = true
 			},
 			endScan: function() {
-				if (!this.scan) return
+				if (!this.scan && !this.isScaning) return
 				this.scan.close()
 				this.scan = null
 				this.isScaning = false
 			},
 			onmarked: function(type, result, file) {
+				console.log(type, result, file);
 				this.endScan()
 				this.scanInfo = result
-				console.log(this.scanInfo);
-				// this.$nextTick(() => {
-				// })
-				console.log(type, result, file);
 			},
 			onerror: function(err) {
 				console.log(err);
+				this.endScan()
+				this.scanInfo = "扫码失败"
 			},
 			
 			
@@ -192,7 +389,6 @@
 				// plus.bluetooth.startBluetoothDevicesDiscovery()
 				// plus.io.getVideoInfo()
 				// plus.ios.invoke()
-				
 				
 				// 获取当前设备的信息   plus.os.name 也可以获取
 				let platform = uni.getSystemInfoSync().platform
