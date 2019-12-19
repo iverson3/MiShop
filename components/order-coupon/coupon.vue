@@ -7,10 +7,10 @@
 		<view class="text-white d-flex flex-column j-center a-center" 
 		:class="item.disabled || !item.status? 'bg-secondary':'main-bg-color'"
 		style="width: 220upx;height: 200upx;">
-			<view class="font-lg line-h">{{ item.price }}<text class="font">元</text></view>
+			<view class="font-lg line-h">{{ item.price }}<text class="font">{{ item.type === 0? '元' : '折' }}</text></view>
 			<view class="font">{{ item.desc }}</view>
 			<view class="rounded bg-white w-50 text-center mt-1" :class="item.disabled || !item.status? 'text-secondary':'main-text-color'" hover-class="bg-light">
-				<slot>{{ item.status ? '去使用' : '已失效' }}</slot>
+				<slot></slot>
 			</view>
 		</view>
 	</view>

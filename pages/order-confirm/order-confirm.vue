@@ -43,16 +43,17 @@
 				<uni-list-item title="运费" :showArrowIcon="false">
 					<view slot="rightContent">包邮</view>
 				</uni-list-item>
-				<navigator url="/pages/order-coupon/order-coupon">
-					<uni-list-item title="优惠券">
-						<view slot="rightContent" class="text-light-muted">无可用</view>
-					</uni-list-item>
-				</navigator>
+				<uni-list-item title="优惠券" @click="openOrderCoupon">
+					<view slot="rightContent" :class="couponCount === 0? 'text-light-muted' : 'main-text-color'">
+						<text v-if="useCoupon.id > 0">{{ useCoupon.type === 0? '-'+useCoupon.value+'元' : useCoupon.value+'折' }}</text>
+						<text v-else>{{ couponCount === 0? '无可用' : couponCount + '张可用' }}</text>
+					</view>
+				</uni-list-item>
 				
 				<uni-list-item :showArrowIcon="false">
 					<text class="main-text-color">小计</text>
 					<view slot="rightContent">
-						<price>{{ order.pay_price }}</price>
+						<price>{{ realPayPrice }}</price>
 					</view>
 				</uni-list-item>
 				<divider></divider>
@@ -63,11 +64,11 @@
 		</view>
 		
 		<view class="w-100 position-fixed bottom-0 left-0 right-0 d-flex a-center j-end bg-white p-2 font-md border-top">
-			合计：<price>{{ order.pay_price }}</price>
-			<view class="main-bg-color px-2 py-1 rounded text-white mx-4 font-md" 
-			@tap="openPayMethods"
+			合计：<price>{{ realPayPrice }}</price>
+			<view class="px-2 py-1 rounded text-white mx-4 font-md" 
+			@tap="openPayMethods" :class="ordering ? 'bg-secondary' : 'main-bg-color'"
 			hover-class="main-bg-hover-color">
-				去支付
+				{{ ordering ? '下单中' : '去支付' }}
 			</view>
 		</view>
 		
@@ -106,16 +107,39 @@
 				path: false,
 				order: {},
 				isShowPopup: 'none',
+				couponCount: 0,
+				useCoupon: {
+					id: 0,
+					type: 0,
+					value: 0
+				},
+				ordering: false,   // 是否正在下单请求中
+				
 				// 弹出框的高度是250的整数倍
 				popupHeight: 250
 			}
 		},
+		
 		computed: {
 			...mapState({
 				tempOrder: state => state.order.tempOrder,
 				selectedList: state => state.cart.selectedList
 			}),
-			...mapGetters(['defaultPath', 'getPathById'])
+			...mapGetters(['defaultPath', 'getPathById']),
+			
+			// 实际支付金额 (计算优惠券)
+			realPayPrice() {
+				// 没有优惠券
+				if (this.useCoupon.id === 0) return this.order.total_price
+				// 处理优惠券
+				if (this.useCoupon.type === 0) {
+					// 满减
+					return this.order.total_price - this.useCoupon.value
+				} else {
+					// 折扣
+					return (this.order.total_price * (this.useCoupon.value / 10)).toFixed(2)
+				}
+			}
 		},
 		onLoad: function() {
 			this.order = JSON.parse(JSON.stringify(this.tempOrder))
@@ -123,6 +147,8 @@
 			this.order.pay_price = this.order.total_price
 			this.order.freight   = 0
 			this.order.coupon_id = 0
+			
+			console.log(JSON.stringify(this.selectedList));
 			
 			if (this.order.path_id !== 0) {
 				// 通过path_id获取path完整信息
@@ -135,6 +161,12 @@
 			} else {
 				this.popupHeight = this.popupHeight * this.order.order_items.length + 100
 			}
+			// 获取当前订单总价可使用的优惠券数量
+			this.getCouponCount()
+			// 监听优惠券的选择事件
+			uni.$on('chooseCoupon', (res) => {
+				this.useCoupon = res
+			})
 			// 监听选择收货地址事件
 			uni.$on('choosePath', (res) => {
 				this.path = res
@@ -143,9 +175,8 @@
 			})
 		},
 		onUnload: function() {
-			uni.$off('choosePath', (e) => {
-				console.log('卸载选择收货地址的事件监听器')
-			})
+			uni.$off('chooseCoupon')
+			uni.$off('choosePath')
 		},
 		onBackPress: function() {
 			this.deleteTempOrder()
@@ -155,9 +186,22 @@
 			...mapMutations(['deleteTempOrder']),
 			...mapActions(['doCreateOrder', 'doDelGoods']),
 			
+			// 获取当前订单总价可使用的优惠券数量
+			getCouponCount: function() {
+				this.$api.post('/coupon_count', {price: this.order.pay_price}, {token: true, toast: false}).then(res => {
+					this.couponCount = res
+				}).catch(err => {
+					uni.showToast({title: '获取优惠券信息失败', icon: 'none'});
+				})
+			},
 			openPathList: function() {
 				uni.navigateTo({
 					url: '/pages/user-path-list/user-path-list?type=choose'
+				})
+			},
+			openOrderCoupon: function() {
+				uni.navigateTo({
+					url: '/pages/order-coupon/order-coupon?price=' + this.order.pay_price
 				})
 			},
 			openOrderInvoice: function() {
@@ -176,9 +220,8 @@
 				}
 			},
 			openPayMethods: function() {
-				if (this.order.path_id === 0) {
-					return uni.showToast({title: '请选择收货地址', icon: 'none'});
-				}
+				if (this.order.path_id === 0) return uni.showToast({title: '请选择收货地址', icon: 'none'});
+				if (this.ordering) return
 			
 				let time = new Date()
 				// 获取时间戳
@@ -198,16 +241,34 @@
 				// 实际支付金额 = 商品总价 + 运费 - 优惠券金额 
 				this.order.pay_price = this.order.total_price + this.order.freight - this.order.coupon_id
 				
-				this.doCreateOrder(this.order)
-				// 正式生成订单后 删除进入订单的商品(即选中的商品)
-				let ids = this.selectedList.join(',')
-				this.$api.post('/cart/delete', {shop_ids: ids}, {token: true, toast: false}).then(res => {
-					this.doDelGoods(false)
+				
+				
+				let options = {
+					user_addresses_id: this.order.path_id,
+					items: this.selectedList.join(',')
+				}
+				if (this.useCoupon.id > 0) {
+					options.coupon_user_id = this.useCoupon.id
+				}
+				this.ordering = true
+				this.$api.post('/order', options, {token: true, toast: false}).then(res => {
+					
+					this.doCreateOrder(this.order)
+					// 正式生成订单后 删除进入订单的商品(即选中的商品)
+					let ids = this.selectedList.join(',')
+					this.$api.post('/cart/delete', {shop_ids: ids}, {token: true, toast: false}).then(res => {
+						this.doDelGoods(false)
+					})
+					
+					uni.redirectTo({
+						url: "/pages/pay-methods/pay-methods?orderid=" + this.order.id
+					})
+					
+				}).catch(err => {
+					this.ordering = false
+					uni.showToast({title: '创建订单失败，请重试', icon: 'none'});
 				})
 				
-				uni.redirectTo({
-					url: "/pages/pay-methods/pay-methods?orderid=" + this.order.id
-				})
 			}
 		}
 	}

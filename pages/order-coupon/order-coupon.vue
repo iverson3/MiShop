@@ -19,7 +19,10 @@
 					<template v-if="tab.list.length > 0">
 						<view class="p-3">
 							<!-- 列表 -->
-							<coupon v-for="(item,index) in tab.list" :key="index" :item="item" :index="index"></coupon>
+							<coupon @click="useCoupon(item)" v-for="(item,index) in tab.list" :key="index" :item="item" :index="index">
+								<text v-if="item.disabled">已使用</text>
+								<text v-else>{{ item.status ? '去使用' : validText }}</text>
+							</coupon>
 						</view>
 					</template>
 					
@@ -46,6 +49,7 @@
 		data() {
 			return {
 				tabIndex: 0,
+				price: 0,
 				tabBars: [
 					{
 						name:"可用",
@@ -75,9 +79,15 @@
 			},
 			isValid() {
 				return this.tabBars[this.tabIndex].key
+			},
+			validText() {
+				return this.tabIndex === 0 ? '不可用' : '已失效'
 			}
 		},
-		onLoad: function() {
+		onLoad: function(e) {
+			if (e.price) {
+				this.price = parseFloat(e.price)
+			}
 			this.getData()
 		},
 		methods: {
@@ -86,6 +96,8 @@
 				this.$api.get('/usercoupon/' + this.page + '/' + this.isValid, {}, {token: true, toast: false}).then(res => {
 					
 					this.tabBars[index].list = res.map(item => {
+						// 订单总金额必须大于等于优惠券的使用限定价格才可使用该优惠券
+						let status = (index === 0) && (this.price >= parseFloat(item.coupon.min_price))
 						return {
 							id: item.id,
 							title: item.coupon.name,
@@ -93,8 +105,9 @@
 							end_time: item.coupon.end_time,
 							price: item.coupon.value,
 							desc: item.coupon.desc,
-							status: index === 0,
-							disabled: false
+							status: status,
+							disabled: item.used,     // 是否已使用
+							type: item.coupon.type   // 优惠券类型(满减or折扣)
 						}
 					})
 					this.tabBars[index].firstLoaded = true
@@ -108,6 +121,16 @@
 				if (!this.tabBars[index].firstLoaded) {
 					this.getData()
 				}
+			},
+			// 用户点击使用优惠券
+			useCoupon: function(item) {
+				if (item.disabled || !item.status) return
+				uni.$emit('chooseCoupon', {
+					id: item.id,
+					type: item.type,
+					value: item.price
+				})
+				uni.navigateBack({delta: 1})
 			}
 		}
 	}
