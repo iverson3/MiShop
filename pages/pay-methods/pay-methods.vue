@@ -6,22 +6,14 @@
 		</view>
 		
 		<view class="px-5">
-			<label>
-				<uni-list-item leftIcon="icon-zhifubao text-primary"
-				title="支付宝支付" note="推荐使用支付宝支付" 
-				leftIconStyle="font-size:60upx;"
-				:showExtraIcon="true">
-					<radio slot="right" value="1" color="#FD6801" />
-				</uni-list-item>
-			</label>
-			<label>
-				<uni-list-item leftIcon="icon-weixinzhifu text-success"
-				title="微信支付"
-				leftIconStyle="font-size:60upx;"
-				:showExtraIcon="true">
-					<radio slot="right" value="2" color="#FD6801" />
-				</uni-list-item>
-			</label>
+			<radio-group @change="changePayMethod">
+				<label v-for="(item,index) in options" :key="index">
+					<uni-list-item :leftIcon="item.icon" :title="item.title" :note="item.note" 
+					leftIconStyle="font-size:60upx;" :showExtraIcon="true">
+						<radio slot="right" :value="item.value" :checked="payMethod === item.value" color="#FD6801" />
+					</uni-list-item>
+				</label>
+			</radio-group>
 			
 			<view class="w-100 main-bg-color py-2 rounded font-md text-white d-flex j-center mt-3" 
 			@tap="confirmPay"
@@ -44,7 +36,20 @@
 		},
 		data() {
 			return {
-				orderInfo: {}
+				orderInfo: {},
+				payMethod: "alipay",
+				options: [{
+						title: "支付宝支付",
+						note: "推荐使用支付宝支付",
+						icon: "icon-zhifubao text-primary",
+						value: "alipay"
+					},{
+						title: "微信支付",
+						note: "",
+						icon: "icon-weixinzhifu text-success",
+						value: "wxpay"
+					}
+				]
 			}
 		},
 		computed: {
@@ -75,6 +80,9 @@
 		methods: {
 			...mapMutations(['changeOrderStatus']),
 			
+			changePayMethod: function(e) {
+				this.payMethod = e.detail.value
+			},
 			confirmPay: function() {
 				// 支付结果 1-成功 2-失败
 				let payres = 1

@@ -53,6 +53,13 @@ export default {
 			return n[1] ? n : '0' + n
 		}).join(':')
 	},
+	// 日期字符串转时间戳
+	dateStringToTime(dateStr) {
+		let date = dateStr.substring(0, 19);    
+		date = date.replace(/-/g, '/'); 
+		let timestamp = new Date(date).getTime();
+		return timestamp
+	},
 	
 	formatLocation(longitude, latitude) {
 		if (typeof longitude === 'string' && typeof latitude === 'string') {

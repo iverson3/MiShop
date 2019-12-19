@@ -134,7 +134,7 @@
 				// 处理优惠券
 				if (this.useCoupon.type === 0) {
 					// 满减
-					return this.order.total_price - this.useCoupon.value
+					return (this.order.total_price - this.useCoupon.value).toFixed(2)
 				} else {
 					// 折扣
 					return (this.order.total_price * (this.useCoupon.value / 10)).toFixed(2)
@@ -222,26 +222,6 @@
 			openPayMethods: function() {
 				if (this.order.path_id === 0) return uni.showToast({title: '请选择收货地址', icon: 'none'});
 				if (this.ordering) return
-			
-				let time = new Date()
-				// 获取时间戳
-				let timestamp = time.getTime()
-				// 截取时间戳的最后6位数字作为订单id
-				let id = parseInt((timestamp + "").slice(-6))
-				let timeStr = utils.dateFormat(time, "{Y}{MM}{DD}{tt}{ii}{ss}")
-				
-				this.order.id = id
-				this.order.orderNo = 'orderno' + timeStr
-				this.order.create_time = timestamp
-				this.order.statusNo = 1
-				this.order.status = "待支付"
-				// 后续再完善运费计算和优惠券逻辑
-				this.order.freight = 0
-				this.order.coupon_id = 0
-				// 实际支付金额 = 商品总价 + 运费 - 优惠券金额 
-				this.order.pay_price = this.order.total_price + this.order.freight - this.order.coupon_id
-				
-				
 				
 				let options = {
 					user_addresses_id: this.order.path_id,
@@ -252,14 +232,27 @@
 				}
 				this.ordering = true
 				this.$api.post('/order', options, {token: true, toast: false}).then(res => {
+					console.log(res);
+		
+					this.order.id = parseInt(res.id)
+					this.order.orderNo = res.no
+					this.order.create_time = utils.dateStringToTime(res.create_time)
+					this.order.statusNo = 1
+					this.order.status = "待支付"
+					this.order.freight = 0
+					this.order.coupon_id = this.useCoupon.id
+					this.order.pay_price = this.realPayPrice
 					
 					this.doCreateOrder(this.order)
 					// 正式生成订单后 删除进入订单的商品(即选中的商品)
 					let ids = this.selectedList.join(',')
 					this.$api.post('/cart/delete', {shop_ids: ids}, {token: true, toast: false}).then(res => {
 						this.doDelGoods(false)
+					}).catch(err => {
+						console.log(err);
 					})
 					
+					this.ordering = false
 					uni.redirectTo({
 						url: "/pages/pay-methods/pay-methods?orderid=" + this.order.id
 					})

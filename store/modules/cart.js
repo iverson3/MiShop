@@ -32,7 +32,7 @@ export default {
 					total += (v.pprice * v.num)
 				}
 			})
-			return total
+			return total.toFixed(2)
 		},
 		// 禁用全选
 		disableSelectAll: (state) => {
