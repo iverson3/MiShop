@@ -2,8 +2,8 @@ export default {
 	state: {
 		tempOrder: {
 			id: 0,
-			orderNo: '',    // 订单编号 格式： orderno20191108110635
-			create_time: 0, // 订单创建时间 (时间戳)  显示： 2019-08-12
+			no: '',         // 订单编号 格式： orderno20191108110635
+			create_time: "",// 订单创建时间 (时间字符串)  格式： 2019-08-12 12:28:35
 			status: "未知",  
 			statusNo: 0,    // 订单状态
 			order_items: [],// 商品列表数据
@@ -11,7 +11,7 @@ export default {
 			total_price: 0, // 商品总价  
 			pay_price: 0,   // 实际支付金额 (实际付款 = 商品总价 + 运费 - 优惠券金额)
 			freight: 0,     // 运费
-			coupon_id: 0,   // 优惠券
+			coupon_id: 0,   // 优惠券id
 			path_id: 0,     // 收货地址id
 		},
 		// 0-未知 1-待支付 2-待发货 3-待收货 4-待评价 5-支付失败 6-已取消 7-退货退款中
@@ -75,6 +75,10 @@ export default {
 		// 用户退出登录之后隐藏当前用户的订单数据
 		hideOrderData(state) {
 			state.list = []
+		},
+		
+		setOrderList(state, list) {
+			state.list = list
 		},
 		
 		// 添加临时订单

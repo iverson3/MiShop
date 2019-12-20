@@ -3,7 +3,7 @@
 		<divider></divider>
 		<!-- header -->
 		<view class="d-flex a-center p-2 border-bottom border-light-secondary">
-			<text class="text-light-muted font-md ">{{ item.create_time | formatTime }}</text>
+			<text class="text-light-muted font-md ">{{ item.create_time }}</text>
 			<text class="main-text-color ml-auto font-md">{{ item.status }}</text>
 		</view>
 		<!-- body -->
@@ -14,7 +14,7 @@
 		</view>
 		<!-- footer -->
 		<view class="d-flex a-center p-2">
-			<text class="text-dark font-md ml-auto">共{{ item.total_num }}件商品，合计：￥{{ item.total_price }}</text>
+			<text class="text-dark font-md ml-auto">共{{ item.order_items | goodsCount }}件商品，合计：￥{{ item.total_price }}</text>
 		</view>
 		<view class="d-flex j-end a-center px-2 pb-2">
 			
@@ -74,6 +74,14 @@
 		filters: {
 			formatTime(value) {
 				return utils.gettime(value, true)
+			},
+			
+			goodsCount(order_items) {
+				let count = 0
+				order_items.forEach((item) => {
+					count = count + item.num
+				})
+				return count
 			}
 		},
 		methods: {

@@ -49,6 +49,10 @@ export default {
 				...options,
 				success: (result) => {
 					console.log(result);
+					// 返回请求结果的原始数据 (支付类的请求需要原始数据进行业务处理)
+					if (options.native) {
+						return res(result)
+					}
 					// 服务端出错
 					if (result.statusCode !== 200) {
 						

@@ -383,8 +383,8 @@
 				// 初始化临时订单的字段
 				let data = {
 					id: 0,
-					orderNo: '',   
-					create_time: 0,
+					no: '',   
+					create_time: "",
 					status: "临时订单",
 					statusNo: 0,
 					order_items: [],
@@ -399,11 +399,24 @@
 				let selectedList = JSON.parse(JSON.stringify(this.selectedInfoList))
 				let sum = 0
 				// 处理商品信息中的字段
-				selectedList.forEach(goods => {
+				selectedList.forEach(goods => {		
+					// 重新组装订单商品部分的数据结构 (保持跟服务端接口返回的数据结构一致)
+					goods.goods_item = {
+						id: goods.id,
+						title: goods.title,
+						cover: goods.cover,
+						sku_type: goods.skus_type
+					}
+					// 这个应该还缺少一个 购物车id的字段 来作为goods的id
+					goods.goods_id = goods.id
+					goods.price = goods.pprice
 					// 删除订单中不需要的商品字段
 					delete goods.checked
 					delete goods.minnum
 					delete goods.maxnum
+					delete goods.title
+					delete goods.cover
+					delete goods.pprice
 					// 计算总的商品数
 					sum = sum + goods.num
 				})

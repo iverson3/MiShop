@@ -17,7 +17,8 @@
         },
         /* 模块配置 */
         "modules" : {
-            "Maps" : {}
+            "Maps" : {},
+            "Payment" : {}
         },
         /* 应用发布信息 */
         "distribute" : {
@@ -54,7 +55,10 @@
             "ios" : {},
             /* SDK配置 */
             "sdkConfigs" : {
-                "maps" : {}
+                "maps" : {},
+                "payment" : {
+                    "alipay" : {}
+                }
             }
         }
     },

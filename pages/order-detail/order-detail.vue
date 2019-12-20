@@ -35,7 +35,7 @@
 		</uni-list-item>
 		<uni-list-item extraWidth="40%">
 			<text class="font-md text-light-muted">优惠券</text>
-			<view slot="right" class="font-md text-light-muted">{{ orderInfo.coupon_id === 0? '没使用优惠券' : '-￥'+orderInfo.coupon_id }}</view>
+			<view slot="right" class="font-md text-light-muted">{{ orderInfo.coupon_id === 0? '没使用优惠券' : '优惠券id:'+orderInfo.coupon_id }}</view>
 		</uni-list-item>
 		<uni-list-item>
 			<text class="font-md main-text-color">实际付款</text>
@@ -47,10 +47,10 @@
 		
 		<card headTitle="订单信息">
 			<uni-list-item title="订单编号" extraWidth="50%">
-				<view slot="right" class="font-md text-light-muted">{{ orderInfo.orderNo }}</view>
+				<view slot="right" class="font-md text-light-muted">{{ orderInfo.no }}</view>
 			</uni-list-item>
 			<uni-list-item title="支付时间" extraWidth="60%">
-				<view slot="right" class="font-md text-light-muted">{{ orderInfo.create_time | formatTime }}</view>
+				<view slot="right" class="font-md text-light-muted">{{ orderInfo.create_time }}</view>
 			</uni-list-item>
 		</card>
 		
@@ -197,8 +197,31 @@
 		},
 		onLoad: function(e) {
 			if (e.orderid) {
+				this.$api.get('/order/' + e.orderid, {}, {token: true, toast: false}).then(res => {
+					console.log(res);
+					// this.orderInfo = res
+					// this.pathInfo = this.getPathById(this.orderInfo.address.id)
+					this.orderInfo.coupon_id = res.coupon_user_id
+					this.orderInfo.pay_price = res.total_price
+					this.pathInfo = res.address
+				}).catch(err => {
+					console.log(err);
+				})
+				
 				this.orderInfo = this.getOrderInfoById(parseInt(e.orderid))
-				this.pathInfo = this.getPathById(this.orderInfo.path_id)
+				console.log(this.orderInfo);
+				// this.pathInfo = this.getPathById(this.orderInfo.path_id)
+			} else {
+				uni.showModal({
+					title: '提示',
+					content: '该订单不存在',
+					showCancel: false,
+					complete: () => {
+						uni.navigateBack({
+							delta: 1
+						})
+					}
+				});
 			}
 		},
 		onBackPress: function() {

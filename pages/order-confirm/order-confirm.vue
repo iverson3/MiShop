@@ -24,12 +24,12 @@
 					<view class="d-flex a-center">
 						<template v-if="order.order_items.length > 3">
 							<template v-for="i in 3">
-								<image :key="i" :src="order.order_items[i].cover" class="rounded mr-2" style="width: 100upx;height: 100upx;"></image>
+								<image :key="i" :src="order.order_items[i].goods_item.cover" class="rounded mr-2" style="width: 100upx;height: 100upx;"></image>
 							</template>
 						</template>
 						<template v-else>
 							<template v-for="(item,index) in order.order_items">
-								<image :key="index" :src="item.cover" class="rounded mr-2" style="width: 100upx;height: 100upx;"></image>
+								<image :key="index" :src="item.goods_item.cover" class="rounded mr-2" style="width: 100upx;height: 100upx;"></image>
 							</template>
 						</template>
 					</view>
@@ -235,8 +235,8 @@
 					console.log(res);
 		
 					this.order.id = parseInt(res.id)
-					this.order.orderNo = res.no
-					this.order.create_time = utils.dateStringToTime(res.create_time)
+					this.order.no = res.no
+					this.order.create_time = res.create_time
 					this.order.statusNo = 1
 					this.order.status = "待支付"
 					this.order.freight = 0

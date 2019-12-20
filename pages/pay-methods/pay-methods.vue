@@ -15,10 +15,10 @@
 				</label>
 			</radio-group>
 			
-			<view class="w-100 main-bg-color py-2 rounded font-md text-white d-flex j-center mt-3" 
-			@tap="confirmPay"
+			<view class="w-100 py-2 rounded font-md text-white d-flex j-center mt-3" 
+			@tap="confirmPay" :class="paying? 'bg-secondary' : 'main-bg-color'"
 			hover-class="main-bg-hover-color">
-				确认支付
+				{{ paying ? '支付中...' : '确认支付'}}
 			</view>
 		</view>
 	</view>
@@ -38,6 +38,7 @@
 			return {
 				orderInfo: {},
 				payMethod: "alipay",
+				paying: false,
 				options: [{
 						title: "支付宝支付",
 						note: "推荐使用支付宝支付",
@@ -84,31 +85,62 @@
 				this.payMethod = e.detail.value
 			},
 			confirmPay: function() {
-				// 支付结果 1-成功 2-失败
-				let payres = 1
+				if (this.paying) return
 				
-				let rand = Math.floor(Math.random() * 10)
-				if (rand < 5) payres = 2
+				this.paying = true
 				
-				if (payres === 1) {
-					// 支付成功 则修改订单状态为待发货
-					let new_status = 2
-					if (rand % 2 === 0) new_status = 3
-					this.changeOrderStatus({
-						id: this.orderInfo.id,
-						old_status: this.orderInfo.statusNo,
-						new_status: new_status
-					})
-				} else {
-					// 支付失败 则修改订单状态为支付失败
-					this.changeOrderStatus({
-						id: this.orderInfo.id,
-						old_status: this.orderInfo.statusNo,
-						new_status: 5
-					})
-				}
-				uni.redirectTo({
-					url: `/pages/pay-result/pay-result?orderid=${this.orderInfo.id}&payres=${payres}`
+				// 从服务端获取支付数据
+				this.$api.get('/payment/' + this.orderInfo.id + '/' + this.payMethod, {}, {
+					token: true,
+					toast: false,
+					native: true
+				}).then(res => {
+					
+					// 发起支付请求
+					uni.requestPayment({
+						provider: this.payMethod, // 支付方式
+						orderInfo: res.data,  // 微信、支付宝订单数据
+						success: res => {
+							console.log(res);
+							// 支付成功 则修改订单状态为待发货
+							this.changeOrderStatus({
+								id: this.orderInfo.id,
+								old_status: this.orderInfo.statusNo,
+								new_status: 3
+							})
+							
+							uni.redirectTo({
+								url: `/pages/pay-result/pay-result?orderid=${this.orderInfo.id}&payres=1`
+							})
+						},
+						fail: (err) => {
+							console.log(err);
+							uni.showModal({
+								title: "提示",
+								content: "支付失败",
+								showCancel: false
+							})
+							
+							// 支付失败 则修改订单状态为支付失败
+							this.changeOrderStatus({
+								id: this.orderInfo.id,
+								old_status: this.orderInfo.statusNo,
+								new_status: 5
+							})
+							
+						},
+						complete: () => {
+							this.paying = false
+						}
+					});
+					
+				}).catch(err => {
+					console.log(err);
+					this.paying = false
+					uni.showToast({
+						title: '无法获取支付数据',
+						icon: 'none'
+					});
 				})
 			}
 		}
