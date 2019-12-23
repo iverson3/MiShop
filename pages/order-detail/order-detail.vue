@@ -2,24 +2,24 @@
 	<view>
 		<view class="main-bg-color p-4 text-white d-flex a-end j-sb" style="height: 300upx;">
 			<view class="mb-3">
-				<view class="font-lg">{{ statusInfoList[orderInfo.statusNo].title }}</view>
-				<view class="font">{{ statusInfoList[orderInfo.statusNo].desc }}</view>
+				<view class="font-lg">{{ orderStatus }}</view>
+				<view class="font">{{ timeDownText }}</view>
 			</view>
-			<view class="iconfont line-h mb-3" :class="statusInfoList[orderInfo.statusNo].icon" style="font-size: 100upx;"></view>
+			<view class="iconfont line-h mb-3" :class="orderStatusIcon" style="font-size: 100upx;"></view>
 		</view>
 		
 		<view class="p-3">
 			<view class="text-light-muted font-md">
-				<text class="font-lg text-dark mr-2">{{ pathInfo.name }}</text>
-				{{ pathInfo.phone }}
+				<text class="font-lg text-dark mr-2">{{ orderInfo.address.name }}</text>
+				{{ orderInfo.address.phone }}
 			</view>
 			<view class="text-light-muted font-md">
-				{{ pathInfo.province }} {{ pathInfo.city }} {{ pathInfo.district }} {{ pathInfo.address }}
+				{{ path }}
 			</view>
 		</view>
 		<divider></divider>
 		<view class="px-2">
-			<block v-for="(item,index) in orderInfo.order_items" :key="index">
+			<block v-for="(item,index) in orderInfo.orderItems" :key="index">
 				<order-list-item :goods="item" :index="index"></order-list-item>
 			</block>
 		</view>
@@ -35,12 +35,12 @@
 		</uni-list-item>
 		<uni-list-item extraWidth="40%">
 			<text class="font-md text-light-muted">优惠券</text>
-			<view slot="right" class="font-md text-light-muted">{{ orderInfo.coupon_id === 0? '没使用优惠券' : '优惠券id:'+orderInfo.coupon_id }}</view>
+			<view slot="right" class="font-md text-light-muted">{{ orderInfo.couponUserItem.length === 0? '没使用优惠券' : '优惠券id:'+orderInfo.couponUserItem.length }}</view>
 		</uni-list-item>
 		<uni-list-item>
 			<text class="font-md main-text-color">实际付款</text>
 			<view slot="right" class="font-md main-text-color">
-				<price>{{ orderInfo.pay_price }}</price>
+				<price>{{ orderInfo.total_price }}</price>
 			</view>
 		</uni-list-item>
 		<divider></divider>
@@ -128,7 +128,7 @@
 	import card from '@/components/common/card.vue'
 	import utils from '@/common/lib/utils.js';
 	
-	import {mapGetters, mapMutations} from 'vuex'
+	import {mapState, mapGetters, mapMutations} from 'vuex'
 	export default {
 		components: {
 			orderListItem,
@@ -138,10 +138,35 @@
 		},
 		data() {
 			return {
-				orderInfo: {},
-				pathInfo: {},
+				orderInfo: {
+					id: 0,
+					no: "",
+					address: {
+						province: "",
+						city: "",
+						district: "",
+						address: "",
+						zip: 0,
+						name: "",
+						phone: ""
+					},
+					total_price: 0,
+					freight: 0,
+					remark: "",
+					paid_time: null,  // 支付时间
+					payment_method: "",
+					payment_no: "",   // 支付流水号
+					refund_status: "pending", // 退款状态
+					ship_status: "", // 物流状态
+					extra: null,   // 退款相关信息
+					create_time: "",
+					update_time: "",
+					reviewed: 0,   // 评论相关信息
+					orderItems: [],
+					couponUserItem: []
+				},
 				
-				// 状态值： 0-未知 1-待支付 2-待发货 3-待收货 4-待评价 5-支付失败 6-已取消 7-退货退款中
+				// 状态值： 0-未知 1-待支付 2-待发货 3-待收货 4-待评价 5-支付失败 6-已取消 7-退货退款中 8-退款成功 9-退款失败
 				statusInfoList: [
 					{
 						title: "未知状态订单",
@@ -187,7 +212,52 @@
 			}
 		},
 		computed: {
-			...mapGetters(['getOrderInfoById', 'getPathById'])
+			...mapState({
+				statusList: state => state.order.statusList
+			}),
+			...mapGetters(['getOrderInfoById', 'getPathById']),
+			
+			path() {
+				let {province, city, district, address} = this.orderInfo.address
+				return `${province} ${city} ${district} ${address}`
+			},
+			orderStatus() {
+				return this.$help.formatOrderStatus({
+					paid_time: this.orderInfo.paid_time,
+					refund_status: this.orderInfo.refund_status,
+					ship_status: this.orderInfo.ship_status
+				})
+			},
+			orderStatusIcon() {
+				let statusObj = this.statusList.find(obj => obj.status === this.orderStatus)
+				return statusObj.icon
+			},
+			timeDownText() {
+				let msg = ""
+				switch (this.orderStatus){
+					case '待支付':
+						msg = "取消"
+						break;
+					case '待收货':
+						msg = "确认"
+						break;
+					case '待发货':
+						msg = "等待商家发货"
+						break;
+					case '退款中':
+						msg = "等待商家审核"
+						break;
+					case '已签收':
+						msg = "订单已签收"
+						break;
+					default:
+						break;
+				}
+				// if (msg !== '' && this.timeDownText !== '') {
+				// 	return `还差 ${this.timeDown} 自动${msg}`
+				// }
+				return ''
+			}
 		},
 		filters: {
 			formatTime(value) {
@@ -199,18 +269,48 @@
 			if (e.orderid) {
 				this.$api.get('/order/' + e.orderid, {}, {token: true, toast: false}).then(res => {
 					console.log(res);
-					// this.orderInfo = res
-					// this.pathInfo = this.getPathById(this.orderInfo.address.id)
-					this.orderInfo.coupon_id = res.coupon_user_id
-					this.orderInfo.pay_price = res.total_price
-					this.pathInfo = res.address
+					
+					this.orderInfo.id = res.id
+					this.orderInfo.no = res.no
+					this.orderInfo.address = res.address
+					this.orderInfo.total_price = res.total_price
+					this.orderInfo.remark = res.remark
+					this.orderInfo.paid_time = res.paid_time
+					this.orderInfo.payment_method = res.payment_method
+					this.orderInfo.payment_no = res.payment_no
+					this.orderInfo.refund_status = res.refund_status
+					this.orderInfo.ship_status = res.ship_status
+					this.orderInfo.extra = res.extra
+					this.orderInfo.create_time = res.create_time
+					this.orderInfo.update_time = res.update_time
+					this.orderInfo.reviewed = res.reviewed
+					
+					let total_num = 0
+					let order_items = res.orderItems.map(v => {
+						let attrs = []
+						if (v.skus_type === 1 && v.goodsSkus && v.goodsSkus.skus) {
+							let skus = v.goodsSkus.skus
+							for (let k in skus) {
+								attrs.push(skus[k].value)
+							}
+						}
+						total_num = total_num + v.num
+						return {
+							id: v.goods_id,
+							cover: v.goodsItem.cover,
+							title: v.goodsItem.title,
+							pprice: v.price,
+							skusText: attrs.join(','),
+							num: v.num
+						}
+					})
+					
+					this.orderInfo.orderItems = order_items
+					this.orderInfo.couponUserItem = res.couponUserItem
+		
 				}).catch(err => {
 					console.log(err);
 				})
-				
-				this.orderInfo = this.getOrderInfoById(parseInt(e.orderid))
-				console.log(this.orderInfo);
-				// this.pathInfo = this.getPathById(this.orderInfo.path_id)
 			} else {
 				uni.showModal({
 					title: '提示',

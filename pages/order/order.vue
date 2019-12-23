@@ -119,61 +119,13 @@
 					}
 				],
 				
-				hotList: [
-					{
-						id: 25,
-						cover:"/static/images/demo/list/1.jpg",
-						title:"米家空调",
-						desc:"1.5匹变频",
-						oprice:2699,
-						pprice:1399
-					},
-					{
-						id: 25,
-						cover:"/static/images/demo/list/1.jpg",
-						title:"米家空调",
-						desc:"1.5匹变频",
-						oprice:2699,
-						pprice:1399
-					},
-					{
-						id: 25,
-						cover:"/static/images/demo/list/1.jpg",
-						title:"米家空调",
-						desc:"1.5匹变频",
-						oprice:2699,
-						pprice:1399
-					},
-					{
-						id: 25,
-						cover:"/static/images/demo/list/1.jpg",
-						title:"米家空调",
-						desc:"1.5匹变频",
-						oprice:2699,
-						pprice:1399
-					},
-					{
-						id: 25,
-						cover:"/static/images/demo/list/1.jpg",
-						title:"米家空调",
-						desc:"1.5匹变频",
-						oprice:2699,
-						pprice:1399
-					},
-					{
-						id: 25,
-						cover:"/static/images/demo/list/1.jpg",
-						title:"米家空调",
-						desc:"1.5匹变频",
-						oprice:2699,
-						pprice:1399
-					}
-				]
+				hotList: []
 			}
 		},
 		computed: {
 			...mapState({
 				list: state => state.order.list,
+				statusList: state => state.order.statusList
 			}),
 			...mapGetters(['getOrderListByStatus'])
 		},
@@ -198,6 +150,7 @@
 				this.tabIndex = parseInt(e.tab)
 			}
 			this.__init()
+			this.getHotList()
 		},
 		onShow: function() {
 			// this.__init()
@@ -218,6 +171,21 @@
 					}
 				}
 			},
+			// 获取热门商品列表数据
+			getHotList: function() {
+				this.$api.get('/goods/hotlist').then(res => {
+					this.hotList = res.map(v => {
+						return {
+							id: v.id,
+							cover: v.cover,
+							title: v.title,
+							desc: v.desc,
+							oprice: v.min_oprice,
+							pprice: v.min_price
+						}
+					})
+				})
+			},
 			
 			changeTab: function(index) {
 				this.tabIndex = index
@@ -235,40 +203,51 @@
 			},
 			getOrderData: function(index) {
 				if (this.tabBars[index].type === '') return
+				uni.showLoading({title: "加载中...", mask: true})
+				
 				this.$api.post('/order/' + this.tabBars[index].type, {}, {token: true, toast: false}).then(res => {
-
 					console.log(res.length);
-					res.forEach(obj => {
-						if (obj.paid_time) {
-							if (obj.ship_status === 'pending') {
-								obj.statusNo = 3
-								obj.status = "待收货"
-							} else if (obj.ship_status === 'received') {
-								obj.statusNo = 4
-								obj.status = "待评价"
+					uni.hideLoading()
+					this.tabBars[index].list = res.map(item => {
+						let total_num = 0
+						let order_items = item.order_items.map(v => {
+							let attrs = []
+							if (v.skus_type === 1 && v.goods_skus && v.goods_skus.skus) {
+								let skus = v.goods_skus.skus
+								for (let k in skus) {
+									attrs.push(skus[k].value)
+								}
 							}
-							
-							if (obj.refund_status === 'pending') {
-								// 退款处理中
-							} else if (obj.refund_status === 'success') {
-								// 退款完成
+							total_num = total_num + v.num
+							return {
+								id: v.goods_id,
+								cover: v.goods_item.cover,
+								title: v.goods_item.title,
+								pprice: v.price,
+								skusText: attrs.join(','),
+								num: v.num
 							}
-							
-						} else {
-							obj.statusNo = 1
-							obj.status = "待支付"
+						})
+						let status = this.$help.formatOrderStatus(item)
+						let statusObj = this.statusList.find(obj => obj.status === status)
+						return {
+							id: item.id,
+							create_time: item.create_time,
+							statusNo: statusObj.statusNo,
+							status: statusObj.status,
+							order_items: order_items,
+							total_num: total_num,
+							total_price: item.total_price
 						}
 					})
-					
-					if (index === 0) {
-						this.setOrderList(res)
-					}
-					
-					this.tabBars[index].list = res
+					// if (index === 0) {
+					// 	this.setOrderList(res)
+					// }
 					this.tabBars[index].refetch = false
 					
 				}).catch(err => {
 					console.log(err);
+					uni.hideLoading()
 					this.tabBars[index].list = []
 					this.tabBars[index].refetch = true
 					uni.showToast({title: '获取数据失败', icon: 'none'});

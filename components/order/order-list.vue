@@ -21,37 +21,45 @@
 			<!-- 如果是待支付状态 可以取消订单/去支付 -->
 			<!-- 如果是支付失败状态 可以去支付/取消订单 -->
 			<template v-if="item.statusNo === 1 || item.statusNo === 5">
-				<view @click.stop="openPayMethod(item)" class="rounded border border-light-secondary px-2 py-1 text-secondary" hover-class="bg-light-secondary">{{ item.statusNo === 1?'去支付':'重新支付'}}</view>
-				<view @click.stop="cancelOrder(item)" class="rounded border border-light-secondary px-2 py-1 text-secondary ml-2" hover-class="bg-light-secondary">取消订单</view>
+				<common-button @click="openPayMethod">{{ item.statusNo === 1?'去支付':'重新支付'}}</common-button>
+				<common-button @click="cancelOrder">取消订单</common-button>
 			</template>
 			
 			<!-- 如果是待发货状态 可以取消订单 -->
-			<template v-if="item.statusNo === 2">
-				<view @click.stop="cancelOrder(item)" class="rounded border border-light-secondary px-2 py-1 text-secondary" hover-class="bg-light-secondary">取消订单</view>
+			<template v-else-if="item.statusNo === 2">
+				<common-button>提醒发货</common-button>
+				<common-button @click="applyRefund">申请退款</common-button>
+				<!-- <common-button @click="cancelOrder">取消订单</common-button> -->
 			</template>
 			
 			<!-- 如果是待收货状态 可以取消订单/确认收货 -->
-			<template v-if="item.statusNo === 3">
-				<view @click.stop="completeOrder(item)" class="rounded border border-light-secondary px-2 py-1 text-secondary" hover-class="bg-light-secondary">确认收货</view>
-				<view @click.stop="openLogistics(item.id)" class="rounded border border-light-secondary px-2 py-1 text-secondary ml-2" hover-class="bg-light-secondary">查看物流</view>
-				<view class="rounded border border-light-secondary px-2 py-1 text-secondary ml-2" hover-class="bg-light-secondary">申请退货退款</view>
+			<template v-else-if="item.statusNo === 3">
+				<common-button @click="completeOrder">确认收货</common-button>
+				<common-button @click="openLogistics">查看物流</common-button>
 			</template>
 			
+			
+			
+			
 			<!-- 如果是待评价状态 可以申请退货/去评价/再买一单 -->
-			<template v-if="item.statusNo === 4">
-				<view @click.stop="openAfterSale(item.id)" class="rounded border border-light-secondary px-2 py-1 text-secondary" hover-class="bg-light-secondary">申请售后</view>
-				<view @click.stop="toComment(item.id)" class="rounded border border-light-secondary px-2 py-1 text-secondary ml-2" hover-class="bg-light-secondary">去评价</view>
-				<view class="rounded border border-light-secondary px-2 py-1 text-secondary ml-2" hover-class="bg-light-secondary">再买一单</view>
+			<template v-else-if="item.statusNo === 4">
+				<common-button @click="openAfterSale">申请售后</common-button>
+				<common-button @click="toComment">去评价</common-button>
+				<!-- <common-button>再买一单</common-button> -->
 			</template>
 			
 			<!-- 如果是已取消状态  可以删除订单/重新下单 -->
-			<template v-if="item.statusNo === 6">
-				<view @click.stop="reOrder(item)" class="rounded border border-light-secondary px-2 py-1 text-secondary" hover-class="bg-light-secondary">重新下单</view>
-				<view @click.stop="deleteOrder(item.id)" class="rounded border border-light-secondary px-2 py-1 text-secondary ml-2" hover-class="bg-light-secondary">删除订单</view>
+			<template v-else-if="item.statusNo === 6">
+				<common-button @click="reOrder">重新下单</common-button>
+				<common-button @click="deleteOrder">删除订单</common-button>
 			</template>
 			<!-- 如果是退货退款状态 可以退货退款完成 -->
-			<template v-if="item.statusNo === 7">
-				<view class="rounded border border-light-secondary px-2 py-1 text-secondary" hover-class="bg-light-secondary">退货退款完成</view>
+			<template v-else-if="item.statusNo === 7">
+				<common-button>退货退款完成</common-button>
+			</template>
+			
+			<template v-else>
+				<common-button @click="openDetail">查看详情</common-button>
 			</template>
 			
 		</view>
@@ -60,12 +68,14 @@
 
 <script>
 	import orderListItem from '@/components/order/order-list-item.vue'
+	import commonButton from '@/components/common/common-button.vue';
 	import utils from '@/common/lib/utils.js';
 	
 	import {mapMutations} from 'vuex'
 	export default {
 		components: {
-			orderListItem
+			orderListItem,
+			commonButton
 		},
 		props: {
 			item: Object,
@@ -87,73 +97,116 @@
 		methods: {
 			...mapMutations(['changeOrderStatus', 'deleteOrderById', 'reCreateOrder']),
 			
-			openDetail: function(id) {
+			// 申请退款
+			applyRefund: function() {
 				uni.navigateTo({
-					url: "/pages/order-detail/order-detail?orderid=" + id
+					url: '/pages/order-refund/order-refund?orderid=' + this.item.id
+				});
+			},
+			// 去支付
+			openPayMethod: function() {
+				// 处于支付失败状态的订单 在去支付之前先修改订单状态为"待支付"
+				// if (item.statusNo === 5) {
+				// 	this.changeOrderStatus({
+				// 		id: item.id,
+				// 		old_status: item.statusNo,
+				// 		new_status: 1
+				// 	})
+				// }
+				uni.navigateTo({
+					url: "/pages/pay-methods/pay-methods?orderid=" + this.item.id + "&price=" + this.item.total_price
+				});
+			},
+			openDetail: function() {
+				uni.navigateTo({
+					url: "/pages/order-detail/order-detail?orderid=" + this.item.id
 				})
 			},
 			// 查看物流
-			openLogistics: function(id) {
+			openLogistics: function() {
 				uni.navigateTo({
-					url: "/pages/logistics-detail/logistics-detail?orderid=" + id
+					url: "/pages/logistics-detail/logistics-detail?orderid=" + this.item.id
 				})
 			},
+			// 取消订单
+			cancelOrder: function() {
+				uni.showModal({
+					content: '确定要取消该订单么？',
+					success: (res) => {
+						if (res.confirm) {
+							uni.showLoading({title: '取消订单中...', mask: true});
+							this.$api.post('/closeorder/'+ this.item.id, {}, {token: true, toast: false}).then(res => {
+								uni.hideLoading()
+								uni.showToast({title: '取消订单成功', icon: 'none'});
+								this.$emit('refreshView')
+							}).catch(err => {
+								uni.hideLoading()
+								uni.showToast({title: '取消订单失败', icon: 'none'});
+							})
+						}
+					}
+				});
+				// this.changeOrderStatus({
+				// 	id: item.id,
+				// 	old_status: item.statusNo,
+				// 	new_status: 6
+				// })
+			},
+			// 确认收货
+			completeOrder: function() {
+				uni.showModal({
+					content: '是否要确认收货?',
+					success: res => {
+						if (res.confirm) {
+							uni.showLoading({title: "确认收货中...", mask: true})
+							
+							this.$api.post('/order/'+this.item.id+'/received', {}, {token: true, toast: false}).then(res => {
+								uni.hideLoading()
+								uni.showToast({title: '确认收货成功', icon: 'success'});
+								this.$emit('refreshView')
+							}).catch(err => {
+								uni.hideLoading()
+								uni.showToast({title: '确认收货失败', icon: 'none'});
+							})
+						}
+					}
+				});
+				// this.changeOrderStatus({
+				// 	id: item.id,
+				// 	old_status: item.statusNo,
+				// 	new_status: 4
+				// })
+			},
+			
+			
+			// 去评价
+			toComment: function() {
+				uni.navigateTo({
+					url: '/pages/comment/comment?orderid=' + this.item.id
+				});
+			},
+			
+			// 删除订单
+			deleteOrder: function() {
+				// this.deleteOrderById(id)
+				this.$emit('refreshView')
+				uni.showToast({title: '删除成功', icon: 'none'});
+			},
+			
+			
+			
 			// 申请售后
 			openAfterSale: function(id) {
 				uni.navigateTo({
 					url: "/pages/after-sale/after-sale?orderid=" + id
 				})
 			},
-			// 去支付
-			openPayMethod: function(item) {
-				// 处于支付失败状态的订单 在去支付之前先修改订单状态为"待支付"
-				if (item.statusNo === 5) {
-					this.changeOrderStatus({
-						id: item.id,
-						old_status: item.statusNo,
-						new_status: 1
-					})
-				}
-				uni.navigateTo({
-					url: "/pages/pay-methods/pay-methods?orderid=" + item.id
-				});
-			},
-			// 确认收货
-			completeOrder: function(item) {
-				this.changeOrderStatus({
-					id: item.id,
-					old_status: item.statusNo,
-					new_status: 4
-				})
-				uni.showToast({title: '订单已完成', icon: 'none'});
-			},
-			// 取消订单
-			cancelOrder: function(item) {
-				this.changeOrderStatus({
-					id: item.id,
-					old_status: item.statusNo,
-					new_status: 6
-				})
-				uni.showToast({title: '取消成功', icon: 'none'});
-			},
 			// 重新下单
 			reOrder: function(item) {
-				this.reCreateOrder(item)
-				uni.navigateTo({
-					url: '/pages/order-confirm/order-confirm'
-				});
-			},
-			// 去评价
-			toComment: function(id) {
-				uni.navigateTo({
-					url: '/pages/comment/comment?orderid=' + id
-				});
-			},
-			// 删除订单
-			deleteOrder: function(id) {
-				this.deleteOrderById(id)
-				this.$emit('refreshView')
-				uni.showToast({title: '删除成功', icon: 'none'});
+				// this.reCreateOrder(item)
+				// uni.navigateTo({
+				// 	url: '/pages/order-confirm/order-confirm'
+				// });
 			}
 			
 		}

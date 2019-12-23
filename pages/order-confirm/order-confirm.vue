@@ -24,12 +24,12 @@
 					<view class="d-flex a-center">
 						<template v-if="order.order_items.length > 3">
 							<template v-for="i in 3">
-								<image :key="i" :src="order.order_items[i].goods_item.cover" class="rounded mr-2" style="width: 100upx;height: 100upx;"></image>
+								<image :key="i" :src="order.order_items[i].cover" class="rounded mr-2" style="width: 100upx;height: 100upx;"></image>
 							</template>
 						</template>
 						<template v-else>
 							<template v-for="(item,index) in order.order_items">
-								<image :key="index" :src="item.goods_item.cover" class="rounded mr-2" style="width: 100upx;height: 100upx;"></image>
+								<image :key="index" :src="item.cover" class="rounded mr-2" style="width: 100upx;height: 100upx;"></image>
 							</template>
 						</template>
 					</view>
@@ -234,19 +234,18 @@
 				this.$api.post('/order', options, {token: true, toast: false}).then(res => {
 					console.log(res);
 		
-					this.order.id = parseInt(res.id)
-					this.order.no = res.no
-					this.order.create_time = res.create_time
-					this.order.statusNo = 1
-					this.order.status = "待支付"
-					this.order.freight = 0
-					this.order.coupon_id = this.useCoupon.id
-					this.order.pay_price = this.realPayPrice
-					
-					this.doCreateOrder(this.order)
+					// this.order.id = parseInt(res.id)
+					// this.order.no = res.no
+					// this.order.create_time = res.create_time
+					// this.order.statusNo = 1
+					// this.order.status = "待支付"
+					// this.order.freight = 0
+					// this.order.coupon_id = this.useCoupon.id
+					// this.order.pay_price = this.realPayPrice
+					// this.doCreateOrder(this.order)
 					// 正式生成订单后 删除进入订单的商品(即选中的商品)
 					let ids = this.selectedList.join(',')
-					this.$api.post('/cart/delete', {shop_ids: ids}, {token: true, toast: false}).then(res => {
+					this.$api.post('/cart/delete', {shop_ids: ids}, {token: true, toast: false}).then(res2 => {
 						this.doDelGoods(false)
 					}).catch(err => {
 						console.log(err);
@@ -254,7 +253,7 @@
 					
 					this.ordering = false
 					uni.redirectTo({
-						url: "/pages/pay-methods/pay-methods?orderid=" + this.order.id
+						url: "/pages/pay-methods/pay-methods?orderid=" + res.id + "&price=" + this.realPayPrice
 					})
 					
 				}).catch(err => {

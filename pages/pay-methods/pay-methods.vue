@@ -2,7 +2,7 @@
 	<view>
 		<view class="py-5 d-flex flex-column j-center a-center my-3">
 			<text class="text-light-muted font-md mb-1">支付金额</text>
-			<price priceSize="font-lg" unitSize="font-md">{{ orderInfo.pay_price }}</price>
+			<price priceSize="font-lg" unitSize="font-md">{{ price }}</price>
 		</view>
 		
 		<view class="px-5">
@@ -36,7 +36,8 @@
 		},
 		data() {
 			return {
-				orderInfo: {},
+				orderid: 0,
+				price: 0,
 				payMethod: "alipay",
 				paying: false,
 				options: [{
@@ -57,8 +58,12 @@
 			...mapGetters(['getOrderInfoById'])
 		},
 		onLoad: function(e) {
-			if (e.orderid) {
-				this.orderInfo = this.getOrderInfoById(parseInt(e.orderid))
+			if (e.orderid && e.price) {
+				this.orderid = parseInt(e.orderid)
+				this.price = parseFloat(e.price)
+			} else {
+				uni.showToast({title: '出现未知错误，请重新下单', icon: 'none'});
+				uni.navigateBack({delta: 1});
 			}
 		},
 		onBackPress: function() {
@@ -72,7 +77,7 @@
 				success: res => {
 					if (res.confirm) {
 						// 用户选择放弃支付 则直接跳转到订单详情页 并显示该订单处于待支付状态
-						uni.redirectTo({url: "/pages/order-detail/order-detail?orderid=" + this.orderInfo.id});
+						uni.redirectTo({url: "/pages/order-detail/order-detail?orderid=" + this.orderid});
 					}
 				}
 			});
@@ -86,11 +91,10 @@
 			},
 			confirmPay: function() {
 				if (this.paying) return
-				
 				this.paying = true
 				
 				// 从服务端获取支付数据
-				this.$api.get('/payment/' + this.orderInfo.id + '/' + this.payMethod, {}, {
+				this.$api.get('/payment/' + this.orderid + '/' + this.payMethod, {}, {
 					token: true,
 					toast: false,
 					native: true
@@ -103,14 +107,14 @@
 						success: res => {
 							console.log(res);
 							// 支付成功 则修改订单状态为待发货
-							this.changeOrderStatus({
-								id: this.orderInfo.id,
-								old_status: this.orderInfo.statusNo,
-								new_status: 3
-							})
+							// this.changeOrderStatus({
+							// 	id: this.orderInfo.id,
+							// 	old_status: this.orderInfo.statusNo,
+							// 	new_status: 3
+							// })
 							
 							uni.redirectTo({
-								url: `/pages/pay-result/pay-result?orderid=${this.orderInfo.id}&payres=1`
+								url: `/pages/pay-result/pay-result?orderid=${this.orderid}&payres=1`
 							})
 						},
 						fail: (err) => {
@@ -122,11 +126,11 @@
 							})
 							
 							// 支付失败 则修改订单状态为支付失败
-							this.changeOrderStatus({
-								id: this.orderInfo.id,
-								old_status: this.orderInfo.statusNo,
-								new_status: 5
-							})
+							// this.changeOrderStatus({
+							// 	id: this.orderInfo.id,
+							// 	old_status: this.orderInfo.statusNo,
+							// 	new_status: 5
+							// })
 							
 						},
 						complete: () => {

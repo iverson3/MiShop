@@ -14,39 +14,57 @@ export default {
 			coupon_id: 0,   // 优惠券id
 			path_id: 0,     // 收货地址id
 		},
-		// 0-未知 1-待支付 2-待发货 3-待收货 4-待评价 5-支付失败 6-已取消 7-退货退款中
+		// 0-未知 1-待支付 2-待发货 3-待收货 4-待评价 5-支付失败 6-已取消 7-退款中 8-退款成功 9-退款失败
 		statusList: [
 			{
 				status: '未知状态',
-				statusNo: 0
+				statusNo: 0,
+				icon: "icon-unknown"
 			},
 			{
 				status: '待支付',
-				statusNo: 1
+				statusNo: 1,
+				icon: "icon-daifukuan"
 			},
 			{
 				status: '待发货',
-				statusNo: 2
+				statusNo: 2,
+				icon: "icon-daifahuo"
 			},
 			{
 				status: '待收货',
-				statusNo: 3
+				statusNo: 3,
+				icon: "icon-daishouhuo"
 			},
 			{
 				status: '待评价',
-				statusNo: 4
+				statusNo: 4,
+				icon: "icon-daipingjia"
 			},
 			{
 				status: '支付失败',
-				statusNo: 5
+				statusNo: 5,
+				icon: "icon-daipingjia"
 			},
 			{
 				status: '已取消',
-				statusNo: 6
+				statusNo: 6,
+				icon: "icon-daipingjia"
 			},
 			{
-				status: '退货退款中',
-				statusNo: 7
+				status: '退款中',
+				statusNo: 7,
+				icon: "icon-tuihuo"
+			},
+			{
+				status: '退款成功',
+				statusNo: 8,
+				icon: "icon-tuihuo"
+			},
+			{
+				status: '退款失败',
+				statusNo: 9,
+				icon: "icon-tuihuo"
 			}
 		],
 		
