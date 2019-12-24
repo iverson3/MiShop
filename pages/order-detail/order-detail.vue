@@ -74,7 +74,7 @@
 			
 			<!-- 如果是待发货状态 可以取消订单 -->
 			<template v-else-if="orderStatusNo === 2">
-				<common-button>提醒发货</common-button>
+				<common-button @click="remindShip">提醒发货</common-button>
 				<common-button @click="applyRefund">申请退款</common-button>
 				<!-- <common-button @click="cancelOrder">取消订单</common-button> -->
 			</template>
@@ -96,12 +96,12 @@
 			
 			<!-- 如果是已取消状态  可以删除订单/重新下单 -->
 			<template v-else-if="orderStatusNo === 6">
-				<common-button @click="reOrder">重新下单</common-button>
-				<common-button @click="deleteOrder">删除订单</common-button>
+				<!-- <common-button @click="reOrder">重新下单</common-button> -->
+				<!-- <common-button @click="deleteOrder">删除订单</common-button> -->
 			</template>
 			<!-- 如果是退货退款状态 可以退货退款完成 -->
 			<template v-else-if="orderStatusNo === 7">
-				<common-button>退货退款完成</common-button>
+				<!-- <common-button>退货退款完成</common-button> -->
 			</template>
 		</view>
 	
@@ -381,6 +381,10 @@
 				}
 			},
 			
+			// 提醒商家发货
+			remindShip: function() {
+				uni.showToast({title: '已提醒商家', icon: 'none'});
+			},
 			// 申请退款
 			applyRefund: function() {
 				uni.navigateTo({
