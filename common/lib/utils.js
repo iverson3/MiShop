@@ -361,5 +361,23 @@ export default {
 		let birthday=new Date(data.replace(/-/g, "\/")); 
 		let d=new Date(); 
 		return d.getFullYear()-birthday.getFullYear()-((d.getMonth()<birthday.getMonth()|| d.getMonth()==birthday.getMonth() && d.getDate()<birthday.getDate())?1:0);
+	},
+	
+	// 倒计时
+	getTimeDown(endTime) {
+		let now = new Date().getTime() / 1000
+		let totalSeconds = parseInt(endTime - now)
+		// 天数
+		let days = Math.floor(totalSeconds / (60 * 60 * 24))
+		let module = totalSeconds % (60 * 60 * 24)
+		// 小时数
+		let hours = Math.floor(module / (60 * 60))
+		module = module % (60 * 60)
+		// 分钟
+		let minutes = Math.floor(module / 60)
+		// 秒数
+		let seconds = module % 60
+		
+		return `${days}天 ${hours}小时 ${minutes}分 ${seconds}秒`
 	}
 }

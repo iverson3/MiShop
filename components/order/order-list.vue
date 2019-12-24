@@ -196,13 +196,13 @@
 			
 			
 			// 申请售后
-			openAfterSale: function(id) {
+			openAfterSale: function() {
 				uni.navigateTo({
-					url: "/pages/after-sale/after-sale?orderid=" + id
+					url: "/pages/after-sale/after-sale?orderid=" + this.item.id
 				})
 			},
 			// 重新下单
-			reOrder: function(item) {
+			reOrder: function() {
 				// this.reCreateOrder(item)
 				// uni.navigateTo({
 				// 	url: '/pages/order-confirm/order-confirm'

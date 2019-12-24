@@ -59,7 +59,7 @@
 	import noThing from '@/components/common/no-thing.vue'
 	import orderList from '@/components/order/order-list.vue'
 	
-	import {mapState, mapGetters, mapMutations, mapActions} from 'vuex'
+	import {mapState} from 'vuex'
 	export default {
 		components: {
 			commonList,
@@ -124,15 +124,8 @@
 		},
 		computed: {
 			...mapState({
-				list: state => state.order.list,
 				statusList: state => state.order.statusList
-			}),
-			...mapGetters(['getOrderListByStatus'])
-		},
-		watch: {
-			async tabIndex(newValue, oldValue) {
-				// console.log(newValue)
-			}
+			})
 		},
 		onNavigationBarButtonTap: function(e) {
 			if (e.index === 0) {
@@ -149,28 +142,13 @@
 			if (e.tab) {
 				this.tabIndex = parseInt(e.tab)
 			}
-			this.__init()
+			this.getOrderData(this.tabIndex)
 			this.getHotList()
 		},
 		onShow: function() {
-			// this.__init()
+			this.refetchOrderData()
 		},
 		methods: {
-			...mapMutations(['setOrderList']),
-			
-			async __init() {
-				this.getOrderData(this.tabIndex)
-				return
-				
-				this.tabBars[0].list = this.list
-				for (let k in this.tabBars) {
-					// 索引变量 k 的类型是 string
-					let key = parseInt(k)
-					if (key !== 0) {
-						this.tabBars[key].list = this.getOrderListByStatus(key)
-					}
-				}
-			},
 			// 获取热门商品列表数据
 			getHotList: function() {
 				this.$api.get('/goods/hotlist').then(res => {
@@ -189,13 +167,11 @@
 			
 			changeTab: function(index) {
 				this.tabIndex = index
-				// this.__init()
 				// 切换tab时 页面回到顶部
 				uni.pageScrollTo({
 					scrollTop: 0,
 					duration: 100
 				})
-
 				this.getOrderData(index)
 			},
 			refetchOrderData: function() {
@@ -240,9 +216,6 @@
 							total_price: item.total_price
 						}
 					})
-					// if (index === 0) {
-					// 	this.setOrderList(res)
-					// }
 					this.tabBars[index].refetch = false
 					
 				}).catch(err => {
