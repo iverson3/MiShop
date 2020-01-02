@@ -1,7 +1,7 @@
 <template>
 	<view>
 		
-		<view v-if="beforeReady" class="w-100 d-flex flex-column" style="margin-top: 100upx;">
+		<view v-if="beforeReady" class="w-100 d-flex flex-column" style="margin-top: 100rpx;">
 			<mi-skeleton
 				:loading="beforeReady"
 				:showTitle="true">
@@ -104,9 +104,9 @@
 			商品信息 h275
 			图片 180*180
 			 -->
-			<view class="d-flex a-center" style="height: 275upx;">
+			<view class="d-flex a-center" style="height: 275rpx;">
 				<image src="../../static/images/demo/list/1.jpg" 
-				style="width: 180upx;height: 180upx;"
+				style="width: 180rpx;height: 180rpx;"
 				class="border rounded"
 				mode="widthFix"></image>
 				<view class="pl-2">
@@ -116,7 +116,7 @@
 			</view>
 			 
 			<!-- 表单部分 h660 -->
-			<scroll-view scroll-y class="w-100" style="height: 660upx;">
+			<scroll-view scroll-y class="w-100" style="height: 660rpx;">
 			 	<card :headTitle="item.title" 
 				v-for="(item,index) in selects"
 				:key="index"
@@ -135,19 +135,19 @@
 			:hover-class="maxStock === 0? '' : 'main-bg-hover-color'"
 			:class="maxStock === 0? 'bg-secondary' : 'main-bg-color'"
 			@tap.stop="addCart"
-			style="height: 100upx;margin-left: -30upx;margin-right: -30upx;">
+			style="height: 100rpx;margin-left: -30rpx;margin-right: -30rpx;">
 				{{ maxStock === 0? '暂无库存' : '加入购物车' }}
 			</view>
 		</common-popup>
 		
 		<!-- 收货地址选择弹出框 -->
 		<common-popup :popupClass="popup.express" @hide="hidePopup('express')">
-			<view class="d-flex a-center j-center font-md border-bottom border-light-secondary" style="height: 100upx;">
+			<view class="d-flex a-center j-center font-md border-bottom border-light-secondary" style="height: 100rpx;">
 				收货地址
 			</view>
 			 
 			<!-- 地址列表 h660 -->
-			<scroll-view scroll-y class="w-100" style="height: 835upx;">
+			<scroll-view scroll-y class="w-100" style="height: 835rpx;">
 			 	<uni-list-item @tap="changeCurPath(item)" v-for="(item,index) in pathList" :key="index">
 					<view class="iconfont icon-dingwei font-weight font-md">
 						{{ item.name }}
@@ -164,19 +164,19 @@
 			<view class="main-bg-color text-white font-md d-flex j-center a-center"
 			hover-class="main-bg-hover-color"
 			@tap.stop="openCreatePath"
-			style="height: 100upx;margin-left: -30upx;margin-right: -30upx;">
+			style="height: 100rpx;margin-left: -30rpx;margin-right: -30rpx;">
 				选择新地址
 			</view>
 		</common-popup>
 		
 		<!-- 服务说明弹出框 -->
 		<common-popup :popupClass="popup.service" @hide="hidePopup('service')">
-			<view class="d-flex a-center j-center font-md border-bottom border-light-secondary" style="height: 100upx;">
+			<view class="d-flex a-center j-center font-md border-bottom border-light-secondary" style="height: 100rpx;">
 				服务说明
 			</view>
 			 
 			<!-- 服务说明列表 h660 -->
-			<scroll-view scroll-y class="w-100" style="height: 835upx;">
+			<scroll-view scroll-y class="w-100" style="height: 835rpx;">
 			 	<view class="py-1">
 			 		<view class="d-flex a-center">
 						<view class="iconfont icon-finish main-text-color mr-1"></view>
@@ -197,7 +197,7 @@
 			<view class="main-bg-color text-white font-md d-flex j-center a-center"
 			hover-class="main-bg-hover-color"
 			@tap.stop="hidePopup('service')"
-			style="height: 100upx;margin-left: -30upx;margin-right: -30upx;">
+			style="height: 100rpx;margin-left: -30rpx;margin-right: -30rpx;">
 				确定
 			</view>
 		</common-popup>

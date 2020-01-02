@@ -1,11 +1,11 @@
 <template>
 	<view>
-		<view class="main-bg-color p-4 text-white d-flex a-end j-sb" style="height: 300upx;">
+		<view class="main-bg-color p-4 text-white d-flex a-end j-sb" :style="'height: '+orderStatusHeight+'rpx;'">
 			<view class="mb-3">
 				<view class="font-lg">{{ orderStatus }}</view>
 				<view class="font">{{ timeDownText }}</view>
 			</view>
-			<view class="iconfont line-h mb-3" :class="orderStatusIcon" style="font-size: 100upx;"></view>
+			<view class="iconfont line-h mb-3" :class="orderStatusIcon" style="font-size: 100rpx;"></view>
 		</view>
 		
 		<view class="p-3">
@@ -62,8 +62,8 @@
 			</uni-list-item>
 		</card>
 		
-		<view v-if="orderStatus && orderStatusNo && orderStatusNo < 5" class="w-100 bg-white" style="height: 100upx;"></view>
-		<view v-if="orderStatus && orderStatusNo && orderStatusNo < 5" class="position-fixed bottom-0 left-0 right-0 w-100 d-flex a-center j-end pr-3 bg-white" style="height: 100upx;">
+		<view v-if="orderStatus && orderStatusNo && orderStatusNo < 5" class="w-100 bg-white" style="height: 100rpx;"></view>
+		<view v-if="orderStatus && orderStatusNo && orderStatusNo < 5" class="position-fixed bottom-0 left-0 right-0 w-100 d-flex a-center j-end pr-3 bg-white" style="height: 100rpx;">
 			
 			<!-- 如果是待支付状态 可以取消订单/去支付 -->
 			<!-- 如果是支付失败状态 可以去支付/取消订单 -->
@@ -158,6 +158,7 @@
 				},
 				timer: null,
 				timeDown: '',
+				orderStatusHeight: 300,  // 订单状态view的高度
 				
 				// 状态值： 0-未知 1-待支付 2-待发货 3-待收货 4-待评价 5-支付失败 6-已取消 7-退货退款中 8-退款成功 9-退款失败
 				statusInfoList: [
@@ -273,6 +274,10 @@
 			}
 		},
 		onLoad: function(e) {
+			// #ifdef MP
+			this.orderStatusHeight = 200
+			// #endif
+			
 			if (e.orderid) {
 				this.orderid = e.orderid
 			} else {

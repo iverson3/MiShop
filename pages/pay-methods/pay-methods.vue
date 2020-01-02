@@ -40,18 +40,7 @@
 				price: 0,
 				payMethod: "alipay",
 				paying: false,
-				options: [{
-						title: "支付宝支付",
-						note: "推荐使用支付宝支付",
-						icon: "icon-zhifubao text-primary",
-						value: "alipay"
-					},{
-						title: "微信支付",
-						note: "",
-						icon: "icon-weixinzhifu text-success",
-						value: "wxpay"
-					}
-				]
+				options: []
 			}
 		},
 		computed: {
@@ -65,6 +54,31 @@
 				uni.showToast({title: '出现未知错误，请重新下单', icon: 'none'});
 				uni.navigateBack({delta: 1});
 			}
+			
+			// #ifdef APP-PLUS
+			this.options = [{
+						title: "支付宝支付",
+						note: "推荐使用支付宝支付",
+						icon: "icon-zhifubao text-primary",
+						value: "alipay"
+					},{
+						title: "微信支付",
+						note: "",
+						icon: "icon-weixinzhifu text-success",
+						value: "wxpay"
+					}]
+			// #endif
+			
+			// 微信小程序端只支持微信支付
+			// #ifdef MP-WEIXIN
+			this.payMethod = "wxpay"
+			this.options = [{
+						title: "微信支付",
+						note: "推荐使用微信支付",
+						icon: "icon-weixinzhifu text-success",
+						value: "wxpay"
+					}]
+			// #endif
 		},
 		onBackPress: function() {
 			let pages = getCurrentPages()
@@ -93,26 +107,29 @@
 				if (this.paying) return
 				this.paying = true
 				
+				// #ifdef APP-PLUS
+				this.appPay()
+				// #endif
+				
+				// #ifdef MP-WEIXIN
+				this.weixinMpPay()
+				// #endif
+			},
+			
+			// app端的支付逻辑
+			appPay: function() {
 				// 从服务端获取支付数据
 				this.$api.get('/payment/' + this.orderid + '/' + this.payMethod, {}, {
 					token: true,
 					toast: false,
 					native: true
 				}).then(res => {
-					
 					// 发起支付请求
 					uni.requestPayment({
 						provider: this.payMethod, // 支付方式
 						orderInfo: res.data,  // 微信、支付宝订单数据
 						success: res => {
 							console.log(res);
-							// 支付成功 则修改订单状态为待发货
-							// this.changeOrderStatus({
-							// 	id: this.orderInfo.id,
-							// 	old_status: this.orderInfo.statusNo,
-							// 	new_status: 3
-							// })
-							
 							uni.redirectTo({
 								url: `/pages/pay-result/pay-result?orderid=${this.orderid}&payres=1`
 							})
@@ -124,14 +141,6 @@
 								content: "支付失败",
 								showCancel: false
 							})
-							
-							// 支付失败 则修改订单状态为支付失败
-							// this.changeOrderStatus({
-							// 	id: this.orderInfo.id,
-							// 	old_status: this.orderInfo.statusNo,
-							// 	new_status: 5
-							// })
-							
 						},
 						complete: () => {
 							this.paying = false
@@ -146,6 +155,11 @@
 						icon: 'none'
 					});
 				})
+			},
+			
+			// 微信小程序端的支付逻辑
+			weixinMpPay: function() {
+				
 			}
 		}
 	}

@@ -5,7 +5,7 @@
 		<view class="_body" :style="getPopupStyle">
 			<view class="position-absolute iconfont icon-shanchu1 rounded-circle bg-light-secondary" 
 			@tap.stop="$emit('hide')"
-			style="top: 40upx; right: 40upx;font-size: 16upx;padding: 6upx 12upx;"></view>
+			style="top: 40rpx; right: 40rpx;font-size: 16rpx;padding: 6rpx 12rpx;"></view>
 			<slot></slot>
 		</view>
 	</view>
@@ -25,7 +25,7 @@
 		},
 		computed: {
 			getPopupStyle() {
-				return `height: ${this.popupHeight}upx;bottom: -${this.popupHeight}upx;`
+				return `height: ${this.popupHeight}rpx;bottom: -${this.popupHeight}rpx;`
 			}
 		},
 		methods: {
@@ -55,11 +55,11 @@
 	._popup ._body {
 		position: fixed;
 		/* 注意，这里bottom不能设置为0 要设置为跟弹出框body高度一样的负值 */
-		/* bottom: -1035upx;  */
+		/* bottom: -1035rpx;  */
 		width: 92%;
 		padding: 0 4%;
-		/* height: 1035upx; */
-		border-radius: 20upx 20upx 0 0;
+		/* height: 1035rpx; */
+		border-radius: 20rpx 20rpx 0 0;
 		background: #FFFFFF;
 		z-index: 2003;
 		display: flex;

@@ -1,64 +1,81 @@
 <template>
-	<view class="d-flex border-top border-light-secondary animated fadeIn faster" style="height: 100%; box-sizing: border-box;">
-		
-		<!-- <loading-plus v-if="beforeReady"></loading-plus> -->
-		<!-- <loading :show="showLoading"></loading> -->
-		
-		<template v-if="!beforeReady && (cate.length === 0)">
-			<view class="w-100 j-center a-center text-center" style="padding-top: 300upx;" @tap="reloadData">
-				<text class="font-md text-light-muted">获取数据失败，请检查网络</text>
+	<view class="d-flex flex-column" style="height: 100vh;">
+		<!-- #ifdef MP -->
+		<!-- 顶部的自定义导航栏 -->
+		<view class="w-100 d-flex a-center" style="height: 90upx;">
+			<view class="flex-1 bg-light rounded d-flex a-center text-light-muted ml-2" 
+			@click="openSearch" style="height: 65upx;">
+				<text class="iconfont icon-sousuo mx-2"></text>
+				小米手机
 			</view>
-		</template>
-		
-		<template v-if="!beforeReady">
-			<!-- 左边 分类列表 -->
-			<scroll-view id="leftScroll" scroll-y 
-			:scroll-top="leftScrollTop"
-			style="flex: 1;height: 100%;" 
-			class="border-right border-light-secondary">
-				<view v-for="(item,index) in cate" :key="index" 
-				@tap="changeCate(index)"
-				hover-class="bg-light-secondary"
-				class="border-bottom border-light-secondary py-1 left-scroll-item">
-					<view :class="activeIndex===index?'class-active':''" class="py-1 font-md text-muted text-center">{{ item.name }}</view>
-				</view>
-			</scroll-view>
-			
-			<!-- 右边 对应分类下的商品列表 -->
-			<scroll-view scroll-y style="flex: 3.5;height: 100%;" 
-			@scroll="onRightScroll"
-			:scroll-top="rightScrollTop" 
-			:scroll-with-animation="true">
-				<view v-for="(item,index) in list" :key="index" class="row right-scroll-item">
-					<view v-for="(item2,index2) in item.list" :key="index2" 
-					@tap="openDetail(item2.goods_id)"
-					class="span24-8 text-center py-2">
-						<image :src="item2.cover" style="width: 120upx;height: 120upx;"></image>
-						<text class="d-block">{{ item2.name }}</text>
-					</view>
-				</view>
-			</scroll-view>
-		</template>
-		
-		<view v-if="beforeReady" class="w-100 d-flex flex-column">
-			<mi-skeleton
-				:loading="beforeReady"
-				:showTitle="true">
-			</mi-skeleton>
-			<mi-skeleton
-				:loading="beforeReady"
-				:showTitle="true">
-			</mi-skeleton>
-			<mi-skeleton
-				:loading="beforeReady"
-				:showTitle="true">
-			</mi-skeleton>
-			<mi-skeleton
-				:loading="beforeReady"
-				:showTitle="true">
-			</mi-skeleton>
+			<view style="width: 85upx;" class="d-flex a-center j-center" @click="openMessage">
+				<text class="iconfont icon-xiaoxi" style="font-size: 40upx;"></text>
+			</view>
 		</view>
+		<!-- #endif -->
 		
+		
+		<view class="d-flex border-top border-light-secondary animated fadeIn faster" style="height: 100%; box-sizing: border-box;">
+			
+			<!-- <loading-plus v-if="beforeReady"></loading-plus> -->
+			<!-- <loading :show="showLoading"></loading> -->
+			
+			<template v-if="!beforeReady && (cate.length === 0)">
+				<view class="w-100 j-center a-center text-center" style="padding-top: 300upx;" @tap="reloadData">
+					<text class="font-md text-light-muted">获取数据失败，请检查网络</text>
+				</view>
+			</template>
+			
+			<template v-if="!beforeReady">
+				<!-- 左边 分类列表 -->
+				<scroll-view id="leftScroll" scroll-y 
+				:scroll-top="leftScrollTop"
+				style="flex: 1;height: 100%;" 
+				class="border-right border-light-secondary">
+					<view v-for="(item,index) in cate" :key="index" 
+					@tap="changeCate(index)"
+					hover-class="bg-light-secondary"
+					class="border-bottom border-light-secondary py-1 left-scroll-item">
+						<view :class="activeIndex===index?'class-active':''" class="py-1 font-md text-muted text-center">{{ item.name }}</view>
+					</view>
+				</scroll-view>
+				
+				<!-- 右边 对应分类下的商品列表 -->
+				<scroll-view scroll-y style="flex: 3.5;height: 100%;" 
+				@scroll="onRightScroll"
+				:scroll-top="rightScrollTop" 
+				:scroll-with-animation="true">
+					<view v-for="(item,index) in list" :key="index" class="row right-scroll-item">
+						<view v-for="(item2,index2) in item.list" :key="index2" 
+						@tap="openDetail(item2.goods_id)"
+						class="span24-8 text-center py-2">
+							<image :src="item2.cover" style="width: 120upx;height: 120upx;"></image>
+							<text class="d-block">{{ item2.name }}</text>
+						</view>
+					</view>
+				</scroll-view>
+			</template>
+			
+			<view v-if="beforeReady" class="w-100 d-flex flex-column">
+				<mi-skeleton
+					:loading="beforeReady"
+					:showTitle="true">
+				</mi-skeleton>
+				<mi-skeleton
+					:loading="beforeReady"
+					:showTitle="true">
+				</mi-skeleton>
+				<mi-skeleton
+					:loading="beforeReady"
+					:showTitle="true">
+				</mi-skeleton>
+				<mi-skeleton
+					:loading="beforeReady"
+					:showTitle="true">
+				</mi-skeleton>
+			</view>
+			
+		</view>
 	</view>
 </template>
 
@@ -86,6 +103,8 @@
 				
 				// 分类节点dom的高度
 				cateItemHeight: 0,
+				// 自定义顶部导航条的高度
+				customNavBarH: 0
 			}
 		},
 		watch: {
@@ -130,6 +149,10 @@
 			}
 		},
 		onLoad: function() {
+			// #ifdef MP
+			this.customNavBarH = 45
+			// #endif
+			
 			this.getData()
 		},
 		onReady: function() {
@@ -212,14 +235,15 @@
 			// 左边分类点击事件
 			changeCate: function(index) {
 				this.activeIndex = index
+				
 				// 使右边scroll-view滚动到当前分类所对应的区块
-				this.rightScrollTop = this.rightDomsTop[index]
+				this.rightScrollTop = this.rightDomsTop[index] - this.customNavBarH
 			},
 			// 右边商品列表滚动事件
 			async onRightScroll(e) {
 				// 匹配当前scrollTop所处的索引
 				this.rightDomsTop.forEach((v, k) => {
-					if (v < (e.detail.scrollTop + 3)) {
+					if (v < (e.detail.scrollTop + this.customNavBarH + 3)) {
 						this.activeIndex = k
 					}
 				})
@@ -229,6 +253,18 @@
 				uni.navigateTo({
 					url: '/pages/detail/detail?goods_id=' + id
 				});
+			},
+			openMessage: function() {
+				// 需要验证用户权限的跳转使用 this.navigateTo()
+				// 不需要验证用户权限的跳转使用 uni.navigateTo()
+				this.navigateTo({
+					url: "/pages/msg-list/msg-list"
+				})
+			},
+			openSearch: function() {
+				uni.navigateTo({
+					url: '/pages/search/search'
+				})
 			}
 		}
 	}

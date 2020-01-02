@@ -207,10 +207,6 @@ export default {
 		updateCartList({state, commit}) {
 			return new Promise((res, rej) => {
 				$api.get('/cart', {}, {token: true, toast: false}).then(data => {
-					console.log(data)
-					data.forEach(res => {
-						console.log(res);
-					})
 					// 取消全选状态
 					commit('unSelectAll')
 					// 初始化购物车列表数据

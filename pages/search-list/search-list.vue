@@ -2,32 +2,38 @@
 	<view>
 		<!-- 顶部的自定义导航栏 -->
 		<view class="w-100 position-fixed top-0 left-0 right-0 bg-white" 
-		:style="'z-index: 100;height: '+navbarHeight+'upx;'">
+		:style="'z-index: 100;height: '+navbarHeight+'px;'">
 		    <!-- 非微信小程序平台 需要加一个状态栏的占位 -->
 			<!-- #ifndef MP-WEIXIN -->
 			<view class="uni-status-bar"></view>
 			<!-- #endif -->
 			
 			<view class="w-100 d-flex a-center" style="height: 90upx;">
+				<!-- #ifndef MP -->
+				<!-- 小程序端不需要这个返回按钮 -->
 				<view style="width: 85upx;" class="d-flex a-center j-center" @click="goback">
 					<text class="iconfont icon-back" style="font-size: 46upx;color:#6D6D72"></text>
 				</view>
+				<!-- #endif -->
+				<!-- #ifdef MP -->
+				<view style="width: 30upx;"></view>
+				<!-- #endif -->
 				<view class="flex-1 bg-light rounded d-flex a-center text-light-muted" style="height: 65upx;">
 					<text class="iconfont icon-sousuo mx-2"></text>
 					<input class="flex-1" type="text" v-model="keyword" confirm-type="搜索" />
 				</view>
-				<view @click="searchBtnClick" style="width: 96upx;" class="d-flex a-center j-center">
+				<view @click="search" style="width: 96upx;" class="d-flex a-center j-center">
 					<text style="font-size: 32upx;color: #6D6D72;">搜索</text>
 				</view>
 			</view>
 		</view>
 		<!-- 占位 -->
-		<view class="w-100" :style="'height: '+navbarHeight+'upx;'"></view>
+		<view class="w-100" :style="'height: '+navbarHeight+'px;'"></view>
 		
 		
 		<!-- 排序筛选 -->
 		<view class="d-flex border-top border-bottom a-center position-fixed left-0 right-0 bg-white" 
-		:style="'height: 100upx;z-index: 100;top: '+navbarHeight+'upx;'">
+		:style="'height: 50px;z-index: 100;top: '+navbarHeight+'px;'">
 			<view v-for="(item,index) in screen.list" :key="index" 
 			@tap="changeScreen(index)"
 			class="flex-1 d-flex j-center a-center font-md">
@@ -46,7 +52,7 @@
 		<view class="w-100" style="height: 100upx;"></view>
 		
 		<!-- 筛选功能的抽屉 -->
-		<uni-drawer :visible="showRigth" mode="right" :fixedTop="navbarHeight" @close="closeDrawer">
+		<uni-drawer :visible="showRigth" mode="right" :fixedTop="navbarHeight*2" @close="closeDrawer">
 			<card headTitle="价格范围" :headBorderBottom="false" :headTitleWeight="false">
 				<!-- 单选按钮组 -->
 				<mi-radio-group :label="label" :selected.sync="label.selected"></mi-radio-group>
@@ -57,7 +63,7 @@
 			</card>
 			
 			<!-- 最底下的两个按钮 -->
-			<view class="d-flex position-fixed right-0 w-100 border-top border-light-secondary" :style="'bottom: '+navbarHeight+'upx;'">
+			<view class="d-flex position-fixed right-0 w-100 border-top border-light-secondary" :style="'bottom: '+bottomBtnMargin+'px;'">
 				<view class="flex-1 main-bg-color text-white font-md py-2 text-center" 
 				@tap="drawerConfirm"
 				hover-class="main-bg-hover-color">确定</view>
@@ -146,7 +152,8 @@
 				searching: false,
 				loadtext: "",
 				statusBarHeight: 0,
-				navbarHeight: 90,
+				navbarHeight: 45,   // 单位使用px
+				bottomBtnMargin: 45, // 弹出框底部按钮距离底部的距离
 				
 				showRigth: false,
 				screen: {
@@ -198,7 +205,12 @@
 			// 如果不是微信小程序平台，则获取状态栏高度 并设置自定义导航栏高度要加上状态栏的高度
 			// 状态栏的高度*2 是因为获取的这个高度值的单位是 px  转成 upx单位 需要*2
 			// 另外 这里获取的状态栏高度 应该和css中的变量 var(--status-bar-height) 是相同的值
-			this.navbarHeight = this.navbarHeight + this.statusBarHeight * 2
+			this.navbarHeight = this.navbarHeight + this.statusBarHeight
+			this.bottomBtnMargin = this.navbarHeight
+			
+			// #ifdef MP-WEIXIN
+			this.bottomBtnMargin = 0
+			// #endif
 			
 			if (e.keyword) {
 				this.keyword = e.keyword
@@ -225,9 +237,6 @@
 			})
 		},
 		methods: {
-			searchBtnClick: function() {
-				this.search()
-			},
 			goback: function() {
 				uni.navigateBack({delta: 1})
 			},

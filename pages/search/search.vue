@@ -1,5 +1,14 @@
 <template>
 	<view>
+		<!-- #ifdef MP -->
+		<!-- 顶部的自定义导航栏 -->
+		<view class="w-100 d-flex a-center" style="height: 90upx;">
+			<input type="text" v-model="keyword" placeholder="小米手机" class="flex-1 bg-light rounded ml-3 px-2" style="height: 65upx;" />
+			<view style="width: 85upx;" class="d-flex a-center j-center" @click="search">搜索</view>
+		</view>
+		<!-- #endif -->
+		
+		
 		<card headTitle="热门搜索" bodyCover="/static/images/demo/search-banner.png"></card>
 		
 		<!-- 多色按钮 -->

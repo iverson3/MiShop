@@ -82,7 +82,7 @@
 			
 			// 拿到选中的skus组成的多规格字符串
 			checkedSkus() {
-				if (!this.popupData.selects) return "";
+				if (!this.popupData.selects || !Array.isArray(this.popupData.selects)) return "";
 				let checkedSkus = this.popupData.selects.map(v => {
 					return v.list[v.selected].name
 				})
@@ -90,8 +90,8 @@
 			},
 			// 选中的多规格属性组 对应在价格对照表中的索引
 			checkedSkusIndex() {
-				let index = 0
-				if (this.popupData.goods_skus) {
+				let index = -1
+				if (this.popupData.goods_skus && Array.isArray(this.popupData.goods_skus)) {
 					index = this.popupData.goods_skus.findIndex((item) => {
 						return item.skusText === this.checkedSkus
 					})
@@ -100,7 +100,8 @@
 			},
 			// 根据多规格属性的选择而动态计算的价格
 			showPrice() {
-				if (this.checkedSkusIndex < 0) return this.popupData.min_price || 0.00
+				// if (this.checkedSkusIndex < 0) return this.popupData.min_price || 0.00
+				if (this.checkedSkusIndex < 0) return this.popupData.item ? this.popupData.item.pprice : 0.00
 				if (!this.popupData.goods_skus) return 0.00
 				return this.popupData.goods_skus[this.checkedSkusIndex].pprice
 			},
